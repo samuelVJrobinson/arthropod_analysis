@@ -1,3 +1,5 @@
+#THIS FILE DOWNLOADS DATA FROM ECOLOGICS
+
 library(RODBC)
 conn<-odbcConnect('ecologics',case='nochange') #ODBC connection must be set up beforehand
 
