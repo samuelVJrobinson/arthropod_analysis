@@ -8,8 +8,8 @@ site <- sqlQuery(conn,'SELECT * FROM site') #Site table
 #Key info: BLID
 trap <- sqlQuery(conn,'SELECT * FROM trap') #Trap table
 arth <- sqlQuery(conn,'SELECT * FROM arthropod') #Arthropod table - animal records
-
-#NOTE: THIS TAKES ABOUT 5 MINS TO DOWNLOAD
+#NOTE: THIS TAKES ABOUT 1 MINS TO DOWNLOAD
+save(site,trap,arth,file='rawData.Rdata') #Saves to raw data file
 
 #NOTES ON COLUMNS
 # BBID = Unique ID for speciment
@@ -35,16 +35,5 @@ arth <- sqlQuery(conn,'SELECT * FROM arthropod') #Arthropod table - animal recor
 #Check whether zeros are real! Later material may not have been entered. Dialictus missing from 2018.
 #Some species haven't been IDed (e.g. Lasioglossum_spp. 6)
 #Arthropod table needs cleaning (prior to joining) due to typing errors
-
-setwd("~/Projects/UofC/Wild bee time project")
-save(df1,file='arthropod.Rdata')
-save(df2,file='arthropodJoinLandscape.Rdata')
-save(df3,file='trap.Rdata')
-save(flowers,file='flower.Rdata')
-
-#Other notes from Paul:
 #GDD is a more relevant measure of time than Jday (this is what the bees would "feel" rather than DOY)
-
-
-
 

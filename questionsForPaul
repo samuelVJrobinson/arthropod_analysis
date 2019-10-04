@@ -1,0 +1,5 @@
+Questions for Paul/Hailey:
+
+1) What do the aliasBLID1 and aliasBLID2 columns of trap dataframe mean? Are these BLIDs that share the same location? If so, why not just merge the BLIDs into be a single BLID?
+
+2) Were yellow, blue, white used in all combination of "Coloured cups"? Are we interested in different colours of coloured cups at all?
