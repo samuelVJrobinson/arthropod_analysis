@@ -1,5 +1,9 @@
 Questions for Paul/Hailey:
 
-1) What do the aliasBLID1 and aliasBLID2 columns of trap dataframe mean? Are these BLIDs that share the same location? If so, why not just merge the BLIDs into be a single BLID?
+1) What do the aliasBLID1 and aliasBLID2 columns of trap dataframe mean? Are these BLIDs that share the same location? If so, why not just merge the BLIDs into be a single BLID? Check in both trap and arthropod database, and no aliases are present, so removing columns.
 
 2) Were yellow, blue, white used in all combination of "Coloured cups"? Are we interested in different colours of coloured cups at all?
+
+3) What does "WCC50R1" or "WBV75R1" (for example) mean? Does "R1" indicate another replicate? Why is this needed? 
+  3a) Is "WCC2R1" a typo? Corrected it be WCC25R1?
+  3b) Is "WCCC" a typo? Corrected it to "WCC".
