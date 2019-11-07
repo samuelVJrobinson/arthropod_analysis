@@ -80,12 +80,12 @@ arth %>% filter(BTID=='13902-3-DBV-2017')
 # Notes: 
 # "Coloured cups" consist of blue, white & yellow cup, but were sometimes all amalgamated into single category, so 3x effort makes sense.
 trap2 <- trap %>% 
-=======
+
 #NOTE: MOST OF THE SITE DETAILS ARE CORRECT IN SITE DF BUT NOT TRAP DF. RE-MERGE:
 trap2 <- trap %>% select(-lonTrap:-locationType,-created_at:-updated_at,-startNESWPhoto_DSC:-endNESWPhoto_DSC,-floralAdjacentNotes) %>% 
   left_join(select(site,BLID:lon,elevation,siteType),by='BLID') %>% #Join in lat,lon,elev, siteType
   filter(!is.na(trapType)) %>% #Get rid of NA row
->>>>>>> f74c1ae0a7c0b6aaa0fa9298c3b807cb0d4dd8e0
+
   mutate_if(is.factor,as.character) %>% #Converts all factors to character
   select(-lonTrap:-locationType)
   
