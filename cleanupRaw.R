@@ -50,11 +50,38 @@ site <- site %>% select(-aliasBLID1:-locality,-country,-created_at:-expt_yield_L
 # Clean up trap data ------------------------------------------------------
 
 
+#PROBLEM: SOME BLIDS FROM TRAP DF ARE NOT PRESENT IN SITE DF (either in BLID or aliases)
+badBLID <- trap %>% select(BTID:trapType) %>% filter(!(BLID %in% site$BLID),!is.na(BLID)) %>% 
+  pull(BLID) %>% unique()
+#Bad BLID values:
+# 20427 - duplicate of 24027, nothing in arth df: REMOVE
+# 23460 - should be 13460, change in trap and arth
+# 13395 - should be 11395, change in trap and arth
+# 13048 - should be 10348, change in trap and arth
+# 15280 - duplicate of 15208, nothing in arth df: REMOVE
+# 13752 - should be 13751, change in trap df
+# 25095 - 25091 or 25035, but were recorded on different days (June 22, 23), nothing in arth df
+# 13903 - duplicate of 13902, but has correct deployedhours and startHour
+# 27029 -
+
+
+trap %>% filter(BLID==27029)
+trap %>% filter(BLID==27029,endYear==2017,trapType=='Blue Vane') %>% arrange(BLID)
+trap %>% filter(BLID==13903|BLID==13902,endYear==2017,trapType=='Blue Vane',pass==4) %>% arrange(BLID)
+
+arth %>% filter(BLID==13902)
+
+arth %>% filter(BTID=='13902-3-DBV-2017')
+
+
+
 
 # Notes: 
 # "Coloured cups" consist of blue, white & yellow cup, but were sometimes all amalgamated into single category, so 3x effort makes sense.
 trap2 <- trap %>% 
   mutate_if(is.factor,as.character) %>% #Converts all factors to character
+  select(-lonTrap:-locationType)
+  
   #Fixes typos
   mutate(locationType=gsub('Ditch','ditch',locationType)) %>% #Fix typo in locationtype
   mutate(replicate=gsub('WCCC','WCC',replicate),BTID=gsub('WCCC','WCC',BTID)) %>%
