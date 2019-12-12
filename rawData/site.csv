@@ -1,0 +1,401 @@
+"BLID";"lat";"lon";"aliasBLID1";"aliasBLID2";"locality";"region";"elevation";"country";"province";"siteType";"WLID";"distToWLID_km";"irrigated";"expt_yield_2017";"expt_restore_2018";"provincial_region";"created_at";"updated_at";"expt_yield_Lakeland"
+10069;50.6982;-114.0478;0;0;"Range Rd 12, Black Diamond";"South Calgary";1118;"CANADA";"Alberta";"ditch";99001;7.32;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10092;50.7223;-113.6519;0;0;"Range Rd 272, Blackie";"South Calgary";1075;"CANADA";"Alberta";"ditch";99003;19.2;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10145;50.6416;-114.2095;0;0;"Range Rd 23, Black Diamond";"South Calgary";1263;"CANADA";"Alberta";"ditch";99001;8.69;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10212;50.8051;-113.8213;0;0;"Township Rd 274, De Winton";"South Calgary";1014;"CANADA";"Alberta";"ditch";99001;25.45;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10348;50.7757;-114.0971;0;0;"Township Rd 212, De Winton";"South Calgary";1197;"CANADA";"Alberta";"ditch";99001;8.21;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10399;50.6592;-113.9927;0;0;"Township Rd 200, Aldersyde";"South Calgary";1143;"CANADA";"Alberta";"ditch";99001;12.45;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10495;50.6905;-113.1902;0;0;"Range Rd 240, Arrowwood";"South Calgary";1006;"CANADA";"Alberta";"ditch";99004;11.35;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10558;50.6859;-113.4903;0;0;"Township Rd 202, Mossleigh";"South Calgary";1085;"CANADA";"Alberta";"ditch";99004;10.11;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10669;50.7759;-113.9489;0;0;"306 Ave E, De Winton";"South Calgary";1123;"CANADA";"Alberta";"ditch";99001;15.95;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10781;50.6236;-113.2363;0;0;"Range Rd 242, Mossleigh";"South Calgary";1066;"CANADA";"Alberta";"ditch";99004;9.62;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10832;50.747;-113.5854;0;0;"Near Blackie";"South Calgary";1050;"CANADA";"Alberta";"ditch";99004;18.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10901;50.568;-114.231;0;0;"Cowboy Trail, Longview";"South Calgary";1291;"CANADA";"Alberta";"ditch";99001;16.81;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+10962;50.6595;-113.8616;0;0;"Township Rd 200, Aldersyde";"South Calgary";1027;"CANADA";"Alberta";"ditch";99002;19.67;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11082;50.5719;-114.0643;0;0;"530 Ave W, Longview";"South Calgary";1153;"CANADA";"Alberta";"ditch";99002;7.89;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11395;50.5943;-114.1865;0;0;"Range Rd 22, Longview";"South Calgary";1202;"CANADA";"Alberta";"ditch";99001;13.13;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11399;50.5981;-113.1442;0;0;"Range Rd 234, Arrowwood";"South Calgary";1128;"CANADA";"Alberta";"ditch";99004;16.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11482;50.6944;-113.352;0;0;"Range Rd 251, Mossleigh";"South Calgary";945;"CANADA";"Alberta";"ditch";99004;2.45;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11520;50.7729;-114.1633;0;0;"112 St W, De Winton";"South Calgary";1256;"CANADA";"Alberta";"ditch";99001;7.06;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11589;50.6886;-113.6921;0;0;"3.9 km from Gladys";"South Calgary";1071;"CANADA";"Alberta";"ditch";99003;15.86;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11618;50.6698;-114.0942;0;0;"9.3 km from Okotoks";"South Calgary";1182;"CANADA";"Alberta";"ditch";99001;5.96;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11794;50.7323;-114.1864;0;0;"5.9 km from Black Diamond";"South Calgary";1129;"CANADA";"Alberta";"ditch";99001;3.57;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11891;50.6153;-113.5363;0;0;"3.8 km from Eltham";"South Calgary";1035;"CANADA";"Alberta";"ditch";99003;10.32;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+11988;50.7467;-114.0975;0;0;"7.1 km from Okotoks";"South Calgary";1172;"CANADA";"Alberta";"ditch";99001;5.51;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12000;50.6208;-113.1902;0;0;"14.6 km from Mossleigh";"South Calgary";1014;"CANADA";"Alberta";"ditch";99004;12.58;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12228;50.5718;-114.1111;0;0;"9.2 km from Hartell";"South Calgary";1223;"CANADA";"Alberta";"ditch";99002;9.92;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12276;50.8053;-113.4635;0;0;"13.6 km from Mossleigh";"South Calgary";960;"CANADA";"Alberta";"ditch";99004;16.85;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12304;50.5884;-113.2363;0;0;"14.8 km from Herronton";"South Calgary";1063;"CANADA";"Alberta";"ditch";99004;12.27;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12373;50.6574;-113.6982;0;0;"3.4 km from Mazeppa";"South Calgary";1030;"CANADA";"Alberta";"ditch";99003;12.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12490;50.6597;-113.3683;0;0;"4 km from Farrow";"South Calgary";955;"CANADA";"Alberta";"ditch";99004;1.99;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12504;50.694;-113.0287;0;0;"21.1 km from Mossleigh";"South Calgary";995;"CANADA";"Alberta";"ditch";99005;19.18;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12647;50.7766;-113.8366;0;0;"10.5 km from Gladys";"South Calgary";996;"CANADA";"Alberta";"ditch";99001;23.29;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12674;50.6884;-114.1753;0;0;"4 km from Black Diamond";"South Calgary";1177;"CANADA";"Alberta";"ditch";99001;2.99;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12754;50.572;-114.0012;0;0;"9.3 km from High River";"South Calgary";1103;"CANADA";"Alberta";"ditch";99002;6.93;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12826;50.6014;-113.3784;0;0;"4.9 km from Herronton";"South Calgary";998;"CANADA";"Alberta";"ditch";99004;8.19;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+12898;50.601;-114.2356;0;0;"0.2 km from Hartell";"South Calgary";1228;"CANADA";"Alberta";"ditch";99001;13.55;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13001;50.572;-113.5471;0;0;"1.3 km from Eltham";"South Calgary";1023;"CANADA";"Alberta";"ditch";99003;7.01;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13210;50.7498;-113.421;0;0;"7.2 km from Farrow";"South Calgary";1003;"CANADA";"Alberta";"ditch";99004;10.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13212;50.6014;-113.7052;0;0;"4.9 km from Mazeppa";"South Calgary";1007;"CANADA";"Alberta";"ditch";99003;7.35;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13336;50.5992;-113.9286;0;0;"Range Rd 292, Aldersyde";"South Calgary";1056;"CANADA";"Alberta";"ditch";99002;11.48;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13357;50.7469;-113.6921;0;0;"27315 Township Rd 210, Aldersyde";"South Calgary";1072;"CANADA";"Alberta";"ditch";99003;22.23;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13358;50.6303;-114.0669;0;0;"Near Black Diamond";"South Calgary";1169;"CANADA";"Alberta";"ditch";99001;10.63;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13405;50.706;-113.8594;0;0;"378143 96 St E, Aldersyde";"South Calgary";1025;"CANADA";"Alberta";"ditch";99001;20.49;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13455;50.6886;-113.994;0;0;"Township Rd 202, Aldersyde";"South Calgary";1083;"CANADA";"Alberta";"ditch";99001;11.25;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13460;50.7155;-113.8135;0;0;"Range Rd 283, Aldersyde";"South Calgary";1107;"CANADA";"Alberta";"ditch";99003;22.12;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13751;50.6304;-113.5976;0;0;"466 Ave E, Blackie";"South Calgary";1037;"CANADA";"Alberta";"ditch";99003;9.44;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13806;50.6012;-114.0393;0;0;"AB-543, Aldersyde";"South Calgary";1128;"CANADA";"Alberta";"ditch";99002;10.36;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13825;50.6592;-114.1462;0;0;"Township Rd 200, Black Diamond";"South Calgary";1209;"CANADA";"Alberta";"ditch";99001;5.66;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13902;50.6303;-113.6598;0;0;"466 Ave E, Blackie";"South Calgary";1025;"CANADA";"Alberta";"ditch";99003;9.05;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+13951;50.7178;-113.5998;0;0;"8.4 km from Gladys";"South Calgary";1063;"CANADA";"Alberta";"ditch";99004;18.42;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14006;50.8049;-113.951;0;0;"9.1 km from Okotoks";"South Calgary";1075;"CANADA";"Alberta";"ditch";99001;17.55;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14025;50.6597;-113.2891;0;0;"7.1 km from Mossleigh";"South Calgary";1039;"CANADA";"Alberta";"ditch";99004;4.43;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14143;50.805;-113.8709;0;0;"11.2 km from Okotoks";"South Calgary";1035;"CANADA";"Alberta";"ditch";99001;22.32;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14223;50.6887;-113.6479;0;0;"6 km from Gladys";"South Calgary";1070;"CANADA";"Alberta";"ditch";99003;15.45;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14241;50.5977;-114.0941;0;0;"9.8 km from Hartell";"South Calgary";1161;"CANADA";"Alberta";"ditch";99002;11.43;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14376;50.6304;-113.2782;0;0;"10.5 km from Mossleigh";"South Calgary";1113;"CANADA";"Alberta";"ditch";99004;6.83;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14414;50.7607;-113.9979;0;0;"3.6 km from Okotoks";"South Calgary";1136;"CANADA";"Alberta";"ditch";99001;12.11;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+14455;50.5717;-114.1575;0;0;"6.2 km from Hartell";"South Calgary";1322;"CANADA";"Alberta";"ditch";99002;12.49;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15117;50.6305;-113.4519;0;0;"1.2 km from Herronton";"South Calgary";1002;"CANADA";"Alberta";"ditch";99004;8.66;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15208;50.5722;-113.4028;0;0;"6.3 km from Herronton";"South Calgary";999;"CANADA";"Alberta";"ditch";99004;11.8;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15304;50.6306;-113.3513;0;0;"6.2 km from Herronton";"South Calgary";1031;"CANADA";"Alberta";"ditch";99004;4.67;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15403;50.7466;-114.0408;0;0;"3.5 km from Okotoks";"South Calgary";1130;"CANADA";"Alberta";"ditch";99001;8.71;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15716;50.7347;-113.1672;0;0;"11.2 km from Mossleigh";"South Calgary";943;"CANADA";"Alberta";"ditch";99004;14.54;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+15993;50.6888;-113.4288;0;0;"1.6 km from Farrow";"South Calgary";1024;"CANADA";"Alberta";"ditch";99004;5.94;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+16725;50.7371;-113.8596;0;0;"96 St E, Aldersyde";"South Calgary";1004;"CANADA";"Alberta";"ditch";99001;20.69;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+16943;50.6922;-113.3056;0;0;"Range Rd 245, Mossleigh";"South Calgary";967;"CANADA";"Alberta";"ditch";99004;3.74;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17041;50.7453;-113.9058;0;0;"Near Aldersyde";"South Calgary";1093;"CANADA";"Alberta";"ditch";99001;17.65;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17164;50.6234;-114.1633;0;0;"Range Rd 21, Black Diamond";"South Calgary";1240;"CANADA";"Alberta";"ditch";99001;9.69;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17198;50.572;-113.9154;0;0;"58022 530 Ave E, Aldersyde";"South Calgary";1051;"CANADA";"Alberta";"ditch";99002;9.61;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17411;50.6303;-113.8775;0;0;"Near Aldersyde";"South Calgary";1032;"CANADA";"Alberta";"ditch";99002;16.34;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17514;50.718;-113.3845;0;0;"AB-547, Mossleigh";"South Calgary";1007;"CANADA";"Alberta";"ditch";99004;5.66;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17774;50.7836;-113.4904;0;0;"Township Rd 212, Mossleigh";"South Calgary";1001;"CANADA";"Alberta";"ditch";99004;15.9;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17795;50.776;-113.6364;0;0;"AB-552, Mossleigh";"South Calgary";1041;"CANADA";"Alberta";"ditch";99004;23.33;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17823;50.6596;-113.55;0;0;"Township Rd 200, Blackie";"South Calgary";1059;"CANADA";"Alberta";"ditch";99003;13.76;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+17882;50.8055;-114.2096;0;0;"13.3 km from Black Diamond";"South Calgary";1305;"CANADA";"Alberta";"ditch";99001;11.43;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18030;50.7425;-114.2326;0;0;"6.1 km from Black Diamond";"South Calgary";1152;"CANADA";"Alberta";"ditch";99001;6.85;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18081;50.7179;-113.4647;0;0;"5.4 km from Farrow";"South Calgary";1050;"CANADA";"Alberta";"ditch";99004;9.62;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18107;50.5958;-113.7674;0;0;"5.4 km from Mazeppa";"South Calgary";1012;"CANADA";"Alberta";"ditch";99003;10.35;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18170;50.7194;-113.3289;0;0;"0.2 km from Mossleigh";"South Calgary";950;"CANADA";"Alberta";"ditch";99004;5.4;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18292;50.6596;-113.6122;0;0;"6.3 km from Blackie";"South Calgary";1054;"CANADA";"Alberta";"ditch";99003;12.36;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18302;50.5961;-113.3288;0;0;"8.4 km from Herronton";"South Calgary";1070;"CANADA";"Alberta";"ditch";99004;8.62;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18347;50.747;-113.6328;0;0;"6.8 km from Gladys";"South Calgary";1059;"CANADA";"Alberta";"ditch";99004;21.68;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18381;50.6887;-113.7825;0;0;"5.6 km from Gladys";"South Calgary";1059;"CANADA";"Alberta";"ditch";99003;18.43;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18488;50.7986;-114.1404;0;0;"12.6 km from Okotoks";"South Calgary";1227;"CANADA";"Alberta";"ditch";99001;9.89;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18536;50.8051;-114.054;0;0;"9.4 km from Okotoks";"South Calgary";1144;"CANADA";"Alberta";"ditch";99001;12.56;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+18596;50.6743;-113.9288;0;0;"3.5 km from Aldersyde";"South Calgary";1110;"CANADA";"Alberta";"ditch";99001;16.1;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+19711;50.7688;-114.2096;0;0;"9.2 km from Black Diamond";"South Calgary";1285;"CANADA";"Alberta";"ditch";99001;7.78;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+19735;50.6985;-114.1173;0;0;"8.1 km from Black Diamond";"South Calgary";1154;"CANADA";"Alberta";"ditch";99001;2.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+19737;50.7745;-113.8828;0;0;"8.1 km from Okotoks";"South Calgary";1077;"CANADA";"Alberta";"ditch";99001;20.15;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20006;50.6596;-113.0981;0;0;"17.3 km from Mossleigh";"South Calgary";1077;"CANADA";"Alberta";"ditch";99004;17.73;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20011;50.6302;-113.9942;10293;0;"9.6 km from Aldersyde";"South Calgary";1097;"CANADA";"Alberta";"ditch";99002;13.43;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20005;50.6308;-113.1208;11296;0;"17.5 km from Mossleigh";"South Calgary";1134;"CANADA";"Alberta";"ditch";99004;16.73;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20000;50.7983;-114.0017;11847;0;"7.8 km from Okotoks";"South Calgary";1108;"CANADA";"Alberta";"ditch";99001;14.34;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20008;50.7979;-113.537;12453;0;"15.5 km from Farrow";"South Calgary";986;"CANADA";"Alberta";"ditch";99004;19.26;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20003;50.6014;-113.0269;12666;0;"24.8 km from Mossleigh";"South Calgary";1004;"CANADA";"Alberta";"ditch";99005;15.8;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20004;50.5725;-113.0515;12877;0;"25.3 km from Mossleigh";"South Calgary";994;"CANADA";"Alberta";"ditch";99005;17.77;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20001;50.7761;-113.2619;13175;0;"7.7 km from Mossleigh";"South Calgary";918;"CANADA";"Alberta";"ditch";99004;13.05;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20007;50.6013;-113.4902;13734;0;"4.4 km from Herronton";"South Calgary";1013;"CANADA";"Alberta";"ditch";99003;12.03;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20012;50.601;-113.8357;14522;0;"3.4 km from High River";"South Calgary";1029;"CANADA";"Alberta";"ditch";99003;14.95;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20009;50.7759;-113.583;15256;0;"Township Rd 212, Blackie";"South Calgary";1027;"CANADA";"Alberta";"ditch";99004;20.13;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20013;50.6017;-113.0517;17972;20002;"Township Rd 192, Milo";"South Calgary";1034;"CANADA";"Alberta";"ditch";99005;17.56;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20010;50.8087;-113.789;19615;0;"Near Dalemead";"South Calgary";973;"CANADA";"Alberta";"ditch";99001;27.69;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21470;50.58576;-113.08569;0;0;"Range Rd 232, Arrowwood";"South Calgary";1047;"CANADA";"Alberta";"inField_wetland";99005;20.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21715;50.63321;-113.11923;0;0;"Range Rd 234, Arrowwood";"South Calgary";1134;"CANADA";"Alberta";"inField_wetland";99004;16.77;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22590;50.65124;-113.10489;0;0;"Township Rd 200, Arrowwood";"South Calgary";1095;"CANADA";"Alberta";"inField_wetland";99004;17.36;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21260;50.63131;-113.09937;0;0;"Near Arrowwood";"South Calgary";1133;"CANADA";"Alberta";"inField_wetland";99004;18.18;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21834;50.63299;-113.11005;0;0;"Range Rd 234, Arrowwood";"South Calgary";1134;"CANADA";"Alberta";"inField_wetland";99004;17.4;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22583;50.5737;-113.06084;0;0;"AB-542, Arrowwood";"South Calgary";1000;"CANADA";"Alberta";"inField_wetland";99005;18.4;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21603;50.76638;-113.53779;0;0;"320 St, Mossleigh";"South Calgary";1024;"CANADA";"Alberta";"inField_wetland";99004;16.94;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22492;50.74634;-113.5374;0;0;"304188 338 Ave E, Mossleigh";"South Calgary";1031;"CANADA";"Alberta";"inField_wetland";99004;15.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21554;50.73703;-113.53225;0;0;"336 St E, Mossleigh";"South Calgary";1042;"CANADA";"Alberta";"inField_wetland";99004;14.81;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21071;50.71979;-113.51986;0;0;"AB-547, Mossleigh";"South Calgary";1051;"CANADA";"Alberta";"inField_wetland";99004;13.17;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21057;50.71596;-113.44135;0;0;"Range Rd 255, Mossleigh";"South Calgary";1039;"CANADA";"Alberta";"inField_wetland";99004;8.14;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22345;50.62893;-113.42812;0;0;"Township Rd 194, Brant";"South Calgary";986;"CANADA";"Alberta";"inField_wetland";99004;7.42;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21547;50.77773;-113.56368;0;0;"Township Rd 212, Blackie";"South Calgary";1027;"CANADA";"Alberta";"inField_wetland";99004;19.16;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22513;50.76303;-113.81036;0;0;"Range Rd 283, Aldersyde";"South Calgary";1037;"CANADA";"Alberta";"inField_wetland";99001;24.65;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22576;50.58615;-113.81551;0;0;"Range Rd 283, Aldersyde";"South Calgary";1034;"CANADA";"Alberta";"inField_wetland";99003;13.05;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22128;50.57074;-113.77466;0;0;"AB-23, Blackie";"South Calgary";1016;"CANADA";"Alberta";"inField_wetland";99003;9.8;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21736;50.68958;-113.58646;0;0;"Township Rd 202, Blackie";"South Calgary";1066;"CANADA";"Alberta";"inField_wetland";99003;15.99;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21106;50.69053;-113.61;0;0;"Township Rd 202, Blackie";"South Calgary";1068;"CANADA";"Alberta";"inField_wetland";99003;15.79;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+21120;50.72736;-113.5571;0;0;"304 St E, Blackie";"South Calgary";1058;"CANADA";"Alberta";"inField_wetland";99004;15.92;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+22471;50.75628;-113.76956;0;0;"Range Rd 281, Aldersyde";"South Calgary";1080;"CANADA";"Alberta";"inField_wetland";99003;24.72;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24006;50.7876;-113.8825;0;0;"80 St, De Winton";"South Calgary";1078;"CANADA";"Alberta";"ditch";99001;20.73;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24013;50.7625;-114.2327;0;0;"AB-549, Millarville";"South Calgary";1163;"CANADA";"Alberta";"ditch";99001;8.25;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24027;50.6526;-113.9056;0;0;"Range Rd 291, Aldersyde";"South Calgary";1075;"CANADA";"Alberta";"ditch";99002;17.51;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24034;50.6774;-113.9517;0;0;"Range Rd 293, Aldersyde";"South Calgary";1141;"CANADA";"Alberta";"ditch";99001;14.45;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24041;50.7032;-113.8365;0;0;"230 AB-547, Aldersyde";"South Calgary";1054;"CANADA";"Alberta";"ditch";99003;21.99;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24048;50.7984;-113.8597;0;0;"Range Rd 285, De Winton";"South Calgary";1053;"CANADA";"Alberta";"ditch";99001;22.69;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24055;50.582;-114.0708;0;0;"Range Rd 13, Longview";"South Calgary";1155;"CANADA";"Alberta";"ditch";99002;9.1;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24062;50.6258;-114.1869;0;0;"Range Rd 22, Black Diamond";"South Calgary";1270;"CANADA";"Alberta";"ditch";99001;9.73;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24069;50.6593;-114.2452;0;0;"8 Township Rd 200, Turner Valley";"South Calgary";1215;"CANADA";"Alberta";"ditch";99001;8.77;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24076;50.6284;-113.9054;0;0;"Range Rd 291, Aldersyde";"South Calgary";1052;"CANADA";"Alberta";"ditch";99002;15.11;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24083;50.6162;-113.8821;0;0;"AB-2A, Foothills No. 31";"South Calgary";1036;"CANADA";"Alberta";"ditch";99002;14.88;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24097;50.795;-114.1865;0;0;"Range Rd 22, Millarville";"South Calgary";1297;"CANADA";"Alberta";"ditch";99001;9.81;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24111;50.8072;-114.094;0;0;"Range Rd 14, De Winton";"South Calgary";1135;"CANADA";"Alberta";"ditch";99001;11.52;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24118;50.6303;-113.9581;0;0;"466 Ave E, Aldersyde";"South Calgary";1099;"CANADA";"Alberta";"ditch";99002;13.89;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24125;50.622;-113.8134;0;0;"E Street 128, Aldersyde";"South Calgary";1036;"CANADA";"Alberta";"ditch";99003;14.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24132;50.762;-113.2828;0;0;"Range Rd 244, Mossleigh";"South Calgary";936;"CANADA";"Alberta";"ditch";99004;10.99;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24139;50.6889;-113.1378;0;0;"Township Rd 202, Arrowwood";"South Calgary";1016;"CANADA";"Alberta";"ditch";99004;14.98;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24146;50.656;-113.7674;0;0;"160 St E, Aldersyde";"South Calgary";1027;"CANADA";"Alberta";"ditch";99003;14.84;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24153;50.7638;-113.1901;0;0;"near Arrowwood";"South Calgary";907;"CANADA";"Alberta";"ditch";99004;15.1;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24160;50.5876;-113.19;0;0;"Range Rd 240, Arrowwood";"South Calgary";1045;"CANADA";"Alberta";"ditch";99004;14.65;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24167;50.7179;-113.1047;0;0;"Township Rd 204, Arrowwood";"South Calgary";973;"CANADA";"Alberta";"ditch";99004;17.93;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24181;50.6063;-113.7904;0;0;"144 St E, Aldersyde";"South Calgary";1023;"CANADA";"Alberta";"ditch";99003;12.34;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24188;50.7761;-113.7439;0;0;"AB-552, Aldersyde";"South Calgary";1072;"CANADA";"Alberta";"ditch";99003;26.22;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24195;50.8046;-113.2827;0;0;"Range Rd 244, Mossleigh";"South Calgary";923;"CANADA";"Alberta";"ditch";99004;15.42;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24202;50.7402;-113.121;0;0;"Range Rd 233, Arrowwood";"South Calgary";919;"CANADA";"Alberta";"ditch";99004;17.73;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24209;50.5721;-113.6138;0;0;"AB-23, Blackie";"South Calgary";1017;"CANADA";"Alberta";"ditch";99003;3.08;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24216;50.6192;-113.144;0;0;"Range Rd 234, Arrowwood";"South Calgary";1136;"CANADA";"Alberta";"ditch";99004;15.61;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24223;50.6015;-113.0003;0;0;"Township Rd 192, Milo";"South Calgary";969;"CANADA";"Alberta";"ditch";99005;13.93;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24230;50.6886;-113.0499;0;0;"Township Rd 202, Arrowwood";"South Calgary";1010;"CANADA";"Alberta";"ditch";99005;20.13;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24237;50.6411;-113.8132;0;0;"E Street 128, Aldersyde";"South Calgary";1037;"CANADA";"Alberta";"ditch";99003;15.89;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24244;50.6333;-113.7674;0;0;"160 St E, Aldersyde";"South Calgary";1016;"CANADA";"Alberta";"ditch";99003;12.92;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24251;50.6889;-113.0817;0;0;"Township Rd 202, Arrowwood";"South Calgary";1011;"CANADA";"Alberta";"ditch";99004;18.91;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24258;50.776;-113.7145;0;0;"AB-552, Aldersyde";"South Calgary";1073;"CANADA";"Alberta";"ditch";99003;25.7;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24265;50.6595;-113.8135;0;0;"434 Ave E, Aldersyde";"South Calgary";1036;"CANADA";"Alberta";"ditch";99003;17.29;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24272;50.7761;-113.7898;0;0;"AB-552, Aldersyde";"South Calgary";1040;"CANADA";"Alberta";"ditch";99001;26.42;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24279;50.738;-113.7905;0;0;"Range Rd 282, Aldersyde";"South Calgary";1096;"CANADA";"Alberta";"ditch";99003;23.47;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24286;50.6596;-113.7273;0;0;"565a 434 Ave E, Blackie";"South Calgary";1032;"CANADA";"Alberta";"ditch";99003;13.67;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24293;50.7243;-113.1675;0;0;"Range Rd 235, Arrowwood";"South Calgary";975;"CANADA";"Alberta";"ditch";99004;14.01;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24300;50.7979;-113.6289;0;0;"Range Rd 271, Mossleigh";"South Calgary";988;"CANADA";"Alberta";"ditch";99004;24.18;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24307;50.6729;-113.098;0;0;"Range Rd 232, Arrowwood";"South Calgary";1030;"CANADA";"Alberta";"ditch";99004;17.68;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24314;50.7364;-113.6982;0;0;"Range Rd 274, Aldersyde";"South Calgary";1079;"CANADA";"Alberta";"ditch";99003;21.15;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24321;50.8022;-113.6752;0;0;"224 St E, Dalemead";"South Calgary";982;"CANADA";"Alberta";"ditch";99004;27.16;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24328;50.7245;-113.2827;0;0;"Range Rd 244, Mossleigh";"South Calgary";936;"CANADA";"Alberta";"ditch";99004;7.42;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24335;50.7453;-113.1672;0;0;"Range Rd 235, Arrowwood";"South Calgary";925;"CANADA";"Alberta";"ditch";99004;15.14;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+24342;50.572;-113.1753;0;0;"AB-542, Vulcan";"South Calgary";1061;"CANADA";"Alberta";"ditch";99004;16.58;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20101;55.7684;-118.5692;0;0;"Range Rd 44, Rycroft";"Grande Prairie";587;"CANADA";"Alberta";"ditch";99010;8.67;0;0;0;"Northern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20102;55.7681;-118.5631;0;0;"Range Rd 44, Rycroft";"Grande Prairie";585;"CANADA";"Alberta";"ditch";99010;9.05;0;0;0;"Northern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20103;55.7812;-118.5072;0;0;"Township Rd 784, Wanham";"Grande Prairie";576;"CANADA";"Alberta";"ditch";99010;12.76;0;0;0;"Northern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+20104;55.7811;-118.4807;0;0;"Township Rd 784, Wanham";"Grande Prairie";575;"CANADA";"Alberta";"ditch";99010;14.38;0;0;0;"Northern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23050;50.09119;-112.14243;0;0;"Range Rd 164, Vauxhall";"Vauxhall-Taber";783;"CANADA";"Alberta";"ditch";99007;4.67;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23064;50.15876;-112.1199;0;0;"Range Rd 163, Vauxhall";"Vauxhall-Taber";775;"CANADA";"Alberta";"ditch";99007;12.13;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23057;50.14153;-112.12015;0;0;"Range Rd 163, Vauxhall";"Vauxhall-Taber";787;"CANADA";"Alberta";"ditch";99007;10.21;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23071;50.16447;-111.98087;0;0;"Township Rd 142, Vauxhall";"Vauxhall-Taber";767;"CANADA";"Alberta";"ditch";99007;16.61;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23078;50.16488;-111.96081;0;0;"Range Rd 152, Hays";"Vauxhall-Taber";769;"CANADA";"Alberta";"ditch";99007;17.59;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23085;50.13543;-111.96181;0;0;"Township Rd 140, Vauxhall";"Vauxhall-Taber";783;"CANADA";"Alberta";"ditch";99007;15.32;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23099;50.22084;-111.98907;0;0;"Range Rd 154, Scandia";"Vauxhall-Taber";747;"CANADA";"Alberta";"ditch";99008;17.92;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23092;50.23384;-111.97527;0;0;"Range Rd 152, Scandia";"Vauxhall-Taber";757;"CANADA";"Alberta";"ditch";99008;17.05;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23106;50.24459;-111.95841;0;0;"AB-530, Scandia";"Vauxhall-Taber";768;"CANADA";"Alberta";"ditch";99008;16.65;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23134;50.4123;-112.11217;0;0;"Range Rd 162, Rainier";"Vauxhall-Taber";767;"CANADA";"Alberta";"ditch";99008;5.14;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23141;50.42379;-112.1124;0;0;"Range Rd 162, Rainier";"Vauxhall-Taber";770;"CANADA";"Alberta";"ditch";99008;6.37;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23113;50.22262;-111.67709;0;0;"AB-525, Rolling Hills";"Vauxhall-Taber";743;"CANADA";"Alberta";"ditch";99012;5.02;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23120;50.23716;-111.69828;0;0;"Township Rd 151, Rolling Hills";"Vauxhall-Taber";741;"CANADA";"Alberta";"ditch";99012;3.11;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23127;50.24416;-111.68292;0;0;"Township Rd 151, Rolling Hills";"Vauxhall-Taber";740;"CANADA";"Alberta";"ditch";99012;2.66;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23148;49.69864;-111.68694;0;0;"Township Rd 90, Grassy Lake";"Vauxhall-Taber";825;"CANADA";"Alberta";"ditch";99011;19.75;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23155;49.69872;-111.6524;0;0;"Township Rd 90, Grassy Lake";"Vauxhall-Taber";823;"CANADA";"Alberta";"ditch";99011;20.31;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23162;49.73507;-111.69787;0;0;"AB-877, Grassy Lake";"Vauxhall-Taber";821;"CANADA";"Alberta";"ditch";99011;15.62;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23043;49.81496;-112.25621;0;0;"Township Rd 102, Cranford";"Vauxhall-Taber";767;"CANADA";"Alberta";"ditch";99009;6.09;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23036;49.81498;-112.23135;0;0;"Township Rd 102, Cranford";"Vauxhall-Taber";800;"CANADA";"Alberta";"ditch";99009;6.48;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23029;49.80038;-112.25287;0;0;"Range Rd 174, Cranford";"Vauxhall-Taber";812;"CANADA";"Alberta";"ditch";99009;4.5;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23015;49.81397;-112.3755;0;0;"Range Rd 183, Cranford";"Vauxhall-Taber";827;"CANADA";"Alberta";"ditch";99009;10.08;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23022;49.82203;-112.37534;0;0;"Range Rd 183, Cranford";"Vauxhall-Taber";827;"CANADA";"Alberta";"ditch";99009;10.62;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23008;49.78592;-112.41956;0;0;"Township Rd 100, Cranford";"Vauxhall-Taber";838;"CANADA";"Alberta";"ditch";99009;11.64;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+23001;49.81506;-112.54124;0;0;"Township Rd 102, Turin";"Vauxhall-Taber";851;"CANADA";"Alberta";"ditch";99009;20.94;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25000;50.7594;-113.5598;0;0;"Range Rd 264, Foothills No. 31";"South Calgary";1030;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25007;50.718;-113.5192;0;0;"AB-547, Mossleigh";"South Calgary";1060;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26126;50.6341;-113.4761;0;0;"466 Ave E, Blackie";"South Calgary";1003;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26119;50.7728;-113.7964;0;0;"AB-552, Aldersyde";"South Calgary";1040;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26112;50.6835;-113.5638;0;0;"Township Rd 202, Blackie";"South Calgary";1074;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26105;50.1109;-113.4251;0;0;"Township Rd 134, Claresholm";"Claresholm";969;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26098;50.9346;-112.2105;0;0;"Range Rd 165, Gem";"Duchess";755;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26091;50.9021;-112.2265;0;0;"Range Rd 170, Gem";"Duchess";749;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26084;50.9199;-112.2087;0;0;"AB-862, Gem";"Duchess";753;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26077;50.9781;-112.1567;0;0;"AB-862, Gem";"Duchess";761;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26070;50.9515;-112.1574;0;0;"AB-862, Gem";"Duchess";747;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26063;50.7993;-112.0638;0;0;"Range Rd 155, Rosemary";"Duchess";728;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26056;50.8121;-112.0617;0;0;"Range Rd 155, Rosemary";"Duchess";726;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26049;50.7091;-112.0464;0;0;"Range Rd 154, Duchess";"Duchess";756;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26042;50.7389;-112.1;0;0;"Range Rd 161, Rosemary";"Duchess";752;"CANADA";"Alberta";"inField_pivot";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26035;50.8938;-111.9037;0;0;"Veterans Memorial Hwy, Duchess";"Duchess";706;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26028;50.9144;-111.9975;0;0;"AB-556, Finnegan";"Duchess";722;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26021;50.8893;-111.9476;0;0;"Range Rd 150, Duchess";"Duchess";718;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26014;50.8788;-111.9291;0;0;"Township Rd 222A, Duchess";"Duchess";716;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26007;50.8984;-111.9368;0;0;"18.4 km from Rosemary";"Duchess";716;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26000;50.8986;-111.9151;0;0;"18.3 km from Duchess";"Duchess";711;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25245;50.9838;-112.1445;0;0;"16.8 km from Finnegan";"Duchess";755;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25238;50.7356;-112.0822;0;0;"2.5 km from Rosemary";"Duchess";749;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25231;50.0017;-113.3223;0;0;"17.1 km from Woodhouse";"Claresholm";967;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25224;50.0533;-113.5044;0;0;"6.1 km from Claresholm";"Claresholm";1018;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25217;50.0611;-113.5272;0;0;"5.3 km from Claresholm";"Claresholm";1018;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25210;50.1066;-113.4248;0;0;"14.2 km from Claresholm";"Claresholm";973;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25203;50.128;-113.345;0;0;"Near Stavely";"Claresholm";963;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25196;50.5858;-113.8133;0;0;"Range Rd 283, Aldersyde";"South Calgary";1035;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25189;50.7761;-113.6682;0;0;"AB-552, Mossleigh";"South Calgary";1061;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25182;50.7761;-113.6452;0;0;"AB-552, Mossleigh";"South Calgary";1043;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25175;50.6887;-113.5883;0;0;"Township Rd 202, Blackie";"South Calgary";1066;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25168;50.6342;-113.4789;0;0;"466 Ave E, Blackie";"South Calgary";1003;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25161;50.8948;-111.9074;0;0;"Veterans Memorial Hwy, Duchess";"Duchess";708;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25154;50.9196;-111.993;0;0;"AB-556, Finnegan";"Duchess";721;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25147;50.8893;-111.9436;0;0;"Range Rd 150, Duchess";"Duchess";718;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25140;50.8754;-111.9319;0;0;"Township Rd 222A, Duchess";"Duchess";716;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25133;50.9016;-111.9364;0;0;"18.7 km from Rosemary";"Duchess";695;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25126;50.9002;-111.9146;0;0;"18.5 km from Duchess";"Duchess";711;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25119;50.9349;-112.2143;0;0;"22.2 km from Rosemary";"Duchess";757;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25112;50.9023;-112.2207;0;0;"19.3 km from Rosemary";"Duchess";748;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25105;50.9214;-112.2088;0;0;"20.7 km from Rosemary";"Duchess";753;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25098;50.9796;-112.1567;0;0;"17.5 km from Finnegan";"Duchess";761;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25091;50.9517;-112.1678;0;0;"20.7 km from Finnegan";"Duchess";756;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25084;50.7994;-112.0589;0;0;"4.8 km from Rosemary";"Duchess";729;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25077;50.8122;-112.0591;0;0;"6.2 km from Rosemary";"Duchess";726;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25070;50.7092;-112.0359;0;0;"5.9 km from Rosemary";"Duchess";758;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25063;50.7402;-112.105;0;0;"3 km from Rosemary";"Duchess";752;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25056;50.7759;-113.7965;0;0;"AB-552, Aldersyde";"South Calgary";1040;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25049;50.6854;-113.6518;0;0;"240 St, Blackie";"South Calgary";1070;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25042;50.6887;-113.6099;0;0;"Township Rd 202, Blackie";"South Calgary";1068;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25035;50.6305;-113.457;0;0;"Township Rd 194, Blackie";"South Calgary";1003;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25028;50.6835;-113.5596;0;0;"304 St E, Blackie";"South Calgary";1074;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25021;50.6888;-113.4957;0;0;"Township Rd 202, Blackie";"South Calgary";1085;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+25014;50.7586;-113.5369;0;0;"320 St, Mossleigh";"South Calgary";1025;"CANADA";"Alberta";"ditch";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26133;50.6874;-113.5883;0;0;"Township Rd 202, Blackie";"South Calgary";1066;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26140;50.778;-113.6455;0;0;"AB-552, Mossleigh";"South Calgary";1039;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26147;50.7783;-113.6685;0;0;"AB-552, Mossleigh";"South Calgary";1055;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26161;50.1272;-113.3662;0;0;"18.5 km from Carmangay";"Claresholm";962;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26168;50.0611;-113.5234;0;0;"5.5 km from Claresholm";"Claresholm";1018;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+26175;50.0013;-113.3325;0;0;"16.4 km from Woodhouse";"Claresholm";966;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+27000;50.759;-113.5677;0;0;"12.9 km from Carseland";"South Calgary";1031;"CANADA";"Alberta";"inField_wetland";0;0.0;0;1;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+27007;50.7202;-113.5194;0;0;"AB-547, Mossleigh";"South Calgary";1051;"CANADA";"Alberta";"inField_wetland";0;0.0;0;1;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+27014;50.7585;-113.5391;0;0;"320 St, Mossleigh";"South Calgary";1028;"CANADA";"Alberta";"inField_wetland";0;0.0;0;1;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+27021;50.6264;-113.4568;0;0;"Township Rd 194, Blackie";"South Calgary";1003;"CANADA";"Alberta";"inField_wetland";0;0.0;0;1;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+27028;50.6906;-113.6101;0;0;"Township Rd 202, Blackie";"South Calgary";1068;"CANADA";"Alberta";"inField_wetland";0;0.0;0;1;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+28007;50.6925;-113.4962;0;0;"Range Rd 261, Mossleigh";"South Calgary";1085;"CANADA";"Alberta";"inField_control";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+28014;50.6853;-113.6476;0;0;"240 St, Blackie";"South Calgary";1070;"CANADA";"Alberta";"inField_control";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+28021;50.0532;-113.5099;0;0;"Range Rd 264, Claresholm";"Claresholm";1022;"CANADA";"Alberta";"inField_control";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+28028;50.9834;-112.1504;0;0;"AB-862, Gem";"Duchess";761;"CANADA";"Alberta";"inField_control";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+28035;50.7356;-112.0872;0;0;"Range Rd 160, Rosemary";"Duchess";749;"CANADA";"Alberta";"inField_control";0;0.0;1;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+51007;50.9193;-114.7794;0;0;"Moose Mtn, Kananaskis";"Rockies";2031;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51014;50.9348;-114.7887;0;0;"Moose Mtn, Kananaskis";"Rockies";1942;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51021;50.943;-114.8084;0;0;"Moose Mtn, Kananaskis";"Rockies";2099;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51028;50.8964;-114.7505;0;0;"Moose Mtn, Kananaskis";"Rockies";1772;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51119;51.6635;-116.4009;0;0;"Helen Lake, Banff NP";"Rockies";2222;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51133;51.664;-116.427;0;0;"Helen Lake, Banff NP";"Rockies";2063;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51140;51.681;-116.4615;0;0;"Helen Lake, Banff NP";"Rockies";1960;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51105;51.3223;-116.2299;0;0;"Moraine Lake, Banff NP";"Rockies";2275;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51112;51.3248;-116.2011;0;0;"Moraine Lake, Banff NP";"Rockies";2195;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51091;52.9554;-116.1491;0;0;"Moraine Lake, Banff NP";"Rockies";1937;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51063;51.1976;-115.6053;0;0;"Mt. Norquay, Banff NP";"Rockies";1856;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51070;51.221;-115.6094;0;0;"Mt. Norquay, Banff NP";"Rockies";1576;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51077;51.2313;-115.593;0;0;"Mt. Norquay, Banff NP";"Rockies";2192;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51035;50.8739;-115.3432;0;0;"Buller Cr, Spray Valley PP";"Rockies";1832;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51042;50.879;-115.3246;0;0;"Buller Cr, Spray Valley PP";"Rockies";1987;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51049;50.887;-115.3002;0;0;"Buller Cr, Spray Valley PP";"Rockies";2195;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51056;50.8917;-115.2827;0;0;"Buller Cr, Spray Valley PP";"Rockies";2335;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Southern Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51084;51.2415;-115.5441;0;0;"Norquay, Banff NP";"Rockies";1998;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51175;52.1999;-117.0897;0;0;"Nigel Pass, Banff NP";"Rockies";1910;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51182;52.2186;-117.0947;0;0;"Nigel Pass, Banff NP";"Rockies";2014;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51189;52.2418;-117.0906;0;0;"Nigel Pass, Banff NP";"Rockies";2210;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51280;52.2318;-117.0951;0;0;"Nigel Pass, Banff NP";"Rockies";2069;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51147;52.076;-116.9071;0;0;"Sunset Pass, Banff NP";"Rockies";1635;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51154;52.091;-116.8949;0;0;"Sunset Pass, Banff NP";"Rockies";1970;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51161;52.0936;-116.8734;0;0;"Sunset Pass, Banff NP";"Rockies";2052;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51168;52.0555;-116.8848;0;0;"Sunset Pass, Banff NP";"Rockies";1464;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51196;52.3459;-116.3669;0;0;"Abraham Lk, Kiska/Wilson PLUZ";"Rockies";1555;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51203;52.2992;-116.4002;0;0;"Abraham Lk, Kiska/Wilson PLUZ";"Rockies";1775;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51210;52.2919;-116.3771;0;0;"Abraham Lk, Kiska/Wilson PLUZ";"Rockies";1373;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51224;52.099;-116.0021;0;0;"Onion Ck, Clearwater/Ram PLUZ";"Rockies";2113;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51231;52.092;-116.0;0;0;"Onion Ck, Clearwater/Ram PLUZ";"Rockies";1923;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51238;52.077;-115.9819;0;0;"Onion Ck, Clearwater/Ram PLUZ";"Rockies";1732;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51243;52.0863;-115.8735;0;0;"Onion Ck, Clearwater/Ram PLUZ";"Rockies";1647;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51252;51.5588;-115.3817;0;0;"Ghost PLUZ";"Rockies";1830;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51259;51.6466;-115.259;0;0;"Ghost PLUZ";"Rockies";1435;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51266;51.6204;-115.2296;0;0;"Ghost PLUZ";"Rockies";1613;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51273;51.5355;-115.1026;0;0;"Ghost PLUZ";"Rockies";1520;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51126;51.68476;-116.4088;0;0;"Helen Lake, Banff NP";"Rockies";2423;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51098;51.33224;-116.2241;0;0;"Moraine Lake, Banff NP";"Rockies";2422;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+51217;52.30427;-116.4149;0;0;"Abraham Lk, Kiska/Wilson PLUZ";"Rockies";1970;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2018-10-26 11:26:28";"2019-07-11 10:12:11";0
+32000;51.7927;-114.2143;0;0;"Range Rd 23, Didsbury";"Red Deer";1013;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32007;52.1233;-113.6952;0;0;"Range Rd 265, Penhold";"Red Deer";966;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32014;52.1199;-113.3857;0;0;"Range Rd 244, Pine Lake";"Red Deer";954;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32021;52.1657;-113.1955;0;0;"4.1 km from Delburne";"Red Deer";878;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32028;52.1156;-113.2667;0;0;"5.3 km from Lousana";"Red Deer";941;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32035;52.145;-113.7187;0;0;"Range Rd 270, Penhold";"Red Deer";953;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32042;52.1378;-113.7426;0;0;"8.7 km from Penhold";"Red Deer";983;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32049;52.1001;-113.3145;0;0;"Range Rd 241, Lousana";"Red Deer";934;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32056;52.0556;-113.1176;0;0;"Township Rd 360, Elnora";"Red Deer";902;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32063;51.9975;-113.0826;0;0;"Township Rd 352, Elnora";"Red Deer";879;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32070;52.0221;-113.1476;0;0;"4.7 km from Elnora";"Red Deer";879;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32077;52.0318;-113.5759;0;0;"18.5 km from Wimborne";"Red Deer";908;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32084;53.0199;-113.6347;0;0;"14 km from Millet";"Kinsella";790;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32091;53.1367;-113.2204;0;0;"12.8 km from Hay Lakes";"Kinsella";760;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32098;53.3377;-112.8421;0;0;"12.5 km from Tofield";"Kinsella";744;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32105;53.2185;-112.4166;0;0;"7.7 km from Poe";"Kinsella";713;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32112;53.2215;-112.0969;0;0;"8.8 km from Holden";"Kinsella";672;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32119;53.0856;-111.5897;0;0;"10.8 km from Kinsella";"Kinsella";702;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32126;53.162;-112.4896;0;0;"7.8 km from Dodds";"Kinsella";716;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32133;53.1445;-112.855;0;0;"6.4 km from Armena";"Kinsella";742;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32140;53.0098;-112.5682;0;0;"6.5 km from Ohaton";"Kinsella";720;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32147;53.1342;-112.2416;0;0;"10.7 km from Holden";"Kinsella";705;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32154;53.1567;-112.197;0;0;"8.4 km from Holden";"Kinsella";691;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32161;53.1051;-112.0656;0;0;"17.7 km from Holden";"Kinsella";692;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32168;53.1031;-111.8677;0;0;"5.9 km from Viking";"Kinsella";684;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32175;53.1511;-111.5406;0;0;"17.1 km from Kinsella";"Kinsella";704;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32182;53.0799;-111.9304;0;0;"10.1 km from Viking";"Kinsella";682;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32189;53.0465;-112.0194;0;0;"16.8 km from Viking";"Kinsella";693;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32196;53.0447;-112.1483;0;0;"21.4 km from Daysland";"Kinsella";697;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32203;53.0384;-112.2213;0;0;"19.6 km from Daysland";"Kinsella";708;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32210;53.0761;-112.3495;0;0;"19 km from Holden";"Kinsella";709;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32217;53.1856;-112.3431;0;0;"Range Rd 170, Holden";"Kinsella";698;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32224;53.233;-112.27;0;0;"Range Rd 163, Holden";"Kinsella";683;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32231;53.068;-111.7602;0;0;"3.3 km from Viking";"Kinsella";708;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32238;52.4922;-112.6233;0;0;"Township 410, Red Willow";"Kinsella";788;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32245;52.4635;-112.7135;0;0;"Township 404, Stettler";"Kinsella";804;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32252;52.4068;-113.0516;0;0;"Range Rd 221, Mirror";"Kinsella";786;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32259;52.3544;-113.2196;0;0;"5.8 km from Alix";"Kinsella";802;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32266;52.2901;-113.695;0;0;"Township 384, Red Deer";"Kinsella";955;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+32273;52.1721;-113.7931;0;0;"6.7 km from Penhold";"Kinsella";908;"CANADA";"Alberta";"ditch";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31133;53.1511;-112.4911;0;0;"8.9 km from Dodds";"Kinsella";716;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31028;53.5283;-112.8599;0;0;"11 km from Uncas";"Kinsella";722;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31119;53.0972;-112.8283;0;0;"8.2 km from Armena";"Kinsella";739;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31105;53.0001;-112.257;0;0;"15.1 km from Daysland";"Kinsella";707;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31147;53.0165;-112.2565;0;0;"17 km from Daysland";"Kinsella";708;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31070;53.0619;-112.1992;0;0;"18.9 km from Holden";"Kinsella";701;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31063;53.1025;-112.1745;0;0;"14.7 km from Holden";"Kinsella";695;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31077;53.2272;-112.0775;0;0;"10 km from Holden";"Kinsella";671;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31182;53.0637;-113.6495;0;0;"12.7 km from Millet";"Kinsella";791;"CANADA";"Alberta";"inField_control";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31042;53.182;-113.1699;0;0;"7.7 km from Hay Lakes";"Kinsella";754;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31203;53.359;-112.8286;0;0;"11.1 km from Tofield";"Kinsella";737;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31049;53.0802;-112.1297;0;0;"18 km from Holden";"Kinsella";692;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31196;53.1077;-111.5439;0;0;"12.3 km from Kinsella";"Kinsella";701;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31189;53.1249;-111.5438;0;0;"14.2 km from Kinsella";"Kinsella";694;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31007;52.4696;-112.6405;0;0;"5.7 km from Red Willow";"Kinsella";800;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31112;53.2303;-112.8032;0;0;"4.6 km from Kingman";"Kinsella";773;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31035;52.4437;-112.7173;0;0;"10.3 km from Red Willow";"Kinsella";802;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31210;51.7457;-114.4554;0;0;"3.5 km from Harmattan";"Red Deer";1092;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31091;52.1119;-113.5103;0;0;"21.4 km from Delburne";"Red Deer";932;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31175;52.1709;-113.2762;0;0;"4.3 km from Delburne";"Red Deer";853;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31000;52.1456;-113.1977;0;0;"3.6 km from Lousana";"Red Deer";914;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31021;52.0724;-113.1756;0;0;"Range Rd 231A, Lousana";"Red Deer";889;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31168;52.0643;-113.174;0;0;"Range Rd 231, Lousana";"Red Deer";887;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31014;52.0425;-113.0267;0;0;"Township 355, Big Valley";"Red Deer";872;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31161;51.9863;-113.103;0;0;"Range Rd 224, Elnora";"Red Deer";870;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31154;52.0283;-113.2728;0;0;"7.5 km from Elnora";"Red Deer";897;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+31217;52.8417;-112.2091;0;0;"Township Rd 450, Daysland";"Kinsella";709;"CANADA";"Alberta";"inField_control";0;0.0;0;0;1;"Central Alberta";"2018-10-26 11:26:28";"2018-10-26 11:26:28";0
+61007;53.2834;-111.288;0;0;"6.2 km from Minburn";"Vermillion";681;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Central Alberta";"2019-06-14 15:24:02";"2019-06-14 15:46:05";1
+61008;53.273;-111.2894;0;0;"6.8 km from Minburn";"Vermillion";688;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Central Alberta";"2019-06-14 15:24:37";"2019-06-14 15:46:05";1
+61009;53.1484;-110.9496;0;0;"22 km from Claysmore";"Vermillion";676;"CANADA";"Alberta";"inField_wetland";0;0.0;0;0;0;"Central Alberta";"2019-06-14 15:25:06";"2019-06-14 15:46:05";1
+52105;51.054;-118.1391;0;0;"Meadows, Revelstoke NP";"Selkirks";1838;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52098;51.0501;-118.1433;0;0;"Meadows, Revelstoke NP";"Selkirks";1925;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52091;51.0331;-118.1589;0;0;"Meadows, Revelstoke NP";"Selkirks";1702;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Southern Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52112;51.3014;-117.5243;0;0;"Balu Pass, Glacier NP";"Selkirks";1332;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52133;51.2851;-117.5831;0;0;"Balu Pass, Glacier NP";"Selkirks";2087;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52126;51.2918;-117.5675;0;0;"Balu Pass, Glacier NP";"Selkirks";1773;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52119;51.2988;-117.5474;0;0;"Balu Pass, Glacier NP";"Selkirks";1549;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52140;51.219;-116.5883;0;0;"Mt. Hunter, Yoho NP";"Rockies";1094;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52147;51.236;-116.6077;0;0;"Mt. Hunter, Yoho NP";"Rockies";1467;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52154;51.2421;-116.6205;0;0;"Mt. Hunter, Yoho NP";"Rockies";1727;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52161;51.0874;-116.0519;0;0;"Ball Pass, Kootenay NP";"Rockies";1350;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52168;51.0996;-116.0405;0;0;"Ball Pass, Kootenay NP";"Rockies";1540;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52175;51.1121;-116.0115;0;0;"Ball Pass, Kootenay NP";"Rockies";1813;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52182;51.1259;-115.99;0;0;"Ball Pass, Kootenay NP";"Rockies";2169;"CANADA";"BC";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-11 10:08:24";"2019-07-11 10:11:15";0
+52014;53.1185;-117.7745;0;0;"Sulphur Sky, Jasper NP";"Rockies";1450;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52021;53.1277;-117.7564;0;0;"Sulphur Sky, Jasper NP";"Rockies";1519;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52028;53.1171;-117.7542;0;0;"Sulphur Sky, Jasper NP";"Rockies";1984;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52007;53.1487;-117.7833;0;0;"Sulphur Sky, Jasper NP";"Rockies";1292;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52042;52.7225;-117.6617;0;0;"Bald Hills, Jasper NP";"Rockies";1762;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52056;52.7027;-117.6893;0;0;"Bald Hills, Jasper NP";"Rockies";2262;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52049;52.7236;-117.6857;0;0;"Bald Hills, Jasper NP";"Rockies";1968;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52035;52.9365;-118.0259;0;0;"Bald Hills, Jasper NP";"Rockies";1000;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52063;52.0968;-116.8898;0;0;"Sunset Pass, Banff NP";"Rockies";2017;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52070;52.1154;-116.8803;0;0;"Sunset Pass, Banff NP";"Rockies";2145;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0
+52077;51.5816;-115.1533;0;0;"Ghost PLUZ";"Rockies";1516;"CANADA";"Alberta";"alpine";0;0.0;0;0;0;"Central Alberta";"2019-07-19 14:25:49";"2019-07-19 14:26:34";0

@@ -50,8 +50,8 @@ site <- site %>% select(-aliasBLID1:-locality,-country,-created_at:-expt_yield_L
 # Clean up trap data ------------------------------------------------------
 
 #PROBLEM: SOME BLIDS FROM TRAP DF ARE NOT PRESENT IN SITE DF (either in BLID or aliases)
-badBLID <- trap %>% select(BTID:trapType) %>% filter(!(BLID %in% site$BLID),!is.na(BLID)) %>% 
-  pull(BLID) %>% unique()
+# badBLID <- trap %>% select(BTID:trapType) %>% filter(!(BLID %in% site$BLID),!is.na(BLID)) %>% 
+#   pull(BLID) %>% unique()
 #Bad BLID values:
 # 23460 - should be 13460: CHANGE IN TRAP AND ARTH DF
 # 13395 - should be 11395: CHANGE IN TRAP AND ARTH DF
