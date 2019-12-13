@@ -33,32 +33,22 @@ load('rawData.Rdata')
 
 # Clean up site data ------------------------------------------------------
 
-# NOTE: aliases are not present in either trap or arthropod database (see commented code below to verify)
 site <- site %>% select(-aliasBLID1:-locality,-country,-created_at:-expt_yield_Lakeland) %>% 
   mutate_if(is.factor,as.character)
 
-# #Checking to see if any of the aliases are represented in the rest of the database
-# aliases <- site %>% select(aliasBLID1,aliasBLID2) %>% 
-#   pivot_longer(cols=c(aliasBLID1,aliasBLID2),names_to='type',values_to='alias') %>% 
-#   filter(alias!=0,!is.na(alias)) %>% select(alias) %>% 
-#   mutate(inTrapBLID=alias %in% trap$BLID,inArthBLID=alias %in% arth$BLID) %>% 
-#   rowwise() %>% 
-#   mutate(inTrapBTID=any(grepl(alias,trap$BTID))) %>%
-#   mutate(inArthBTID=any(grepl(alias,arth$BTID)))
-
-
 # Clean up trap data ------------------------------------------------------
 
-#PROBLEM: SOME BLIDS FROM TRAP DF ARE NOT PRESENT IN SITE DF (either in BLID or aliases)
-# badBLID <- trap %>% select(BTID:trapType) %>% filter(!(BLID %in% site$BLID),!is.na(BLID)) %>% 
+# #PROBLEM: SOME BLIDS FROM TRAP DF ARE NOT PRESENT IN SITE DF (either in BLID or aliases)
+# badBLID <- trap %>% select(BTID:trapType) %>% filter(!(BLID %in% site$BLID),!is.na(BLID)) %>%
 #   pull(BLID) %>% unique()
+
 #Bad BLID values:
+# 20427 - duplicate of 24027, nothing in site or arth df: REMOVE FROM TRAP DF
 # 23460 - should be 13460: CHANGE IN TRAP AND ARTH DF
 # 13395 - should be 11395: CHANGE IN TRAP AND ARTH DF
 # 13048 - should be 10348: CHANGE IN TRAP AND ARTH DF
-# 13752 - should be 13751: CHANGE IN TRAP DF
-# 20427 - duplicate of 24027, nothing in site or arth df: REMOVE FROM TRAP DF
 # 15280 - duplicate of 15208, nothing in arth df: REMOVE FROM TRAP DF
+# 13752 - should be 13751: CHANGE IN TRAP DF
 # 25095 - 25091 or 25035, but were recorded on different days (June 22, 23), nothing in site or arth df: REMOVE FROM TRAP DF
 # 13903 - duplicate of 13902: REMOVE FROM TRAP DF
 # 27029 - present in site table, but not arth table: REMOVE FROM TRAP DF
@@ -69,20 +59,15 @@ changeBLID <- data.frame(BLID=c(23460,13395,13048,13752),to=c(13460,11395,10348,
 
 # Notes: 
 # "Coloured cups" consist of blue, white & yellow cup, but were sometimes all amalgamated into single category, so 3x effort makes sense.
-
-#trap2 <- 
-temp <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
+trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
   filter(!(BLID %in% removeBLID)) %>% #Removes bad BLIDs
   mutate(change=(BLID %in% changeBLID$BLID)) %>% #Marks BLIDs for changes
   left_join(changeBLID,by='BLID') %>% rowwise() %>% 
   mutate(BTID=ifelse(change,gsub(as.character(BLID),to,BTID),BTID),BLID=ifelse(change,to,BLID)) %>% 
-  ungroup() %>% select(-change,-to) %>% #Cleanup
-  #Re-merge site data
-  select(-lonTrap:-locationType,-created_at:-updated_at,-startNESWPhoto_DSC:-endNESWPhoto_DSC,-floralAdjacentNotes) %>% 
-  left_join(select(site,BLID:lon,elevation,siteType),by='BLID') %>% #Join in lat,lon,elev, siteType
-  filter(!is.na(trapType)) %>% #Get rid of NA row
+  ungroup() %>% select(-change,-to,-startNESWPhoto_DSC,-endNESWPhoto_DSC) %>% #Cleanup
+  filter(!is.na(trapType),BLID!=0) %>% #Get rid of NA and 0 rows
   #Fixes typos
-  mutate(siteType=gsub('Ditch','ditch',siteType)) %>% #Fix typo in locationtype
+  mutate(locationType=gsub('Ditch','ditch',locationType)) %>% #Fix typo in locationtype
   mutate(BTID=gsub('2107','2017',BTID)) %>% #Fixes reversal in year label
   mutate(replicate=gsub('WCCC','WCC',replicate),BTID=gsub('WCCC','WCC',BTID)) %>%
   mutate(replicate=gsub('WCC2R1','WCC25R1',replicate),BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
@@ -101,7 +86,7 @@ temp <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   #Convert -99 in mowed data to NA
   mutate(adjMowed=ifelse(adjMowed==-99,NA,adjMowed),oppMowed=ifelse(oppMowed==-99,NA,oppMowed)) %>% 
   #Beginning to reorganize trap dataframe:
-  rename('trapLoc'='siteType') %>% #trapLoc = location of trap (what feature is the trap sitting in?)
+  rename('trapLoc'='locationType') %>% #trapLoc = location of trap (what feature is the trap sitting in?)
   #dist = distance from some "source" feature (usually wetland/SNL if in field)
   #distFrom = type of "source" feature
   rowwise() %>% mutate(dist=as.numeric(gsub('[A-Z]','0',replicate)),distFrom='NA') %>% ungroup() %>% 
@@ -111,37 +96,44 @@ temp <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
     useYear & dist>0  ~ adjCrop,
     useYear & dist==0  ~ distFrom,
     TRUE ~ trapLoc)) %>% 
-  select(-useYear) %>% 
+  mutate(trapType=case_when(
+    trapType=='infield' & replicate=='WBV' ~ 'Blue Vane',
+    trapType=='infield' & replicate=='WPF' ~ 'Pit Fall',
+    trapType=='infield' & replicate=='WCC' ~ 'Coloured Cups',
+    TRUE ~ trapType
+  )) %>% 
+  select(-useYear) %>%
   filter(!grepl('-2019',BTID)) #Material from 2019 not prepped yet, so filter out for now
 
-#Other things to fix:
-#Replace 'infield' with appropriate trap type in 2018 data
-# Fix labels in arth database using appropriate BLIDs, re-merge data from trap df
-# Create exclosure/non-exclosure column in 2019 data, remove "Exclosure Pit Fall" from trapType
-    
+# #Looks OK
+# trap %>% group_by(endYear,trapType) %>% summarize(count=n())
 
-  
-  
-  
-  
-  
-  
-  #in-field trapType recorded as "infield" for 2018, with type of trap recorded in replicate code. Confusing...
-  mutate(isInfield=trapType=='infield',
-         trapType=case_when(isInfield & replicate=='WBV'~'Blue Vane',
-                            isInfield & replicate=='WPF'~'Pit Fall',
-                            isInfield & replicate=='WCC'~'Coloured Cups',
-                            TRUE ~ trapType))
-  
+
 # Clean up arthropod data -------------------------------------------------
-# head(arth)
 
-arth <- arth %>% mutate_if(is.factor,as.character) %>% #Converts all factors to character
+arth <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
+  mutate(change=(BLID %in% changeBLID$BLID)) %>%  #Marks BLIDs for changes
+  left_join(changeBLID,by='BLID') %>% rowwise() %>% 
+  mutate(BTID=ifelse(change,gsub(as.character(BLID),to,BTID),BTID),BLID=ifelse(change,to,BLID)) %>% 
+  ungroup() %>% select(-change,-to) %>% #Cleanup
+  filter(BLID!=0,!is.na(BLID)) %>% #Get rid of NA and 0 rows
+  filter(nchar(BLID))
+  #Fixes typos
+  mutate(BTID=gsub('2107','2017',BTID)) %>% #Fixes reversal in year label
+  mutate(BTID=gsub('WCCC','WCC',BTID)) %>% mutate(BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
   #Convert blue, white, yellow cups to "coloured cups"
-  mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% 
-  #Spelling mistake
-  mutate(BTID=gsub('WCCC','WCC',BTID))
+  mutate(BTID=gsub('W[BWY]C','WCC',BTID))
 
+arth %>% separate(BTID,c('a','b','c','year'),sep='-') %>% 
+  select(-a:-c) %>% mutate(year=as.numeric(year)) %>% 
+  group_by(year) %>% summarize(count=n())
+#Problems with arth df: about 144 entries with non-standard BTIDs. Some are typographic errors, but some appear to be combinations of multiple passes 
+#To do: merge trap and arth dfs by BTID, see which ones don't match, and see if they're easily fixed
+
+arth[143716,] #Too many replicate codes
+arth[61385,'BTID'] #BTID missing, no info
+
+nchar(arth[61385,'BTID'])
 
 # Save to file ------------------------------------------------------------
 
