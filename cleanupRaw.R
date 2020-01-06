@@ -60,6 +60,7 @@ changeBLID <- data.frame(BLID=c(23460,13395,13048,13752),to=c(13460,11395,10348,
 # Notes: 
 # "Coloured cups" consist of blue, white & yellow cup, but were sometimes all amalgamated into single category, so 3x effort makes sense.
 trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
+  filter(startMonth!=0) %>% #Removes pass 0 (where traps are deployed)
   filter(!(BLID %in% removeBLID)) %>% #Removes bad BLIDs
   mutate(change=(BLID %in% changeBLID$BLID)) %>% #Marks BLIDs for changes
   left_join(changeBLID,by='BLID') %>% rowwise() %>% 
@@ -105,24 +106,37 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   select(-useYear) %>%
   filter(!grepl('-2019',BTID)) #Material from 2019 not prepped yet, so filter out for now
 
-# #Looks OK
-# trap %>% group_by(endYear,trapType) %>% summarize(count=n())
+##Looks OK
+# trap %>% group_by(trapType,endYear) %>% summarize(nPasses=n(),daysDeployed=round(sum(deployedhours)/24),
+#         nLocs=length(unique(BLID))) %>% ungroup() %>% 
+#   mutate(daysPerLoc=daysDeployed/nLocs)
 
 
 # Clean up arthropod data -------------------------------------------------
 
-arth <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
+#Questions for Paul:
+# What does ascension_date mean? Date that it was uploaded to database? Some dates are in the future (2022); does this matter?
+
+temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
   mutate(change=(BLID %in% changeBLID$BLID)) %>%  #Marks BLIDs for changes
   left_join(changeBLID,by='BLID') %>% rowwise() %>% 
   mutate(BTID=ifelse(change,gsub(as.character(BLID),to,BTID),BTID),BLID=ifelse(change,to,BLID)) %>% 
   ungroup() %>% select(-change,-to) %>% #Cleanup
-  filter(BLID!=0,!is.na(BLID)) %>% #Get rid of NA and 0 rows
-  filter(nchar(BLID))
-  #Fixes typos
+  select(-specimenID) %>% #Get rid of specimenID (all zeros) and BBID (other specimen ID column?)
+  filter(BLID!=0,!is.na(BLID),nchar(arthOrder)>0) %>%  #Get rid of NA and 0 rows, and what look like "test" rows
+  #Fixes typos:
+  mutate(BTID=gsub('-DBV-DBV','-DBV',BTID)) %>% 
   mutate(BTID=gsub('2107','2017',BTID)) %>% #Fixes reversal in year label
   mutate(BTID=gsub('WCCC','WCC',BTID)) %>% mutate(BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
   #Convert blue, white, yellow cups to "coloured cups"
-  mutate(BTID=gsub('W[BWY]C','WCC',BTID))
+  mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% 
+  separate(BTID,c('BLID','pass','rep','year'),remove=F,convert=T,sep='-') 
+
+temp %>% slice(113739) %>% 
+
+  filter(nchar(BLID))
+  #Fixes typos
+  
 
 arth %>% separate(BTID,c('a','b','c','year'),sep='-') %>% 
   select(-a:-c) %>% mutate(year=as.numeric(year)) %>% 
