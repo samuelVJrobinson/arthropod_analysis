@@ -69,7 +69,9 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   filter(!is.na(trapType),BLID!=0) %>% #Get rid of NA and 0 rows
   #Fixes typos
   mutate(locationType=gsub('Ditch','ditch',locationType)) %>% #Fix typo in locationtype
-  mutate(BTID=gsub('2107','2017',BTID)) %>% #Fixes reversal in year label
+  #Fixes reversal in year labels
+  mutate(BTID=gsub('-2007','-2017',BTID)) %>% mutate(BTID=gsub('-20107','-2017',BTID)) %>% 
+  mutate(BTID=gsub('-2107','-2017',BTID)) %>% mutate(BTID=gsub('-2071','-2017',BTID)) %>% 
   mutate(replicate=gsub('WCCC','WCC',replicate),BTID=gsub('WCCC','WCC',BTID)) %>%
   mutate(replicate=gsub('WCC2R1','WCC25R1',replicate),BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
   mutate(collector=case_when(collector=='J. VIckruck' ~ 'J. Vickruck',
@@ -106,9 +108,9 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   select(-useYear) %>%
   filter(!grepl('-2019',BTID)) #Material from 2019 not prepped yet, so filter out for now
 
-##Looks OK
+# #Looks OK
 # trap %>% group_by(trapType,endYear) %>% summarize(nPasses=n(),daysDeployed=round(sum(deployedhours)/24),
-#         nLocs=length(unique(BLID))) %>% ungroup() %>% 
+#         nLocs=length(unique(BLID))) %>% ungroup() %>%
 #   mutate(daysPerLoc=daysDeployed/nLocs)
 
 
