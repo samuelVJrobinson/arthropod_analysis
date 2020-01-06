@@ -116,6 +116,9 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
 
 #Questions for Paul:
 # What does ascension_date mean? Date that it was uploaded to database? Some dates are in the future (2022); does this matter?
+# More info on missing dates for spiders: 12490-DPF-2017, 12490-X-DPF-2017, 17774-DPF-2017, 25070-DPF-2017
+# Are all spiders within these from the same pass? If not, how should these be dealt with?
+# Potential Excel-related problem: dates on many BTIDs have been "dragged down" resulting in increased years. Easy to fix when year is >2019, but could be a lot of material with erronious 2019 labels on them (should be 2018)
 
 temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
   mutate(change=(BLID %in% changeBLID$BLID)) %>%  #Marks BLIDs for changes
@@ -124,30 +127,49 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   ungroup() %>% select(-change,-to) %>% #Cleanup
   select(-specimenID) %>% #Get rid of specimenID (all zeros) and BBID (other specimen ID column?)
   filter(BLID!=0,!is.na(BLID),nchar(arthOrder)>0) %>%  #Get rid of NA and 0 rows, and what look like "test" rows
-  #Fixes typos:
-  mutate(BTID=gsub('-DBV-DBV','-DBV',BTID)) %>% 
-  mutate(BTID=gsub('2107','2017',BTID)) %>% #Fixes reversal in year label
-  mutate(BTID=gsub('WCCC','WCC',BTID)) %>% mutate(BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
   #Convert blue, white, yellow cups to "coloured cups"
   mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% 
-  separate(BTID,c('BLID','pass','rep','year'),remove=F,convert=T,sep='-') 
+  #Fixes typos:
+  mutate(BTID=gsub('-DBV-DBV','-DBV',BTID)) %>% 
+  mutate(BTID=gsub('-2007','-2017',BTID)) %>% mutate(BTID=gsub('-20107','-2017',BTID)) %>% 
+  mutate(BTID=gsub('-2107','-2017',BTID)) %>% mutate(BTID=gsub('-2071','-2017',BTID)) %>% 
+  mutate(BTID=gsub('WCCC','WCC',BTID)) %>% mutate(BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
+  mutate(BTID=gsub('14455-8-DPF2017','14455-8-DPF-2017',BTID)) %>%
+  mutate(BTID=gsub('22576-6WPF25-2017','22576-6-WPF25-2017',BTID)) %>%
+  mutate(BTID=gsub('31217-40DBV-2018','31217-4-DBV-2018',BTID)) %>%
+  mutate(BTID=gsub('13902-7-DBV2017','13902-7-DBV-2017',BTID)) %>%
+  mutate(BTID=gsub('31189_4','31189-4',BTID)) %>% mutate(BTID=gsub('115208','11520',BTID)) %>%
+  mutate(BTID=gsub('15208-1-PF-2017','15208-1-DPF-2017',BTID)) %>%
+  #Years that are greater than sampling period - Danielle's bees from 2019 haven't been added yet
+  mutate(BTID=gsub('-20(19|20|21|22|23|24|24|25)','-2018',BTID)) %>% 
+  #Fixes missing pass labels (essentially guesses)
+  mutate(BTID=gsub('11520-DBV-2017','11520-8-DBV-2017',BTID)) %>% #Should be 8, based on other B. insularis
+  mutate(BTID=gsub('13825-DBV-2017','13825-7-DBV-2017',BTID)) %>% #Should be 7, based on other B. nevadensis
+  mutate(BTID=gsub('17823-DBV-2017','17823-7-DBV-2017',BTID)) %>% #Should be 7, based on other B. nevadensis
+  #I need more info about these spiders before assigning them to a discrete pass. For now, all missing passes marked as NA
+  mutate(BTID=gsub('12490-DPF-2017','12490-NA-DPF-2017',BTID)) %>%
+  mutate(BTID=gsub('12490-X-DPF-2017','12490-NA-DPF-2017',BTID)) %>%
+  mutate(BTID=gsub('17774-DPF-2017','17774-NA-DPF-2017',BTID)) %>% 
+  mutate(BTID=gsub('25070-DPF-2017','25070-NA-DPF-2017',BTID)) %>%
+  mutate(BTID=gsub('15208-DPF-2017','15208-NA-DPF-2017',BTID)) %>% 
+  #Create separate columns from BTID
+  separate(BTID,c('BLID','pass','rep','year'),remove=F,convert=T,sep='-') %>% 
+  #Join in site type from site df
+  left_join(select(site,BLID,siteType),by='BLID') %>% 
+  #Join in location of specific trap from trap df
+  left_join(select(trap,BTID,trapLoc),by='BTID')
 
-temp %>% slice(113739) %>% 
+#Check what sites entries are from
+temp %>% group_by(year,siteType,trapLoc) %>% summarize(n=n()) %>% as.data.frame()
 
-  filter(nchar(BLID))
-  #Fixes typos
-  
+#Problem: large number of NAs in traploc/siteType. First check trap df to makes sure that trapLoc is correctly specified, then decide what to do with remaining mismatches.
+#This would take a large amount of time (I think) to go through.
 
-arth %>% separate(BTID,c('a','b','c','year'),sep='-') %>% 
-  select(-a:-c) %>% mutate(year=as.numeric(year)) %>% 
-  group_by(year) %>% summarize(count=n())
-#Problems with arth df: about 144 entries with non-standard BTIDs. Some are typographic errors, but some appear to be combinations of multiple passes 
-#To do: merge trap and arth dfs by BTID, see which ones don't match, and see if they're easily fixed
 
-arth[143716,] #Too many replicate codes
-arth[61385,'BTID'] #BTID missing, no info
+temp %>% filter(is.na(siteType),year==2015) %>% 
+  left_join(select(trap,BTID,trapType)) %>% 
+  as.data.frame()
 
-nchar(arth[61385,'BTID'])
 
 # Save to file ------------------------------------------------------------
 
