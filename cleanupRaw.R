@@ -51,7 +51,8 @@ site <- site %>% select(-aliasBLID1:-locality,-country,-created_at:-expt_yield_L
 # 13752 - should be 13751: CHANGE IN TRAP DF
 # 25095 - 25091 or 25035, but were recorded on different days (June 22, 23), nothing in site or arth df: REMOVE FROM TRAP DF
 # 13903 - duplicate of 13902: REMOVE FROM TRAP DF
-# 27029 - present in site table, but not arth table: REMOVE FROM TRAP DF
+# 27029 - present in trap table, but not arth table: REMOVE FROM TRAP DF
+#allBad <- c(20427,23460,13395,13048,15280,13752,25095,13903,27029)
 
 removeBLID <- c(20427,15280,25095,13903,27029) #BLID values to remove from trap df
 #BLID values to change
@@ -88,31 +89,34 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% mutate(replicate=gsub('W[BWY]C','WCC',replicate)) %>% 
   #Convert -99 in mowed data to NA
   mutate(adjMowed=ifelse(adjMowed==-99,NA,adjMowed),oppMowed=ifelse(oppMowed==-99,NA,oppMowed)) %>% 
-  #Beginning to reorganize trap dataframe:
-  rename('trapLoc'='locationType') %>% #trapLoc = location of trap (what feature is the trap sitting in?)
+  #Beginning to reorganize trap dataframe. Goal:
   #dist = distance from some "source" feature (usually wetland/SNL if in field)
   #distFrom = type of "source" feature
-  rowwise() %>% mutate(dist=as.numeric(gsub('[A-Z]','0',replicate)),distFrom='NA') %>% ungroup() %>% 
-  mutate(useYear=grepl('-201[6-8]',BTID)) %>%   #Fix 2016-2018 data
-  mutate(distFrom=ifelse(useYear,gsub('inField_','',trapLoc),distFrom)) %>% 
-  mutate(trapLoc=case_when(
-    useYear & dist>0  ~ adjCrop,
-    useYear & dist==0  ~ distFrom,
-    TRUE ~ trapLoc)) %>% 
+  rename('trapLoc'='locationType') %>% #trapLoc = location of trap (what feature is the trap sitting in?)
+  mutate(trapLoc=case_when( #Deal with empty trap locations from 2016
+    trapLoc=='' & grepl('W[027]',replicate) ~ 'wetland',
+    trapLoc=='' & grepl('A',replicate) ~ 'ditch',
+    TRUE ~ trapLoc
+  )) %>% 
+  mutate(dist=as.numeric(gsub('[A-Z]','0',replicate)),distFrom=trapLoc) %>% #Create distance and distFrom column
+  mutate(trapLoc=case_when( #Sets trapLoc to adjCrop if trap was placed at a distance into some feature
+    (distFrom=='wetland' | distFrom=='pivot') & (startYear==2016 | startYear==2017) ~ adjCrop, 
+    trapLoc=='control' ~ adjCrop, #I think "control" just means a canola field without any wetland/pivot nearby (i.e. dist = Inf)
+    TRUE ~ trapLoc
+  )) %>% 
   mutate(trapType=case_when(
     trapType=='infield' & replicate=='WBV' ~ 'Blue Vane',
     trapType=='infield' & replicate=='WPF' ~ 'Pit Fall',
     trapType=='infield' & replicate=='WCC' ~ 'Coloured Cups',
     TRUE ~ trapType
-  )) %>% 
-  select(-useYear) %>%
-  filter(!grepl('-2019',BTID)) #Material from 2019 not prepped yet, so filter out for now
+  )) 
 
 # #Looks OK
+# trap %>% select(startYear,trapLoc,replicate,dist,distFrom,trapType) %>% distinct() %>% as.data.frame()
+# 
 # trap %>% group_by(trapType,endYear) %>% summarize(nPasses=n(),daysDeployed=round(sum(deployedhours)/24),
 #         nLocs=length(unique(BLID))) %>% ungroup() %>%
 #   mutate(daysPerLoc=daysDeployed/nLocs)
-
 
 # Clean up arthropod data -------------------------------------------------
 
@@ -132,7 +136,8 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   #Convert blue, white, yellow cups to "coloured cups"
   mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% 
   #Fixes typos:
-  mutate(BTID=gsub('-DBV-DBV','-DBV',BTID)) %>% 
+  mutate(BTID=gsub('-DBV-DBV','-DBV',BTID)) %>% mutate(BTID=gsub('-a-','-A-',BTID)) %>% 
+  mutate(BTID=gsub('-WPF26-','-WPF25-',BTID)) %>% 
   mutate(BTID=gsub('-2007','-2017',BTID)) %>% mutate(BTID=gsub('-20107','-2017',BTID)) %>% 
   mutate(BTID=gsub('-2107','-2017',BTID)) %>% mutate(BTID=gsub('-2071','-2017',BTID)) %>% 
   mutate(BTID=gsub('WCCC','WCC',BTID)) %>% mutate(BTID=gsub('WCC2R1','WCC25R1',BTID)) %>% 
@@ -140,11 +145,20 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   mutate(BTID=gsub('22576-6WPF25-2017','22576-6-WPF25-2017',BTID)) %>%
   mutate(BTID=gsub('31217-40DBV-2018','31217-4-DBV-2018',BTID)) %>%
   mutate(BTID=gsub('13902-7-DBV2017','13902-7-DBV-2017',BTID)) %>%
-  mutate(BTID=gsub('31189_4','31189-4',BTID)) %>% mutate(BTID=gsub('115208','11520',BTID)) %>%
+  mutate(BTID=gsub('_','-',BTID)) %>% mutate(BTID=gsub('115208','11520',BTID)) %>%
   mutate(BTID=gsub('15208-1-PF-2017','15208-1-DPF-2017',BTID)) %>%
   #Years that are greater than sampling period - Danielle's bees from 2019 haven't been added yet
-  mutate(BTID=gsub('-20(19|20|21|22|23|24|24|25)','-2018',BTID)) %>% 
-  #Fixes missing pass labels (essentially guesses)
+  mutate(BTID=gsub('-20(19|20|21|22|23|24|24|25)','-2018',BTID)) %>% #Change all dates >2018 to 2018
+  mutate(BTID=case_when( #BTIDs that weren't fixed by the date swap
+    BTID=='11520-8-DBV-2018' ~ '11520-8-DBV-2017',
+    BTID=='15208-7-DBV-2018' ~ '15208-7-DBV-2017',
+    grepl('25238-7-DBV-2018',BTID) ~ '25238-7-DBV-2017',
+    grepl('25224-6-DBV-2018',BTID) ~ '25224-6-DBV-2017',
+    grepl('25091-5-DBV-2018',BTID) ~ '25091-5-DBV-2017',
+    grepl('31128-1-WBV-2018',BTID) ~ '31028-1-WBV-2018',
+    TRUE ~ BTID
+  )) %>% 
+  #Deals with missing pass labels (essentially guesses)
   mutate(BTID=gsub('11520-DBV-2017','11520-8-DBV-2017',BTID)) %>% #Should be 8, based on other B. insularis
   mutate(BTID=gsub('13825-DBV-2017','13825-7-DBV-2017',BTID)) %>% #Should be 7, based on other B. nevadensis
   mutate(BTID=gsub('17823-DBV-2017','17823-7-DBV-2017',BTID)) %>% #Should be 7, based on other B. nevadensis
@@ -156,21 +170,21 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   mutate(BTID=gsub('15208-DPF-2017','15208-NA-DPF-2017',BTID)) %>% 
   #Create separate columns from BTID
   separate(BTID,c('BLID','pass','rep','year'),remove=F,convert=T,sep='-') %>% 
+  #Tests merging from 2 different dfs:
   #Join in site type from site df
-  left_join(select(site,BLID,siteType),by='BLID') %>% 
+  left_join(select(site,BLID,siteType),by='BLID') %>%
+  mutate(mismatchBLID=is.na(siteType)) %>% #Records mismatch in BLID (site label)
   #Join in location of specific trap from trap df
-  left_join(select(trap,BTID,trapLoc),by='BTID')
-
-#Check what sites entries are from
-temp %>% group_by(year,siteType,trapLoc) %>% summarize(n=n()) %>% as.data.frame()
-
+  left_join(select(trap,BTID,trapLoc),by='BTID') %>% 
+  mutate(mismatchBTID=is.na(trapLoc)) #Records mismatch in BLID (trapping label)
+  
 #Problem: large number of NAs in traploc/siteType. First check trap df to makes sure that trapLoc is correctly specified, then decide what to do with remaining mismatches.
 #This would take a large amount of time (I think) to go through.
 
-
-temp %>% filter(is.na(siteType),year==2015) %>% 
-  left_join(select(trap,BTID,trapType)) %>% 
-  as.data.frame()
+#Number of mismatches per year - roughly 1-2% each year
+temp %>% select(year,contains('mismatch')) %>% 
+  group_by(year) %>% summarize(total=n(),mismatchBLID=sum(mismatchBLID),mismatchBTID=sum(mismatchBTID)) %>% 
+  mutate(propMismatchBTID=mismatchBTID/total)
 
 
 # Save to file ------------------------------------------------------------
