@@ -126,7 +126,7 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
 # Are all spiders within these from the same pass? If not, how should these be dealt with?
 # Potential Excel-related problem: dates on many BTIDs have been "dragged down" resulting in increased years. Easy to fix when year is >2019, but could be a lot of material with erronious 2019 labels on them (should be 2018)
 
-temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
+arth <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to characters
   mutate(change=(BLID %in% changeBLID$BLID)) %>%  #Marks BLIDs for changes
   left_join(changeBLID,by='BLID') %>% rowwise() %>% 
   mutate(BTID=ifelse(change,gsub(as.character(BLID),to,BTID),BTID),BLID=ifelse(change,to,BLID)) %>% 
@@ -182,11 +182,13 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
 #This would take a large amount of time (I think) to go through.
 
 #Number of mismatches per year - roughly 1-2% each year
-temp %>% select(year,contains('mismatch')) %>% 
+arth %>% #filter(!grepl('-\\d/\\d-',BTID)) %>% #Strips out entries with passes that have a slash in them
+  select(year,contains('mismatch')) %>% group_by(year) %>% 
   summarize(total=n(),mismatchBLID=sum(mismatchBLID),mismatchBTID=sum(mismatchBTID)) %>% 
   mutate(propMismatchBTID=mismatchBTID/total)
 
 #Function for comparing character-by-character similarity of a string to a vector of other strings
+#Could be used to cleanup database further
 #Must be same length of strings
 closestMatch <- function(target,possible,returnType=1){
   #Check inputs
@@ -214,7 +216,6 @@ closestMatch <- function(target,possible,returnType=1){
 testTarg <- 'abcde'
 testPoss <- c('abcee','abcee','aeeee','aaade')
 closestMatch(testTarg,testPoss,2)
-
 
 # Save to file ------------------------------------------------------------
 
