@@ -183,8 +183,37 @@ temp <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
 
 #Number of mismatches per year - roughly 1-2% each year
 temp %>% select(year,contains('mismatch')) %>% 
-  group_by(year) %>% summarize(total=n(),mismatchBLID=sum(mismatchBLID),mismatchBTID=sum(mismatchBTID)) %>% 
+  summarize(total=n(),mismatchBLID=sum(mismatchBLID),mismatchBTID=sum(mismatchBTID)) %>% 
   mutate(propMismatchBTID=mismatchBTID/total)
+
+#Function for comparing character-by-character similarity of a string to a vector of other strings
+#Must be same length of strings
+closestMatch <- function(target,possible,returnType=1){
+  #Check inputs
+  lt <- nchar(target)
+  lp <- nchar(possible)
+  np <- length(possible)
+  if(length(lt)>1) stop('Multiple targets. Use sapply.')
+  if(any(lp!=max(lp))) stop('Possible strings have different lengths.')
+  
+  out <- rep(NA,np) #Output vector
+  splPoss <- strsplit(possible,'') #Splits into characters
+  splTarg <- strsplit(target,'')[[1]]
+  
+  for(i in 1:length(possible)){
+    out[i] <- sum(splTarg == splPoss[[i]])
+  }
+  if(returnType==1) return(out) #Return vector of character similarity
+  if(returnType==2) {
+    ind <- which(out==max(out)) #index of values to return
+    if(length(ind)>1) warning('Multiple matches')
+    return(possible[ind])
+  }
+}
+
+testTarg <- 'abcde'
+testPoss <- c('abcee','abcee','aeeee','aaade')
+closestMatch(testTarg,testPoss,2)
 
 
 # Save to file ------------------------------------------------------------
