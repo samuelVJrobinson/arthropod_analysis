@@ -1,9 +1,9 @@
 #NEW METHOD
 # Download data from ecologics using mySQL workbench, then import csv files
-site <- read.table('./rawData/site.csv',header=T,sep=';',stringsAsFactors = F)
-trap <- read.table('./rawData/trap.csv',header=T,sep=';',stringsAsFactors = F)
-arth <- read.table('./rawData/arthropod.csv',header=T,sep=';',stringsAsFactors = F)
-save(site,trap,arth,file='rawData.Rdata') #Saves to raw data file
+site <- read.table('./data/site.csv',header=T,sep=';',stringsAsFactors = F)
+trap <- read.table('./data/trap.csv',header=T,sep=';',stringsAsFactors = F)
+arth <- read.table('./data/arthropod.csv',header=T,sep=';',stringsAsFactors = F)
+save(site,trap,arth,file='./data/rawData.Rdata') #Saves to raw data file
 
 
 #OLD METHOD

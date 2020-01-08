@@ -3,7 +3,7 @@
 library(tidyverse)
 
 #Load raw data
-load('rawData.Rdata')
+load('./data/rawData.Rdata')
 
 #NOTES ON COLUMNS
 # BBID = Unique ID for speciment
@@ -219,6 +219,6 @@ closestMatch(testTarg,testPoss,2)
 
 # Save to file ------------------------------------------------------------
 
-save(site,trap,arth,file='cleanData.Rdata') #Saves to cleaned data file
+save(site,trap,arth,file='./data/cleanData.Rdata') #Saves to cleaned data file
 
 
