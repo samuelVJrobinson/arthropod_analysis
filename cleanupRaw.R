@@ -177,7 +177,7 @@ arth <- arth %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   #Join in location of specific trap from trap df
   left_join(select(trap,BTID,trapLoc),by='BTID') %>% 
   mutate(mismatchBTID=is.na(trapLoc)) #Records mismatch in BLID (trapping label)
-  
+
 #Problem: large number of NAs in traploc/siteType. First check trap df to makes sure that trapLoc is correctly specified, then decide what to do with remaining mismatches.
 #This would take a large amount of time (I think) to go through.
 
@@ -190,32 +190,37 @@ arth %>% #filter(!grepl('-\\d/\\d-',BTID)) %>% #Strips out entries with passes t
 #Function for comparing character-by-character similarity of a string to a vector of other strings
 #Could be used to cleanup database further
 #Must be same length of strings
-closestMatch <- function(target,possible,returnType=1){
+closestMatch <- function(target,possible){
+  fun1 <- function(poss,targ) sum(targ==poss) #Convenience function
+  #Converts input to characters
+  target <- as.character(target); possible <- as.character(possible)
+  possible <- unique(possible) #Retains unique possible strings
   #Check inputs
   lt <- nchar(target)
   lp <- nchar(possible)
   np <- length(possible)
   if(length(lt)>1) stop('Multiple targets. Use sapply.')
   if(any(lp!=max(lp))) stop('Possible strings have different lengths.')
-  
-  out <- rep(NA,np) #Output vector
-  splPoss <- strsplit(possible,'') #Splits into characters
-  splTarg <- strsplit(target,'')[[1]]
-  
-  for(i in 1:length(possible)){
-    out[i] <- sum(splTarg == splPoss[[i]])
-  }
-  if(returnType==1) return(out) #Return vector of character similarity
-  if(returnType==2) {
-    ind <- which(out==max(out)) #index of values to return
-    if(length(ind)>1) warning('Multiple matches')
-    return(possible[ind])
+  if(lt==max(lp)) { #If target and possible strings are the same lengths
+    out <- rep(NA,np) #Output vector
+    splPoss <- strsplit(possible,'') #Splits into characters
+    splTarg <- strsplit(target,'')[[1]]
+    
+    out <- sapply(splPoss,fun1,targ=splTarg)
+    
+    ret <- data.frame(possible=possible,similarity=out)
+    return(ret[order(-ret$sim),]) #Return vector of character similarity
+  } else { #If target and possible strings are different lengths
+    #Stop here. It is possible to match strings of different lengths, but if difference in nchar() is >1, this is a combinatorial problem
+    #i.e. if 2 characters are missing, where in the string are they missing? Assumes that character order is correct.
+    stop('Target and possible strings must be the same length')
   }
 }
 
 testTarg <- 'abcde'
 testPoss <- c('abcee','abcee','aeeee','aaade')
-closestMatch(testTarg,testPoss,2)
+closestMatch(testTarg,testPoss)
+closestMatch('abcd',testPoss)
 
 # Save to file ------------------------------------------------------------
 
