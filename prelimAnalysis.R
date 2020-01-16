@@ -104,55 +104,79 @@ yearNumbers <- arthNumbers %>%
   theme(axis.text=element_text(size=5),axis.text.x=element_text(angle=90,vjust=0.3,hjust=1)))
   # ggsave('./figures/maps/arthDistMap.png',p1,scale=1.5)
 
+rm(p1)
 # Create new shapefiles for 2018 data --------------------------------
+# 
+# #Add ditch sites from 2015/2016/2018
+# for(i in c(2015,2016,2018)){
+#   trapSf %>% filter(startYear==i,trapLoc=='ditch') %>% 
+#     select(BLID,replicate,trapType) %>% unique() %>% 
+#     st_transform(3403) %>% 
+#     st_write(paste0('~/Documents/shapefiles/digitizedFeaturesSR/DitchSites_',i,'.shp'),delete_dsn=TRUE)
+# }
+# 
+# #Add infields from 2018
+# trapSf %>% filter(startYear==2018,trapLoc!='ditch') %>% 
+#   select(BLID,replicate,trapType) %>% unique() %>% 
+#   st_transform(3403) %>% 
+#   st_write('~/Documents/shapefiles/digitizedFeaturesSR/InfieldSites_2018.shp',delete_dsn=TRUE)
+# 
+# #Get various shapefiles from GDB (can't be written to outside of ArcMap), transform, and save in another folder
+# layers <- st_layers('~/Documents/shapefiles/DigitizedFeatures_AllYears.gdb')$name
+# layers <- layers[!grepl('Buffer',layers)] #Get rid of buffer layers
+#   
+# for(i in layers){
+#   j <- st_read(dsn='~/Documents/shapefiles/DigitizedFeatures_AllYears.gdb',layer=i) %>% 
+#     st_zm() %>% st_transform(3403)
+#   st_write(j,paste0('~/Documents/shapefiles/digitizedFeaturesSR/',i,'.shp'),driver='ESRI Shapefile',delete_layer=TRUE)
+# }
+# 
+# #Only 16 of the ditch sites from 2018 (repeats of previous years in S. Calgary) have been digitized.
+# #The remaining ditch sites (41) and infields (27) need wetland layers created around them
 
-#Add ditch sites from 2015/2016/2018
-for(i in c(2015,2016,2018)){
-  trapSf %>% filter(startYear==i,trapLoc=='ditch') %>% 
-    select(BLID,replicate,trapType) %>% unique() %>% 
-    st_transform(3403) %>% 
-    st_write(paste0('~/Documents/shapefiles/digitizedFeaturesSR/DitchSites_',i,'.shp'),delete_dsn=TRUE)
-}
-
-#Add infields from 2018
-trapSf %>% filter(startYear==2018,trapLoc!='ditch') %>% 
-  select(BLID,replicate,trapType) %>% unique() %>% 
-  st_transform(3403) %>% 
-  st_write('~/Documents/shapefiles/digitizedFeaturesSR/InfieldSites_2018.shp',delete_dsn=TRUE)
-
-#Get various shapefiles from GDB (can't be written to outside of ArcMap), transform, and save in another folder
-layers <- st_layers('~/Documents/shapefiles/DigitizedFeatures_AllYears.gdb')$name
-layers <- layers[!grepl('Buffer',layers)] #Get rid of buffer layers
-  
-for(i in layers){
-  j <- st_read(dsn='~/Documents/shapefiles/DigitizedFeatures_AllYears.gdb',layer=i) %>% 
-    st_zm() %>% st_transform(3403)
-  st_write(j,paste0('~/Documents/shapefiles/digitizedFeaturesSR/',i,'.shp'),driver='ESRI Shapefile',delete_layer=TRUE)
-}
-
-#Only 16 of the ditch sites from 2018 (repeats of previous years in S. Calgary) have been digitized.
-#The remaining ditch sites (41) and infields (27) need wetland layers created around them
-
-#Get wetland distances from various infield sites
+#Get wetland distances from infield sites -------------------
 
 #Wetland distances 
 wtrap2016 <- trapSf %>% filter(startYear==2016,grepl('W',replicate)) #trap locations
-wland2016 <- st_read(dsn='~/Documents/shapefiles/digitizedFeaturesSR/Wetlands2016.shp') #wetland polygons
-
-#Buffer all unique traps by 1km
-trapBuff <- wtrap2016 %>% select(BLID) %>% unique() %>% st_buffer(dist=1000)
+wland2016 <- st_read(dsn='~/Documents/shapefiles/digitizedFeaturesSR/Wetlands2016.shp') %>%  #wetland polygons
+  rbind(select(st_read(dsn='~/Documents/shapefiles/digitizedFeaturesSR/Ephemeral2016.shp'),-Notes)) %>%  # include ephemeral wetlands
+  mutate(wType=ifelse(grepl('Wetland',FldrPth),'Permanant','Ephemeral'))
+  
+#Buffer all unique traps by 200m
+trapBuff <- wtrap2016 %>% select(BLID) %>% unique() %>% st_buffer(dist=300)
 
 #Filter wetlands that overlap buffer distance
-wland2016 <- wland2016[sort(unique(unlist(st_intersects(trapBuff,wland2016)))),]
+wland2016 <- wland2016 %>% slice(sort(unique(unlist(st_intersects(trapBuff,wland2016))))) 
+rm(trapBuff)
 
-wland2016[unique(st_nearest_feature(wtrap2016,wland2016)),'isNearest'] <- TRUE
+#Identify wetlands nearest to traps
+wland2016$isNearest <- 1:nrow(wland2016) %in% st_nearest_feature(wtrap2016,wland2016)
+
+wland2016Points <- st_cast(wland2016,to='POINT') #Cast wetland to point geometry
+wland2016Points$isNearest <- 1:nrow(wland2016Points) %in% st_nearest_feature(wtrap2016,wland2016Points)  #Select points nearest to traps
+
+wtrap2016 <- wtrap2016 %>% 
+  #Gets distance from nearest wetland, unless replicate is at W0 (dist=0)
+  mutate(wlandDist = ifelse(grepl('W0',replicate),0,apply(st_distance(wtrap2016,filter(wland2016Points,isNearest)),1,min)))
+
+ggplot(wtrap2016) + geom_histogram(aes(x=wlandDist)) #Looks good
+  
 
 #Appears to work
-ggplot()+geom_sf(data=wland2016,aes(fill=isNearest))+
-  geom_sf(data=wtrap2016,col='blue')
+coords <- st_coordinates(distinct(wtrap2016))[1,]
+#Polygons
+ggplot()+
+  geom_sf(data=wland2016,aes(fill=wType))+
+  geom_sf(data=wtrap2016,col='blue')+
+  coord_sf(xlim=c(1,-1)*500+coords[1],ylim=c(1,-1)*500+coords[2])+
+  scale_fill_manual(values=c('lightgreen','forestgreen'))
 
-
-
+#Points
+ggplot()+
+  geom_sf(data=wland2016Points,aes(col=isNearest),size=0.5)+
+  geom_sf(data=wtrap2016,col='blue',size=0.5)+
+  coord_sf(xlim=c(1,-1)*400+coords[1],ylim=c(1,-1)*400+coords[2])+
+  scale_colour_manual(values=c('black','red'))
 
 # Question 1: Spillover into crops ----------------------------------------
 
