@@ -141,7 +141,6 @@ kfac <- 10 #Factor to multiply k by (change carrying capacity for all patches)
 
 mkDist(patches,worldLims,r,dispType,dispPars,tim,kfac,propDisperse=0.1,figure='hist',lastStep=F,returnDist=F)
 
-
 # Simple situation --------------------------------------------------------
 
 theme_set(theme_classic())
@@ -177,46 +176,89 @@ mod1 <- dispDist %>% mutate(logn=log(n+0.1),d=d) %>%
 summary(mod1)
 par(mfrow=c(2,1)); plot(mod1,which=c(1,2))
 
-
-
 #Function to extract "onion skin" proportions of patch cover at distances from cent
-# patchDat: dataframe with xlims of patches
+# patches: dataframe with xlims of patches
 # cent: vector of centre locations
-# w: width of each slice
-# dist: max distance(s) to use
-
-onionSkin <- function(patchDat,cent,w,dist){
-  
-  patchDat <- data.frame(xmin=c(0),xmax=c(20),n=c(5))  
-  patchDat
-  
-  
-  #Number of onion slices (rounded down)
-  nslice <- dist %/% w
-  
-  results <- matrix(rep(NA,length(cent)*nslice),nrows=length(cent),ncol=nslice)
-  
-  for(i in 1:length(cent)){ #For each location
-    
-    
-    #Starting boundaries for each slice
-    left <- c(cent-w,cent)
-    right <- c(cent,cent+w)
-    
-    for(j in 1:nslice){ #For each slice
-      
-    }
-    
-    
+# rad: length of radius
+# nSlice: number of slices to take from 0 to rad
+onionSkin <- function(patches,cent,rad,nSlice,scale=F){
+  #Helper function
+  overlap <- function(t1,t2,b1,b2){ #How much of a target line (t1,t2) overlaps the boundary line (b1,b2)
+    if(t1>=t2|b1>=b2) stop('Second argument (t2/b2) must be larger than first (t1/b1)')
+    max(0,min(t2,b2)-max(t1,b1))
   }
   
+  #Setup 
+  nPatch <- nrow(patches) #Number of patches specified
+  nCent <- length(cent) #Number of point centres to use
+  wSlice <- rad/nSlice #Width of a slice
   
+  #Matrix for storing values
+  results <- matrix(rep(NA,nCent*nSlice),nrow=nCent,ncol=nSlice)
+  rownames(results) <- cent
+  colnames(results) <- paste0('d',format(round(seq(wSlice,rad,wSlice),2),nsmall=2,trim=T))
   
-  
-  
-  
-  
+  for(i in 1:nCent){ #For each point centre
+    for(j in 1:nSlice){ #For each slice
+      #Boundaries for each slice
+      left <- c(cent-wSlice*j,cent-wSlice*(j-1))
+      right <- c(cent+wSlice*(j-1),cent+wSlice*j)
+      results[i,j] <- 0 #Initialize to zero
+      for(k in 1:nPatch){
+        results[i,j] <- results[i,j] + #Add overlap 
+          overlap(patches$xmin[k],patches$xmax[k],left[1],left[2]) + 
+          overlap(patches$xmin[k],patches$xmax[k],right[1],right[2])
+      }
+    }
+  }
+  if(scale){ #Scales results to proportion of area in slices
+    results <- results/(rad*2/nSlice)
+  }
+  return(results) #Output
 }
+
+#Function to generate random 1-D landscapes
+# worldLim: vector of x-limits to world
+# nPatches: number of patches to generate
+# nWorlds: number of random landscapes to generate (Go then. There are other worlds than these.)
+# leaveClear: location to check if patches intersect (reject intersecting worlds)
+mkLandscape <- function(worldLims,nPatches,nWorlds=1,leaveClear=NA){
+  #Width of world
+  worldWidth <- max(worldLims)-min(worldLims)
+  
+  require(gtools)
+  nBreaks <- (nPatches*2)+1 #Dimensions for dirichlet process
+  outputList <- list()
+  listInd <- 1 #Index for list
+  
+  while(length(outputList)<nWorlds){
+    #Generate "cut up string" of locations using dirichlet process
+    breakLocs <- cumsum(c(0,rdirichlet(1,rep(1,nBreaks))))*worldWidth + min(worldLims) 
+    
+    #Assemble into data frame
+    patches <- data.frame(xmin=breakLocs[1:length(breakLocs)-1],xmax=breakLocs[2:length(breakLocs)])
+    patches <- patches[seq(2,nrow(patches)-1,2),] #Choose only "middle" patches
+    rownames(patches) <- NULL #Reset row names
+    
+    #Check intersection criteria (if present)
+    if(is.na(leaveClear) | !any(patches$xmax>=leaveClear & leaveClear>=patches$xmin)) {
+      patches$size <- patches$xmax-patches$xmin #Calculate patch size
+      outputList[[listInd]] <- patches #If it passes, append to list
+      listInd <- listInd + 1 #Increment counter
+    }
+  }
+  return(outputList)
+}
+
+#Works
+mkLandscape(worldLims=c(0,100),nPatches=2,nWorlds=3,leaveClear=50)
+
+
+
+
+
+
+
 
 
 
