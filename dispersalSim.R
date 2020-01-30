@@ -446,8 +446,11 @@ data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,
   ggplot(aes(x=counts,y=pred))+geom_point()+
   geom_abline(intercept=0,slope=1,col='red')+
   scale_x_log10()+scale_y_log10()
-  
 
+#NegBin version using TMB
+library(TMB)
+compile("./TMBscripts/ringNegBin.cpp")
+  
 # RFR (radial functional regression) with simulated data -------------------------------------------------
 
 #Step 1: generate worlds
