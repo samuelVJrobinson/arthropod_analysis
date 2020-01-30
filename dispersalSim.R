@@ -1,6 +1,10 @@
 #Simulation to look at dispersal distances from seminatural features, SR 2020
 
 library(tidyverse)
+# library(devtools)
+# install_github('https://github.com/jdyen/FREE')
+# library(FREE) #Functional regression
+library(mgcv)
 
 # Functions for simulation -------------------------------------------------------
 
@@ -366,6 +370,7 @@ nllOnion(c(1.5,3,log(0.1)),dat=datList,pdf='poisson',lambda=2,intercept=T) #Look
 # debugonce(nllOnion)
 
 #Estimate
+#NOTE: lambda can be estimated separately, but it's close to being non-separable. Probably better to fix term or estimate WRT other terms.
 est <- optim(c(1.5,3,log(0.1)),nllOnion,dat=datList,lambda=2,intercept=T,hessian=T) 
 if(any(eigen(est$hessian)$values<=0)) print('Non-positive definite Hessian')
 
@@ -394,7 +399,7 @@ data.frame(dist=0:100,t(apply(bootRep,1,function(x) quantile(x,c(0.5,0.95,0.05))
   labs(x='Distance',y='Coefficient')
 
 #Predicted vs actual values - looks OK
-data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,est$par[2],exp(est$par[3]),est$par[4])))) %>% 
+data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,est$par[2],exp(est$par[3]),2)))) %>% 
   ggplot(aes(x=counts+1,y=pred))+geom_point()+
   geom_abline(intercept=0,slope=1,col='red')+
   scale_x_log10()+scale_y_log10()
@@ -543,13 +548,29 @@ data.frame(est=omod2[[3]]$par,se=sqrt(diag(solve(omod2[[3]]$hessian)))) #Not goo
 if(any(eigen(omod2[[4]]$hessian)$values<=0)) print('Non-positive definite Hessian')
 data.frame(est=omod2[[4]]$par,se=sqrt(diag(solve(omod2[[4]]$hessian)))) #Not good
 
+#Functional regression using mgcv
+datList$ringMat <- matrix(rep(ringDist,each=nrow(ringComp)),ncol=ncol(ringComp)) #Matrix of distance values
+datList$nnDist <- nnDist
+omod3 <- gam(counts~s(ringMat,by=ringComp),data=datList,family='nb',method='ML') #Just ring composition
+omod4 <- gam(counts~nnDist+s(ringMat,by=ringComp),data=datList,family='nb',method='ML') #Ring composition + NN distance
+AIC(omod3,omod4)
+summary(omod3)
+summary(omod4)
+plot(omod3); abline(h=0,lty=2)
+plot(omod4); abline(h=0,lty=2)
+
+
 #Plot coefficient curves
 par(mfrow=c(3,1))
-curve(negExp(x,omod1[[1]]$par[1],exp(omod1[[1]]$par[2]),1),0,50,xlab='Dist',ylab='Coef',main='Radial Functional Regression - Radii only') #Looks OK
+plot(omod3,ylab='Coef',xlab='Dist',main='Radial Functional Regression - Radii only',se=F,col='blue',rug=F)
+abline(h=0,lty=2)
+curve(negExp(x,omod1[[1]]$par[1],exp(omod1[[1]]$par[2]),1),0,50,add=T) #Looks OK
 curve(negExp(x,omod1[[2]]$par[1],exp(omod1[[2]]$par[2]),2),0,50,add=T,col='red') #Looks OK
 curve(negExp(x,omod1[[3]]$par[2],exp(omod1[[3]]$par[3]),1)+omod1[[3]]$par[1],0,50,add=T,lty=2) #Looks OK
 curve(negExp(x,omod1[[4]]$par[2],exp(omod1[[4]]$par[3]),2)+omod1[[4]]$par[1],0,50,add=T,lty=2,col='red') #Looks OK
-legend('topright',c('Linear','Squared','Linear + Int','Squared + Int'),col=c('black','red','black','red'),lty=c(1,1,2,2))
+
+
+legend('topright',c('Linear','Squared','Linear + Int','Squared + Int','Spline'),col=c('black','red','black','red','blue'),lty=c(1,1,2,2,1))
 #Radial component
 curve(negExp(x,omod2[[1]]$par[1],exp(omod2[[1]]$par[2]),1),0,50,xlab='Dist',ylab='Coef',main='Radial Functional Regression - Radii component') #Looks OK
 curve(negExp(x,omod2[[2]]$par[1],exp(omod2[[2]]$par[2]),2),0,50,add=T,col='red')
@@ -567,7 +588,7 @@ plot(predict(mod1,type='response'),counts,ylab='Actual',xlab='Predicted'); ablin
 #Compare different fixed radii as predictors
 mod2 <- list()
 mod2[[1]] <- MASS::glm.nb(counts~ringComp[,1])
-par(mfrow=c(5,2)); plot(mod2[[1]],which=c(1,2),main=paste0('Dist:',ringDist[1]+2.5))
+par(mfrow=c(3,2)); plot(mod2[[1]],which=c(1,2),main=paste0('Dist:',ringDist[1]+2.5))
 for(i in 1:ncol(totalComp)){
   mod2[[i+1]] <- MASS::glm.nb(counts~totalComp[,i])
   plot(mod2[[i+1]],which=c(1,2),main=paste0('Dist:',ringDist[i+1]+2.5))
@@ -577,24 +598,23 @@ par(mfrow=c(1,1))
 #Fixed radii + nnDist
 mod3 <- list()
 mod3[[1]] <- MASS::glm.nb(counts~ringComp[,1]+nnDist)
-par(mfrow=c(5,2)); plot(mod3[[1]],which=c(1,2),main=paste0('Dist:',ringDist[1]+2.5))
+par(mfrow=c(3,2)); plot(mod3[[1]],which=c(1,2),main=paste0('Dist:',ringDist[1]+2.5))
 for(i in 1:ncol(totalComp)){
   mod3[[i+1]] <- MASS::glm.nb(counts~totalComp[,i]+nnDist)
   plot(mod3[[i+1]],which=c(1,2),main=paste0('Dist:',ringDist[i+1]+2.5))
 }
+par(mfrow=c(1,1))
 
-
-# drop1(mod2[[4]],test='Chisq')
-# mod2 <- MASS::glm.nb(counts~ringComp[,4]*nnDist)
-# summary(mod2)
-# par(mfrow=c(2,1)); plot(mod2,which=c(1,2))
+sapply(mod2,car::vif)
 
 #Assemble model results
 modResults <- data.frame(model=c('Onion - No Intercept - Linear','Onion - No Intercept - Square','Onion - Intercept - Linear','Onion - Intercept - Square'),
                          logLik=-sapply(omod1,function(x) x$value),nPars=c(3,3,4,4)) %>% 
+  bind_rows(data.frame(model=c('Onion - Intercept - Spline','Onion - Intercept - Spline + NN'),
+                       logLik=c(logLik(omod3),logLik(omod4)),nPars=c(length(coef(omod3)),length(coef(omod4))))) %>% 
   # #Linear + NN models have same logLik as models above - no improvement
   # bind_rows(data.frame(model=c('Onion - No Intercept - Linear+NN','Onion - No Intercept - Square+NN'),
-  #                      logLik=-sapply(omod2,function(x) x$value)[1:2],nPars=c(4,4))) %>% 
+  #                      logLik=-sapply(omod2,function(x) x$value)[1:2],nPars=c(4,4))) %>%
   bind_rows(data.frame(model=c('LM - Int - Nearest neighbour',paste0('LM - Int - radius',ringDist+2.5),paste0('LM - Int - radius+NN',ringDist+2.5)),
                        logLik=c(logLik(mod1),sapply(mod2,logLik),sapply(mod3,logLik)),
                        nPars=c(rep(3,1+length(mod2)),rep(4,length(mod3))))) %>%
@@ -609,11 +629,12 @@ abline(h=logLik(mod1),lty='dashed')
 text(40,logLik(mod1)-5,'Nearest patch')
 text(40,logLik(mod2[[8]])+25,'Varying\nradii')
 text(40,logLik(mod3[[8]])-15,'Nearest patch +\nVarying radii')
-abline(h=modResults$logLik[grepl('Onion',modResults$modType)],col='red',lty='dashed')
-# text(40,-1465,'"Onion-ring" models',col='red')
-with(modResults,
-     text(40,logLik[grepl('Onion',modType)],paste(predictor[grepl('Onion',modType)],intercept[grepl('Onion',modType)],sep='-'),col='red')
+abline(h=modResults$logLik[grepl('decay',modResults$predictor)],col='red',lty='dashed')
+with(filter(modResults,grepl('decay',predictor)),
+     text(40,logLik,paste(predictor,intercept,sep='-'),col='red')
      )
+abline(h=modResults$logLik[grepl('Spline',modResults$predictor)],col='blue',lty='dashed')
+with(filter(modResults,grepl('Spline',predictor)),text(40,logLik,paste(predictor,intercept,sep='-'),col='blue'))
 legend('bottom',legend=c('Standard GLM','"Onion-skin" GLM'),fill=c('black','red'), y.intersp=0.8,x.intersp=0.5)
 
 #AIC plot
@@ -623,10 +644,13 @@ abline(h=AIC(mod1),lty='dashed')
 text(40,AIC(mod1)+5,'Nearest patch')
 text(40,AIC(mod2[[8]])-45,'Varying\nradii')
 text(40,AIC(mod3[[8]])+25,'Nearest patch +\nVarying radii')
-abline(h=modResults$AIC[grepl('Onion',modResults$modType)],col='red',lty='dashed')
-# text(40,-1465,'"Onion-ring" models',col='red')
-with(filter(modResults,grepl('Onion',modType)),
+abline(h=modResults$AIC[grepl('decay',modResults$predictor)],col='red',lty='dashed')
+with(filter(modResults,grepl('decay',predictor)),
      text(40,AIC,paste(predictor,intercept,sep='-'),col='red')
+)
+abline(h=modResults$AIC[grepl('Spline',modResults$predictor)],col='blue',lty='dashed')
+with(filter(modResults,grepl('Spline',predictor)),
+     text(40,AIC,paste(predictor,intercept,sep='-'),col='blue')
 )
 legend('top',legend=c('Standard GLM','"Onion-skin" GLM'),fill=c('black','red'), y.intersp=0.8,x.intersp=0.5)
 
@@ -681,3 +705,62 @@ data.frame(counts=counts,
 
 #Next step: try functional regression to see if splines do any better  
 
+# #Bootstrap CIs for slope coefficients
+# bootCoef <- replicate(100,{
+#   samps <- sample(1:length(datList[[1]]),length(datList[[1]]),replace=T)
+#   tempDat <- list(datList[[1]][samps],datList[[2]],datList[[3]][samps,],datList[[4]])
+#   tempPars <- optim(omod3$par,nllOnion,dat=tempDat,pdf='negbin',lambda=1,intercept=T,hessian=T)$par
+#   #Predictions for coefs at different distances
+#   tempRet <- negExp(ringDist,tempPars[2],exp(tempPars[3]),1)
+#   names(tempRet) <- colnames(ringComp)
+#   return(tempRet)
+# })
+# 
+# data.frame(dist=ringDist+2.5,
+#            med=apply(bootCoef,1,median),upr=apply(bootCoef,1,function(x) quantile(x,0.95)),lwr=apply(bootCoef,1,function(x) quantile(x,0.05))) %>% 
+#   ggplot(aes(dist,med))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+#   geom_line()+
+#   labs(x='Distance',y='Slope coefficient')
+# 
+# #Bootstrap CIs for predicted values
+# bootPred <- replicate(100,{
+#   samps <- sample(1:length(datList[[1]]),length(datList[[1]]),replace=T) #Samples to take
+#   tempDat <- list(datList[[1]][samps],datList[[2]],datList[[3]][samps,],datList[[4]]) #Re-sampled data
+#   tempPars <- optim(omod3$par,nllOnion,dat=tempDat,pdf='negbin',lambda=1,intercept=T,hessian=T)$par
+#   # #Predictions for coefs at different distances
+#   # tempRet <- lnExp(ringDist,tempPars[2],exp(tempPars[3]))
+#   # names(tempRet) <- colnames(ringComp)
+#   #Generate expected values
+#   tempRet <- as.vector(exp(tempPars[1] + datList[[3]] %*% negExp(ringDist,tempPars[2],exp(tempPars[3]),1)))
+#   # plot(as.vector(exp(tempPars[1] + datList[[3]] %*% lnExp(ringDist,tempPars[2],exp(tempPars[3])))),counts,xlab='pred',ylab='actual')
+#   # abline(0,1,col='red')
+#   return(tempRet)
+#   rm(samps,tempDat,tempPars,tempRet)
+# })
+# 
+# #This looks really overdispersed
+# data.frame(counts=counts,
+#            patches=rep(1:5,each=100),
+#            pred=as.vector(exp(omod3$par[1] + ringComp %*% negExp(ringDist,omod3$par[2],exp(omod3$par[3]),1))),
+#            med=apply(bootPred,1,median),
+#            upr=apply(bootPred,1,function(x) quantile(x,0.95)), lwr=apply(bootPred,1,function(x) quantile(x,0.05))) %>% 
+#   ggplot(aes(x=counts+1,y=pred))+ # geom_pointrange(aes(x=counts+0.1,y=med,ymax=upr,ymin=lwr))+
+#   geom_point()+
+#   # facet_wrap(~patches)+
+#   labs(x='Actual',y='Predicted')
+#   # geom_smooth(method=lm,formula=y~exp(x),se=F)+
+#   # scale_y_log10()+scale_x_log10()
+#   
+# 
+# #Try this again, but with sqrt-transformed distances
+# datList <- list(counts,sqrt(ringDist),ringComp,scal=rep(1,length(ringDist)))
+# 
+# #NegBin - intercept - linear decay
+# (omod5 <- optim(c(0,5.6,-1,0.8),nllOnion,
+#                 # method='L-BFGS-B',lower=c(-10,-10,-10,-10),upper=c(10,10,10,10),
+#                 dat=datList,type='ln',pdf='negbin',intercept=T,hessian=T))
+# if(any(eigen(omod5$hessian)$values<=0)) print('Non-positive definite Hessian')
+# data.frame(est=omod5$par,se=sqrt(diag(solve(omod5$hessian)))) #Looks OK
+# curve(lnExp(x,omod5$par[2],exp(omod5$par[3]))+omod5$par[1],log(1),log(50),xlab='log(Dist)',ylab='Coef') #Looks OK
+# 
+# as.vector(exp(omod5$par[1] + ringComp %*% lnExp(ringDist,omod5$par[2],exp(omod5$par[3]))))
