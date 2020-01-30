@@ -678,17 +678,6 @@ data.frame(counts=counts,
   labs(x='Actual',y='Predicted')
   # geom_smooth(method=lm,formula=y~exp(x),se=F)+
   # scale_y_log10()+scale_x_log10()
-  
 
-#Try this again, but with sqrt-transformed distances
-datList <- list(counts,sqrt(ringDist),ringComp,scal=rep(1,length(ringDist)))
+#Next step: try functional regression to see if splines do any better  
 
-#NegBin - intercept - linear decay
-(omod5 <- optim(c(0,5.6,-1,0.8),nllOnion,
-                # method='L-BFGS-B',lower=c(-10,-10,-10,-10),upper=c(10,10,10,10),
-                dat=datList,type='ln',pdf='negbin',intercept=T,hessian=T))
-if(any(eigen(omod5$hessian)$values<=0)) print('Non-positive definite Hessian')
-data.frame(est=omod5$par,se=sqrt(diag(solve(omod5$hessian)))) #Looks OK
-curve(lnExp(x,omod5$par[2],exp(omod5$par[3]))+omod5$par[1],log(1),log(50),xlab='log(Dist)',ylab='Coef') #Looks OK
-
-as.vector(exp(omod5$par[1] + ringComp %*% lnExp(ringDist,omod5$par[2],exp(omod5$par[3]))))
