@@ -1,11 +1,11 @@
 #Simulation to look at dispersal distances from seminatural features, SR 2020
 
 library(tidyverse)
+library(mgcv)
+library(TMB)
 # library(devtools)
 # install_github('https://github.com/jdyen/FREE')
 # library(FREE) #Functional regression
-library(mgcv)
-library(TMB)
 
 # Functions for simulation -------------------------------------------------------
 
@@ -437,9 +437,37 @@ data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,
   scale_x_log10()+scale_y_log10()
 
 #NegBin version using TMB
-precompile()
 compile("./TMBscripts/ringNegBin.cpp")
-compile("./TMBscripts/test.cpp")
+dyn.load(dynlib("./TMBscripts/ringNegBin"))
+
+#Check out model.matrix()
+model.matrix(~ 1,data=data.frame(counts))
+
+# Step 2 -- build inputs and object
+Data = list( "y_i"=data$Y_i, "X_ij"= model.matrix(~ 1 + data$x1 + data$x2 + data$x1:data$x2))
+Params = list("b_j"=rep(0, ncol(Data$X_ij)))
+Obj = MakeADFun( data=Data, parameters=Params, DLL="poisson")
+
+# Step 3 -- test and optimize
+Obj$fn( Obj$par )
+Obj$gr( Obj$par )
+
+opt = TMBhelper::Optimize(obj=Obj, getsd=T, newtonsteps=1)
+
+SD = sdreport( Obj )
+final_gradient = Obj$gr( opt$par )
+if( any(abs(final_gradient)>0.0001) | SD$pdHess==FALSE ) stop("Not converged")
+
+#Extract the intercept and SE
+ParHat = as.list( opt$SD, "Estimate" )
+SEHat  = as.list( opt$SD, "Std. Error" )
+
+opt$objective #nll
+logLik(glm.fit) #ll from glm 
+
+opt
+
+
 
 # RFR (radial functional regression) with simulated data -------------------------------------------------
 
