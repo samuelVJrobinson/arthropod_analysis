@@ -5,6 +5,7 @@ library(tidyverse)
 # install_github('https://github.com/jdyen/FREE')
 # library(FREE) #Functional regression
 library(mgcv)
+library(TMB)
 
 # Functions for simulation -------------------------------------------------------
 
@@ -123,18 +124,6 @@ mkDist <- function(patches,worldLims,r,dispType,dispPars,tim,kfac,propDisperse=1
 patches <- data.frame(xmin=c(0,30,70),xmax=c(10,40,100),n=c(5,5,15))
 worldLims <- c(0,100)
 r <- 1 #Rate of growth
-
-# #normal distribution
-# dispType <- 'normal'
-# dispPars <- c(5)
-
-# #t distribution
-# dispType <- 't'
-# dispPars <- c(5,3) #dispersal parameters
-
-# #cauchy distribution 
-# dispType <- 'cauchy'
-# dispPars <- c(1) #dispersal parameters
 
 #2-sided fat-tailed distribution
 dispType <- 'ft'
@@ -448,9 +437,10 @@ data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,
   scale_x_log10()+scale_y_log10()
 
 #NegBin version using TMB
-library(TMB)
+precompile()
 compile("./TMBscripts/ringNegBin.cpp")
-  
+compile("./TMBscripts/test.cpp")
+
 # RFR (radial functional regression) with simulated data -------------------------------------------------
 
 #Step 1: generate worlds
