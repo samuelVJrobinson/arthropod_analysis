@@ -1,5 +1,5 @@
-setwd("~/Projects/UofC postdoc/arthropod_analysis/TMBscripts")
-
+# setwd("~/Projects/UofC postdoc/arthropod_analysis/TMBscripts")
+setwd("~/Documents/arthropod_analysis/TMBscripts")
 library(TMB)
 library(tidyverse)
 theme_set(theme_classic())
@@ -38,7 +38,7 @@ if(any(abs(finalGradient)>0.0001) | optSD$pdHess==FALSE ) stop("Not converged")
 obj$fn(opt$par) #LogLik
 opt$par #Parameter estimates
 
-
+#Appears to work.
 data.frame(par=c('int','slope','logTheta'),actual=c(2,1.5,log(2)),est=opt$par,
            se=sqrt(diag(solve(obj$he(obj$par))))) %>% 
   mutate(upr=est+1.96*se,lwr=est-1.96*se) %>% 

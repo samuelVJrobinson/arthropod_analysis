@@ -32,8 +32,8 @@ Type objective_function<Type>::operator() ()
     nll -= dnbinom2(y(i), exp(mu(i)), exp(mu(i))+(pow(exp(mu(i)),2)/theta), true); //Increment nll
   }
   
-  // REPORT(mu);
-  // ADREPORT(mu);
+  REPORT(theta);
+  ADREPORT(theta);
   
   return nll;
 }

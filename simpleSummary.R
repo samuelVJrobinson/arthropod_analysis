@@ -1,11 +1,9 @@
 # CREATES SUMMARY TABLES/MAPS FROM CLEANED DATA
+setwd('~/Documents/arthropod_analysis')
+load('./data/cleanData.Rdata') #Load data
 
-load('cleanData.Rdata') #Load data
-
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 library(sf)
-library(ggplot2)
 theme_set(theme_bw())
 
 # Map data for simple plots ------------------------------------------
@@ -17,10 +15,7 @@ trap2 <- trap %>% rowwise() %>%
   transmute(BLID,type=trapType,year=max(c(startYear,endYear),na.rm=T),hours=deployedhours) %>% 
   ungroup() %>% mutate(type=factor(type),year=factor(year)) 
   
-  
-  group_by(BLID,type,year) %>% summarize(hours=sum(hours,na.rm=T))
-
-
+  # group_by(BLID,type,year) %>% summarize(hours=sum(hours,na.rm=T))
 
 #Types of map projections
 targetCRS <- 32612 #UTM 12

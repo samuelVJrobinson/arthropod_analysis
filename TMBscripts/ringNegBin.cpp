@@ -32,7 +32,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> mu = (coefMat * coefVec) + (ringMat * ringCoef);
   
   for(int i=0; i<nCount; i++){ //For each data point	
-    nll -= dnbinom2(y(i), exp(mu(i)), mu(i) + (pow(mu(i),2)/exp(logTheta)), true); //Increment nll
+    nll -= dnbinom2(y(i), exp(mu(i)), exp(mu(i)) + (pow(exp(mu(i)),2)/logTheta), true); //Increment nll
   }
   
   // Reporting
