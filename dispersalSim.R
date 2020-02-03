@@ -437,30 +437,61 @@ data.frame(counts=counts,pred=exp(est$par[1]+(as.matrix(rings) %*% negExp(dists,
   scale_x_log10()+scale_y_log10()
 
 #NegBin version using TMB
-compile("./TMBscripts/ringNegBin.cpp")
-dyn.load(dynlib("./TMBscripts/ringNegBin"))
+setwd('~/Documents/arthropod_analysis/TMBscripts')
+compile("ringNegBin.cpp",flags="-O0 -g")
+dyn.load(dynlib("ringNegBin"))
 
-#Check out model.matrix()
-model.matrix(~ 1,data=data.frame(counts))
+#List of data
+datList <- list(y=counts, coefMat= matrix(model.matrix(~ 1,data=data.frame(counts))),
+                ringDist=dists,ringMat=as.matrix(rings))
 
-# Step 2 -- build inputs and object
-Data = list( "y_i"=data$Y_i, "X_ij"= model.matrix(~ 1 + data$x1 + data$x2 + data$x1:data$x2))
-Params = list("b_j"=rep(0, ncol(Data$X_ij)))
-Obj = MakeADFun( data=Data, parameters=Params, DLL="poisson")
+#Starting parameters
+# startPars <- list(coefVec=as.vector(1.5),eta=3,logRho=0.1,lambda=2,logTheta=2.5)
+startPars <- list(coefVec=1.5,eta=3,logRho=0.1,logTheta=2.5)
 
-# Step 3 -- test and optimize
-Obj$fn( Obj$par )
-Obj$gr( Obj$par )
+nllOnionTMB <- MakeADFun(data=datList, parameters=startPars, DLL="ringNegBin")
 
-opt = TMBhelper::Optimize(obj=Obj, getsd=T, newtonsteps=1)
+#Check function
+nllOnionTMB$fn(startPars) #Works
+nllOnionTMB$gr(startPars)
+nllOnionTMB$he(startPars)
 
-SD = sdreport( Obj )
-final_gradient = Obj$gr( opt$par )
-if( any(abs(final_gradient)>0.0001) | SD$pdHess==FALSE ) stop("Not converged")
+est <- nlminb(startPars,nllOnionTMB$fn,nllOnionTMB$gr) #Estimate parameters
+estSD <- sdreport(nllOnionTMB) #SD report
+
+#Check convergence
+final_gradient <- nllOnionTMB$gr(est$par) #Gradient at convergence
+if(any(abs(final_gradient)>0.0001) | estSD$pdHess==FALSE ) stop("Not converged")
+
+est$par
+
+str(est)
+str(estSD)
+estSD$value
+
+#This isn't estimating theta correctly
+
+summary(estSD) %>% as.data.frame() %>% 
+  rename('est'='Estimate','SE'='Std. Error') %>% 
+  rownames_to_column() %>% 
+  mutate(upr=est+SE,lwr=est-SE) %>% 
+  mutate(actual=c(1.5,3,NA,NA,0.1,2.5,coefs)) %>% 
+  filter(!is.na(actual)) %>% 
+  ggplot(aes(x=rowname))+geom_pointrange(aes(y=est,ymax=upr,ymin=lwr),col='red')+
+  geom_point(aes(y=actual))+
+  facet_wrap(~rowname,scales='free')
+
+int <- 1.5 #intercept
+dists <- seq(5,50,5)-2.5 #Distances from centre
+eta <- 3
+rho <- 0.1
+
+
+
 
 #Extract the intercept and SE
-ParHat = as.list( opt$SD, "Estimate" )
-SEHat  = as.list( opt$SD, "Std. Error" )
+ParHat = as.list(nllOnionTMB$SD, "Estimate")
+SEHat  = as.list(nllOnionTMB$SD, "Std. Error")
 
 opt$objective #nll
 logLik(glm.fit) #ll from glm 
