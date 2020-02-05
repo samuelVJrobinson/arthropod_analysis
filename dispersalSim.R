@@ -292,7 +292,6 @@ nllOnion <- function(pars,dat,pdf='poisson',intercept=F,lambda=NA){
   return(nll)
 }
 
-
 # Simple situation --------------------------------------------------------
 
 theme_set(theme_classic())
