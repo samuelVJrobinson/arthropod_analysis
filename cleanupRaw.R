@@ -110,7 +110,11 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
     trapType=='infield' & replicate=='WPF' ~ 'Pit Fall',
     trapType=='infield' & replicate=='WCC' ~ 'Coloured Cups',
     TRUE ~ trapType
-  )) 
+  )) %>% 
+  left_join(select(site,BLID,lat,lon),by='BLID') %>% #Joins site latitudes to traps
+  rename('latSite'='lat','lonSite'='lon') %>% 
+  #Replaces lat/lonTrap IF not recorded (infield traps have different location)
+  mutate(latTrap=ifelse(latTrap==0,latSite,latTrap),lonTrap=ifelse(lonTrap==0,lonSite,lonTrap)) 
 
 # #Looks OK
 # trap %>% select(startYear,trapLoc,replicate,dist,distFrom,trapType) %>% distinct() %>% as.data.frame()
@@ -218,10 +222,10 @@ closestMatch <- function(target,possible){
   }
 }
 
-testTarg <- 'abcde'
-testPoss <- c('abcee','abcee','aeeee','aaade')
-closestMatch(testTarg,testPoss)
-closestMatch('abcd',testPoss)
+# testTarg <- 'abcde'
+# testPoss <- c('abcee','abcee','aeeee','aaade')
+# closestMatch(testTarg,testPoss)
+# closestMatch('abcd',testPoss)
 
 # Save to file ------------------------------------------------------------
 

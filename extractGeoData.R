@@ -6,31 +6,17 @@ theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
 
-
 # Helper functions --------------------------------------------------------
 
-
-# Load shapefiles ---------------------------------------------------------
-
-load('./data/cleanData.Rdata') #Load site, trap, arth data
-
-#Set coordinates
-site <- st_as_sf(site,coords=c('lon','lat'),crs=4326) %>% st_transform(3403)
-trap <- st_as_sf(trap,coords=c('lonTrap','latTrap'),crs=4326) %>% st_transform(3403)
-
-#Load 
-allGrass <- st_read('~/Documents/shapefiles/mergedFeatures/allGrass.shp')
-allWetlands <- st_read('~/Documents/shapefiles/mergedFeatures/allWetlands.shp') 
-#%>%   # st_cast('POLYGON')
-
-
 #Function to extract cover within onion rings surrouding site
-# centLoc: central point around which to get onion rings\
+# centLoc: central point around which to get onion rings
 # coverShp: set of polygons representing some cover class
 # ringDists: vector of distances to the outside of each ring (inside is radius of last ring). Zero implied at beginning (first ring is a circle).
 getOnionRings <- function(centLoc,coverShp,ringDists){
+  #Checks
   if(length(ringDists)<1) stop('ringDists must specify 1 or more distances')
   if(any(ringDists<=0)) stop('ringDists must be greater than 0')
+  if(nrow(centLoc)!=1) stop('centLoc must have 1 point only')
   #Create list of buffer circles 
   bObjs <- lapply(ringDists,function(x) st_buffer(centLoc,dist=x))
   #Get intersection area between coverShp and consecutive circles
@@ -42,18 +28,67 @@ getOnionRings <- function(centLoc,coverShp,ringDists){
   #Subtract area from smaller circle to get area within that ring
   ringAreas[2:length(ringAreas)] <- ringAreas[2:length(ringAreas)]-ringAreas[1:length(ringAreas)-1]
   #Assemble into data frame
-  a <- data.frame(overlap=overlapAreas,ringArea=ringAreas)
+  a <- data.frame(ringDists=ringDists,overlap=overlapAreas,ringArea=ringAreas)
   return(a)
 }
+# #Function works
+# b1 <- site[2,] #Test centre
+# b3 <- seq(20,1000,20) #Test ring dists
+# b2 <- st_geometry(st_buffer(b1,dist=max(b3))) %>% #Buffer maximum distance around centLoc
+#   st_intersection(st_geometry(allWetlands)) #Get intersection between buffer and coverShp
+# 
+# getOnionRings(centLoc=b1,coverShp=b2,ringDists=b3) %>% 
+#   mutate(prop=overlap/ringArea) %>% 
+#   ggplot(aes(ringDists,prop))+geom_point()+geom_line()
+
+# Load shapefiles ---------------------------------------------------------
+
+load('./data/cleanData.Rdata') #Load site, trap, arth data
+
+#Set coordinates
+site <- st_as_sf(site,coords=c('lon','lat'),crs=4326) %>% st_transform(3403)
+trap <- st_as_sf(trap,coords=c('lonTrap','latTrap'),crs=4326) %>% st_transform(3403)
+
+#Load 
+allEphemeral <- st_read('~/Documents/shapefiles/mergedFeatures/allEphemeral.shp',crs=3403) %>% st_geometry()
+allGrass <- st_read('~/Documents/shapefiles/mergedFeatures/allGrass.shp',crs=3403) %>% st_geometry()
+allShrubs <- st_read('~/Documents/shapefiles/mergedFeatures/allShrubs.shp',crs=3403) %>% st_geometry()
+allTrees <- st_read('~/Documents/shapefiles/mergedFeatures/allTrees.shp',crs=3403) %>% st_geometry()
+allWetlands <- st_read('~/Documents/shapefiles/mergedFeatures/allWetlands.shp',crs=3403) %>% st_geometry()
+allNonCrop <- st_read('~/Documents/shapefiles/mergedFeatures/allNonCrop.shp',crs=3403) %>% st_geometry()
 
 
-b1 <- site[2,] #Test centre
-b3 <- seq(20,1000,20) #Test ring dists
-b2 <- st_geometry(st_buffer(b1,dist=max(b3))) %>% #Buffer maximum distance around centLoc
-  st_intersection(st_geometry(allWetlands)) #Get intersection between buffer and coverShp
+# Get onion-ring distances from trapping points from 2016-2017 ---------------------------
 
-getOnionRings(b1,b2,b3) %>% 
-  mutate(prop=overlap/ringArea) #Works
+#Create "alternate" BTID in trap df
+trap <- trap %>% 
+  mutate(altBTID=paste(BLID,dist,startYear,sep='-'))
+  # mutate(altBTID=sub('-\\d-','-X-',BTID)) #Doesn't work - contains trap type within replicate
+
+#Get unique trap locations from 2016-2017
+trapU <- trap %>% 
+  filter(startYear==2016|startYear==2017) %>% 
+  select(altBTID,geometry) %>% 
+  unique.data.frame() %>% 
+  slice(1:10)
+  
+# ggplot()+
+#   geom_sf(data=allNonCrop,fill='green',col='green')+
+#   geom_sf(data=trapU,size=0.2)+
+#   coord_sf(xlim=st_bbox(trapU)[c(1,3)],ylim=st_bbox(trapU)[c(2,4)])
+
+#Trap locations in list form
+trapList <- lapply(1:nrow(trapU),function(x) trapU[x,])
+rDists <- seq(20,1000,20)
+oRingNonCrop <- lapply(trapList,function(x){ #Extract area of cover at all distances
+  b1 <- st_geometry(st_buffer(x,dist=max(rDists))) %>% #Buffer maximum distance around centLoc
+    st_intersection(st_geometry(allNonCrop)) #Get intersection between buffer and coverShp
+  return(getOnionRings(centLoc=x,coverShp=b1,ringDists=rDists))
+})
+
+#Convert to matrix form
+oRingNonCropMat <- t(matrix(sapply(oRingNonCrop,function(x) x$overlap),ncol=nrow(trapU),
+                          dimnames=list(paste0('noncrop',rDists),paste0('s',1:10))))
 
 
 
