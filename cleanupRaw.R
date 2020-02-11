@@ -132,13 +132,15 @@ trapLocs <- rbind(transmute(trapLocs[[1]],year=2016,ID=Name,geometry=geometry),
                   transmute(trapLocs[[5]],year=2017,ID=Name,geometry=geometry)) %>% 
   mutate(ID=as.character(ID)) %>% 
   mutate(ID=gsub('-\\d-W\\D{2}-2018','',ID)) %>% #Strips down BTID to BLID and dist
+  filter(!(grepl('21715',ID)&!grepl('(m2|e2)',ID))) %>% #Strips out extra set of points from 2016 at site 21715 
   mutate(ID=gsub('5m2{0,1}','5',ID)) %>% mutate(ID=gsub('Edge2{0,1}','0',ID)) %>%
   mutate(ID=ifelse(!grepl('-',ID),paste0(ID,'-0'),ID)) %>% 
   mutate(ID=paste0(ID,'-',year)) %>% 
   st_transform(crs=4326) %>% #converts to lat/lon
   mutate(lon=st_coordinates(.)[,1], #Pulls out lat/lon 
          lat=st_coordinates(.)[,2]) %>% 
-  as.data.frame() %>% select(-geometry,-year) #Converts to standard df
+  as.data.frame() %>% select(-geometry,-year) %>% #Converts to standard df
+  distinct() #Remove duplicate rows
 
 trap <- trap %>% mutate(ID=BTID) %>% #Construct ID column
   mutate(ID=gsub('-\\d-','-',ID)) %>%
@@ -149,15 +151,13 @@ trap <- trap %>% mutate(ID=BTID) %>% #Construct ID column
   mutate(latTrap=case_when( #Fix latitude
     latTrap==0 & !is.na(lat) ~ lat, #Infield traps
     latTrap==0 & is.na(lat) ~ latSite, #Ditch traps get site location
-    TRUE ~ NA_real_
+    TRUE ~ latTrap
   )) %>%
   mutate(lonTrap=case_when( #Fix longitude
     lonTrap==0 & !is.na(lon) ~ lon, #Infield traps
     lonTrap==0 & is.na(lon) ~ lonSite, #Ditch traps get site location
-    TRUE ~ NA_real_
-  )) %>% select(-lat,-lon)
-
-#CHECK THAT THIS WORKED - look for NA values
+    TRUE ~ lonTrap
+  )) %>% select(-lat,-lon,-ID) 
 
 rm(filePaths,i,trapLocs)
 

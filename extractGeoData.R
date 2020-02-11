@@ -5,6 +5,7 @@ library(tidyverse)
 theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
+library(beepr)
 
 # Helper functions --------------------------------------------------------
 
@@ -65,19 +66,35 @@ allTrees <- st_read('~/Documents/shapefiles/mergedFeatures/allTrees.shp',crs=340
 allWetlands <- st_read('~/Documents/shapefiles/mergedFeatures/allWetlands.shp',crs=3403) %>% st_geometry()
 allNonCrop <- st_read('~/Documents/shapefiles/mergedFeatures/allNonCrop.shp',crs=3403) %>% st_geometry()
 
-#Create "alternate" BTID in trap df to pair with geodata surrounding sites
-trap <- trap %>% mutate(altBTID=paste(BLID,dist,startYear,sep='-'))
+#Merge "permanent" wetlands with ephemeral - takes ~5s
+allWetlands <- st_union(allWetlands,allEphemeral)
+# rm(allEphemeral)
+
+#Create ID in trap df to pair with geodata surrounding sites
+trap <- trap %>% mutate(ID=paste(BLID,dist,startYear,sep='-'))
 
 #Get unique trap locations from 2016-2017
-trapU <- trap %>% filter(startYear==2016|startYear==2017) %>% 
-  select(altBTID,geometry) %>% unique.data.frame() 
+trapU <- trap %>% group_by(BLID) %>% 
+  mutate(nDist=length(unique(dist))) %>% ungroup() %>% 
+  filter(nDist>1) %>% 
+  select(ID,geometry) %>% unique.data.frame() 
 
-#Trap locations in list form
+#Convert trap locations to list form
 trapList <- lapply(1:nrow(trapU),function(x) trapU[x,])
+
+#List of cover class shapefiles
+coverList <- list(allEphemeral,allGrass,allShrubs,allTrees,allWetlands,allNonCrop)
+names(coverList) <- c('ephemeral','grass','shrubs','trees','wetlands','noncrop')
 
 # Get nearest-neighbour distances from various features -------------------
 
-st_distance(trapU,allWetlands) %>% as.numeric() #Get nearest distance - some points have same geometry
+nnDistMat <- lapply(coverList,function(x){ #Get nearest distance
+  as.numeric(st_distance(trapU,x))
+})
+#Convert to matrix
+nnDistMat <- do.call('cbind',nnDistMat)
+rownames(nnDistMat) <- trapU$ID
+colnames(nnDistMat) <- names(coverList)
 
 # Get onion-ring distances from trapping points from 2016-2017 ---------------------------
 
@@ -88,10 +105,6 @@ rDists <- seq(20,1000,20)
 oRingArea <- getOnionRings(centLoc=trapList[[1]],
                            coverShp=st_intersection(st_geometry(st_buffer(trapList[[1]],dist=max(rDists))),st_geometry(allNonCrop)),
                            ringDists=rDists)$ringArea
-
-#List of cover class shapefiles
-coverList <- list(allEphemeral,allGrass,allShrubs,allTrees,allWetlands,allNonCrop)
-names(coverList) <- c('ephemeral','grass','shrubs','trees','wetlands','noncrop')
 
 #Get matrices for each cover class - takes about 10 mins if using the entire dataset
 oRingMat <- lapply(coverList,function(shp){
@@ -104,23 +117,27 @@ oRingMat <- lapply(coverList,function(shp){
   })
   #Convert to matrix form
   tempMat <- t(matrix(sapply(temp,function(x) x$overlap),ncol=nrow(trapU),
-                              dimnames=list(paste0('d',rDists),trapU$altBTID)))
+                              dimnames=list(paste0('d',rDists),trapU$ID)))
   return(tempMat)
   }
 )
 
-#Check results
-# par(mfrow=c(3,2))
-# for(j in 1:length(oRingMat)){ #Looks OK
-#   plot(0,0,type='n',ylab='% cover',xlab='Distance',ylim=c(0,1),xlim=range(rDists),main=names(oRingMat)[j])
-#   for(i in 1:nrow(oRingMat[[j]])) lines(rDists,oRingMat[[j]][i,]/oRingArea,col=alpha('black',0.1))
-#   lines(rDists,apply(oRingMat[[j]],2,mean)/oRingArea,lwd=2,col='red')
-# }
-# par(mfrow=c(1,1))
+beep(2)
 
-#Convert to dataframe
-oRingDf <- lapply(oRingMat,function(x) return(as.data.frame(x) %>% rownames_to_column('altBLID')))
+# Check results
+par(mfrow=c(3,2))
+for(j in 1:length(oRingMat)){ #Looks OK
+  plot(0,0,type='n',ylab='% cover',xlab='Distance',ylim=c(0,max(apply(oRingMat[[j]],2,max)/oRingArea)),
+       xlim=range(rDists),main=names(oRingMat)[j])
+  for(i in 1:nrow(oRingMat[[j]])) lines(rDists,oRingMat[[j]][i,]/oRingArea,col=alpha('black',0.1))
+  lines(rDists,apply(oRingMat[[j]],2,mean)/oRingArea,lwd=2,col='red')
+  abline(h=0,col='red',lty='dashed'); abline(h=max(apply(oRingMat[[j]],2,max)/oRingArea),col='red',lty='dashed');
+}
+par(mfrow=c(1,1))
 
+# Save results ------------------------------------------------------------
+
+save(nnDistMat,oRingMat,file='./data/geoData.Rdata') #Saves to geodata file
 
 # Other geoprocessing code snippets -----------------------
 
