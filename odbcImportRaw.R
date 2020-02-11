@@ -5,7 +5,6 @@ trap <- read.table('./data/trap.csv',header=T,sep=';',stringsAsFactors = F)
 arth <- read.table('./data/arthropod.csv',header=T,sep=';',stringsAsFactors = F)
 save(site,trap,arth,file='./data/rawData.Rdata') #Saves to raw data file
 
-
 #OLD METHOD
 # library(RODBC)
 # 

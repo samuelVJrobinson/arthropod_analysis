@@ -41,6 +41,14 @@ getOnionRings <- function(centLoc,coverShp,ringDists){
 #   mutate(prop=overlap/ringArea) %>% 
 #   ggplot(aes(ringDists,prop))+geom_point()+geom_line()
 
+# #Function to get nearest neighbour distance from 
+# getNNdist <- function(centLoc,coverShp){
+#   # st_buffer(centLoc,dist=bDist) %>% st_geometry() %>% #Buffer trap to bDist
+#   #   st_intersection(coverShp) %>% #Intersection with coverShp
+#     st_distance(coverShp,centLoc) %>% #Get nearest distance
+#     as.numeric()
+# }
+
 # Load shapefiles ---------------------------------------------------------
 
 load('./data/cleanData.Rdata') #Load site, trap, arth data
@@ -57,43 +65,67 @@ allTrees <- st_read('~/Documents/shapefiles/mergedFeatures/allTrees.shp',crs=340
 allWetlands <- st_read('~/Documents/shapefiles/mergedFeatures/allWetlands.shp',crs=3403) %>% st_geometry()
 allNonCrop <- st_read('~/Documents/shapefiles/mergedFeatures/allNonCrop.shp',crs=3403) %>% st_geometry()
 
-
-# Get onion-ring distances from trapping points from 2016-2017 ---------------------------
-
-#Create "alternate" BTID in trap df
-trap <- trap %>% 
-  mutate(altBTID=paste(BLID,dist,startYear,sep='-'))
-  # mutate(altBTID=sub('-\\d-','-X-',BTID)) #Doesn't work - contains trap type within replicate
+#Create "alternate" BTID in trap df to pair with geodata surrounding sites
+trap <- trap %>% mutate(altBTID=paste(BLID,dist,startYear,sep='-'))
 
 #Get unique trap locations from 2016-2017
-trapU <- trap %>% 
-  filter(startYear==2016|startYear==2017) %>% 
-  select(altBTID,geometry) %>% 
-  unique.data.frame() %>% 
-  slice(1:10)
-  
-# ggplot()+
-#   geom_sf(data=allNonCrop,fill='green',col='green')+
-#   geom_sf(data=trapU,size=0.2)+
-#   coord_sf(xlim=st_bbox(trapU)[c(1,3)],ylim=st_bbox(trapU)[c(2,4)])
+trapU <- trap %>% filter(startYear==2016|startYear==2017) %>% 
+  select(altBTID,geometry) %>% unique.data.frame() 
 
 #Trap locations in list form
 trapList <- lapply(1:nrow(trapU),function(x) trapU[x,])
+
+# Get nearest-neighbour distances from various features -------------------
+
+st_distance(trapU,allWetlands) %>% as.numeric() #Get nearest distance - some points have same geometry
+
+# Get onion-ring distances from trapping points from 2016-2017 ---------------------------
+
+#Ring distances
 rDists <- seq(20,1000,20)
-oRingNonCrop <- lapply(trapList,function(x){ #Extract area of cover at all distances
-  b1 <- st_geometry(st_buffer(x,dist=max(rDists))) %>% #Buffer maximum distance around centLoc
-    st_intersection(st_geometry(allNonCrop)) #Get intersection between buffer and coverShp
-  return(getOnionRings(centLoc=x,coverShp=b1,ringDists=rDists))
-})
 
-#Convert to matrix form
-oRingNonCropMat <- t(matrix(sapply(oRingNonCrop,function(x) x$overlap),ncol=nrow(trapU),
-                          dimnames=list(paste0('noncrop',rDists),paste0('s',1:10))))
+#Total area within each ring
+oRingArea <- getOnionRings(centLoc=trapList[[1]],
+                           coverShp=st_intersection(st_geometry(st_buffer(trapList[[1]],dist=max(rDists))),st_geometry(allNonCrop)),
+                           ringDists=rDists)$ringArea
+
+#List of cover class shapefiles
+coverList <- list(allEphemeral,allGrass,allShrubs,allTrees,allWetlands,allNonCrop)
+names(coverList) <- c('ephemeral','grass','shrubs','trees','wetlands','noncrop')
+
+#Get matrices for each cover class - takes about 10 mins if using the entire dataset
+oRingMat <- lapply(coverList,function(shp){
+  #Extract non-crop cover within rings
+  temp <- lapply(trapList,function(x){ 
+    b1 <- st_geometry(st_buffer(x,dist=max(rDists))) %>% #Buffer maximum distance around centLoc
+      st_intersection(st_geometry(shp)) #Get intersection between buffer and coverShp
+    b2 <- getOnionRings(centLoc=x,coverShp=b1,ringDists=rDists)
+    return(b2)
+  })
+  #Convert to matrix form
+  tempMat <- t(matrix(sapply(temp,function(x) x$overlap),ncol=nrow(trapU),
+                              dimnames=list(paste0('d',rDists),trapU$altBTID)))
+  return(tempMat)
+  }
+)
+
+#Check results
+# par(mfrow=c(3,2))
+# for(j in 1:length(oRingMat)){ #Looks OK
+#   plot(0,0,type='n',ylab='% cover',xlab='Distance',ylim=c(0,1),xlim=range(rDists),main=names(oRingMat)[j])
+#   for(i in 1:nrow(oRingMat[[j]])) lines(rDists,oRingMat[[j]][i,]/oRingArea,col=alpha('black',0.1))
+#   lines(rDists,apply(oRingMat[[j]],2,mean)/oRingArea,lwd=2,col='red')
+# }
+# par(mfrow=c(1,1))
+
+#Convert to dataframe
+oRingDf <- lapply(oRingMat,function(x) return(as.data.frame(x) %>% rownames_to_column('altBLID')))
 
 
+# Other geoprocessing code snippets -----------------------
 
-# Create new shapefiles for 2018 data --------------------------------
-# 
+# Create new shapefiles for 2018 data
+ 
 # #Add ditch sites from 2015/2016/2018
 # for(i in c(2015,2016,2018)){
 #   trapSf %>% filter(startYear==i,trapLoc=='ditch') %>% 
@@ -120,47 +152,3 @@ oRingNonCropMat <- t(matrix(sapply(oRingNonCrop,function(x) x$overlap),ncol=nrow
 # 
 # #Only 16 of the ditch sites from 2018 (repeats of previous years in S. Calgary) have been digitized.
 # #The remaining ditch sites (41) and infields (27) need wetland layers created around them
-
-#Get nearest wetland distances from infield sites -------------------
-
-#Wetland distances 
-wtrap2016 <- trapSf %>% filter(startYear==2016,grepl('W',replicate)) #trap locations
-wland2016 <- st_read(dsn='~/Documents/shapefiles/digitizedFeaturesSR/Wetlands2016.shp') %>%  #wetland polygons
-  rbind(select(st_read(dsn='~/Documents/shapefiles/digitizedFeaturesSR/Ephemeral2016.shp'),-Notes)) %>%  # include ephemeral wetlands
-  mutate(wType=ifelse(grepl('Wetland',FldrPth),'Permanant','Ephemeral'))
-
-#Buffer all unique traps by 200m
-trapBuff <- wtrap2016 %>% select(BLID) %>% unique() %>% st_buffer(dist=300)
-
-#Filter wetlands that overlap buffer distance
-wland2016 <- wland2016 %>% slice(sort(unique(unlist(st_intersects(trapBuff,wland2016))))) 
-rm(trapBuff)
-
-#Identify wetlands nearest to traps
-wland2016$isNearest <- 1:nrow(wland2016) %in% st_nearest_feature(wtrap2016,wland2016)
-
-wland2016Points <- st_cast(wland2016,to='POINT') #Cast wetland to point geometry
-wland2016Points$isNearest <- 1:nrow(wland2016Points) %in% st_nearest_feature(wtrap2016,wland2016Points)  #Select points nearest to traps
-
-wtrap2016 <- wtrap2016 %>% 
-  #Gets distance from nearest wetland, unless replicate is at W0 (dist=0)
-  mutate(wlandDist = ifelse(grepl('W0',replicate),0,apply(st_distance(wtrap2016,filter(wland2016Points,isNearest)),1,min)))
-
-ggplot(wtrap2016) + geom_histogram(aes(x=wlandDist)) #Looks good
-
-
-#Appears to work
-coords <- st_coordinates(distinct(wtrap2016))[1,]
-#Polygons
-ggplot()+
-  geom_sf(data=wland2016,aes(fill=wType))+
-  geom_sf(data=wtrap2016,col='blue')+
-  coord_sf(xlim=c(1,-1)*500+coords[1],ylim=c(1,-1)*500+coords[2])+
-  scale_fill_manual(values=c('lightgreen','forestgreen'))
-
-#Points
-ggplot()+
-  geom_sf(data=wland2016Points,aes(col=isNearest),size=0.5)+
-  geom_sf(data=wtrap2016,col='blue',size=0.5)+
-  coord_sf(xlim=c(1,-1)*400+coords[1],ylim=c(1,-1)*400+coords[2])+
-  scale_colour_manual(values=c('black','red'))
