@@ -6,6 +6,7 @@ theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
 library(beepr)
+library(parallel)
 
 # Helper functions --------------------------------------------------------
 
@@ -74,10 +75,15 @@ allWetlands <- st_union(allWetlands,allEphemeral)
 trap <- trap %>% mutate(ID=paste(BLID,dist,startYear,sep='-'))
 
 #Get unique trap locations from 2016-2017
-trapU <- trap %>% group_by(BLID) %>% 
-  mutate(nDist=length(unique(dist))) %>% ungroup() %>% 
-  filter(nDist>1) %>% 
-  select(ID,geometry) %>% unique.data.frame() 
+trapU <- trap %>% 
+  #group_by(BLID) %>% #Get rid of sites with only 1 trap
+  #mutate(nDist=length(unique(dist))) %>% ungroup() %>%
+  # filter(nDist>1) %>% 
+  select(ID,geometry) %>%
+  unique.data.frame() %>% #Problem: 1 trap (31161-0-2018) has 2 different geometry 
+  group_by(ID) %>% mutate(ntraps=1:n()) %>% 
+  filter(ntraps==1) %>% select(-ntraps)
+# trapU %>% filter(ID=='31161-0-2018') 
 
 #Convert trap locations to list form
 trapList <- lapply(1:nrow(trapU),function(x) trapU[x,])
@@ -89,8 +95,7 @@ names(coverList) <- c('ephemeral','grass','shrubs','trees','wetlands','noncrop')
 # Get nearest-neighbour distances from various features -------------------
 
 nnDistMat <- lapply(coverList,function(x){ #Get nearest distance
-  as.numeric(st_distance(trapU,x))
-})
+  as.numeric(st_distance(trapU,x))})
 #Convert to matrix
 nnDistMat <- do.call('cbind',nnDistMat)
 rownames(nnDistMat) <- trapU$ID
@@ -107,7 +112,7 @@ oRingArea <- getOnionRings(centLoc=trapList[[1]],
                            ringDists=rDists)$ringArea
 
 #Get matrices for each cover class - takes about 10 mins if using the entire dataset
-oRingMat <- lapply(coverList,function(shp){
+f <- function(shp){
   #Extract non-crop cover within rings
   temp <- lapply(trapList,function(x){ 
     b1 <- st_geometry(st_buffer(x,dist=max(rDists))) %>% #Buffer maximum distance around centLoc
@@ -117,11 +122,12 @@ oRingMat <- lapply(coverList,function(shp){
   })
   #Convert to matrix form
   tempMat <- t(matrix(sapply(temp,function(x) x$overlap),ncol=nrow(trapU),
-                              dimnames=list(paste0('d',rDists),trapU$ID)))
+                      dimnames=list(paste0('d',rDists),trapU$ID)))
   return(tempMat)
-  }
-)
+}
 
+# oRingMat <- lapply(coverList,f) #Sequential version
+oRingMat <- mclapply(coverList,f,mc.cores=10) #Parallel version (mcapply doesn't work on Windows)
 beep(2)
 
 # Check results
@@ -137,7 +143,7 @@ par(mfrow=c(1,1))
 
 # Save results ------------------------------------------------------------
 
-save(nnDistMat,oRingMat,file='./data/geoData.Rdata') #Saves to geodata file
+save(nnDistMat,oRingMat,oRingArea,file='./data/geoData.Rdata') #Saves to geodata file
 
 # Other geoprocessing code snippets -----------------------
 
