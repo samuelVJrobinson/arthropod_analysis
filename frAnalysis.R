@@ -11,9 +11,8 @@ library(sf)
 load('./data/cleanData.Rdata') #Load site, trap, arth data
 load('./data/geoData.Rdata') #Load NNdist and oring data
 
-# Summary tables for insects of interest ----------------------------------
+# Pterostichus ----------------------------------
 
-#Pterostichus
 tempArth <- arth %>% filter(genus=='Pterostichus') %>% group_by(BTID) %>% summarize(n=n())
 
 #Only using pitfall traps from 2017
@@ -43,17 +42,16 @@ tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each
 #Are these "cultural" species?
 mod1 <- gam(count~offset(log(trapdays))+
               s(endjulian)+
-              s(noncrop)+
-              s(grass)+
               # s(wetlands)+
+              # s(trees)+
+              s(grass)+
+              # s(shrubs)+
               s(BLID,bs='re'),
             data=tempTrap,family='nb',method='ML')
 
 AIC(mod1,
     update(mod1,.~.-s(grass)),
-    update(mod1,.~.-s(noncrop)))
-
-
+    update(mod1,.~.-s(wetlands)))
 # gam.check(mod1)
 summary(mod1)  
 # par(mfrow=c(2,1))
@@ -66,8 +64,20 @@ tempTrap %>% select(BLID,lonSite,latSite,endjulian,trapdays:noncrop) %>%
   st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% 
   ggplot()+geom_sf(aes(col=pred))
 
-#Model of landscape (oRingDist)
+#Effect of grass
+tempTrap %>% select(BLID,lonSite,latSite,endjulian,trapdays:noncrop) %>% 
+  mutate(trapdays=7) %>% 
+  mutate_at(vars(-BLID:-latSite,-trapdays,-grass),mean) %>% distinct() %>% 
+  filter(BLID=='26168') %>% 
+  mutate(pred=predict(mod1,newdata=.),se=predict(mod1,newdata=.,se.fit=T)$se.fit) %>% 
+  mutate(upr=pred+1.96*se,lwr=pred-1.96*se) %>% 
+  mutate_at(vars(pred,upr,lwr),exp) %>%
+  ggplot(aes(x=grass))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+  geom_line(aes(y=pred))
 
+
+
+#Model of landscape (oRingDist)
 grassMat <- tempORing$grass #m2 cover within each ring
 noncropMat <- tempORing$noncrop
 grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
