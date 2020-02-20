@@ -91,6 +91,15 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   mutate(BTID=gsub('W[BWY]C','WCC',BTID)) %>% mutate(replicate=gsub('W[BWY]C','WCC',replicate)) %>% 
   #Convert -99 in mowed data to NA
   mutate(adjMowed=ifelse(adjMowed==-99,NA,adjMowed),oppMowed=ifelse(oppMowed==-99,NA,oppMowed)) %>% 
+  #27028-5-WBVX-2017 startMonth wrong
+  mutate(startMonth=ifelse(grepl('27028-5-W\\D{2}[0275]{0,3}-2017',BTID),7,startMonth)) %>% 
+  #Recalculate startjulian & deployedhours
+  mutate(startTrap=paste0(startYear,'-',startMonth,'-',startDay,' ',startHour,':',startMinute)) %>%
+  mutate(endTrap=paste0(endYear,'-',endMonth,'-',endDay,' ',endHour,':',endMinute)) %>% 
+  mutate(startTrap=as.POSIXct(startTrap,format='%Y-%m-%d %H:%M'),endTrap=as.POSIXct(endTrap,format='%Y-%m-%d %H:%M')) %>% 
+  mutate(deployedhours=as.numeric(difftime(endTrap,startTrap,units='hours'))) %>% 
+  mutate(startjulian=as.numeric(format(startTrap,format='%j')),endjulian=as.numeric(format(endTrap,format='%j')),
+         midjulian=round((endjulian+startjulian)/2)) %>% 
   #Beginning to reorganize trap dataframe. Goal:
   #dist = distance from some "source" feature (usually wetland/SNL if in field)
   #distFrom = type of "source" feature
@@ -98,20 +107,17 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
   mutate(trapLoc=case_when( #Deal with empty trap locations from 2016
     trapLoc=='' & grepl('W[027]',replicate) ~ 'wetland',
     trapLoc=='' & grepl('A',replicate) ~ 'ditch',
-    TRUE ~ trapLoc
-  )) %>% 
+    TRUE ~ trapLoc)) %>% 
   mutate(dist=as.numeric(gsub('[A-Z]','0',replicate)),distFrom=trapLoc) %>% #Create distance and distFrom column
   mutate(trapLoc=case_when( #Sets trapLoc to adjCrop if trap was placed at a distance into some feature
     (distFrom=='wetland' | distFrom=='pivot') & (startYear==2016 | startYear==2017) ~ adjCrop, 
     trapLoc=='control' ~ adjCrop, #I think "control" just means a canola field without any wetland/pivot nearby (i.e. dist = Inf)
-    TRUE ~ trapLoc
-  )) %>% 
+    TRUE ~ trapLoc)) %>% 
   mutate(trapType=case_when(
     trapType=='infield' & replicate=='WBV' ~ 'Blue Vane',
     trapType=='infield' & replicate=='WPF' ~ 'Pit Fall',
     trapType=='infield' & replicate=='WCC' ~ 'Coloured Cups',
-    TRUE ~ trapType
-  )) %>% 
+    TRUE ~ trapType)) %>% 
   left_join(select(site,BLID,lon,lat),by='BLID') %>% #Joins site latitudes to traps
   rename('lonSite'='lon','latSite'='lat') %>% 
   mutate(deployedhours=ifelse(deployedhours==0,NA,deployedhours)) #Some traps have errors in deployed hours
