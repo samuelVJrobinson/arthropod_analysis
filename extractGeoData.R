@@ -5,8 +5,9 @@ library(tidyverse)
 theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
-library(beepr)
+library(raster)
 library(parallel)
+library(beepr)
 
 # Helper functions --------------------------------------------------------
 
@@ -51,7 +52,7 @@ getOnionRings <- function(centLoc,coverShp,ringDists){
 #     as.numeric()
 # }
 
-# Load shapefiles ---------------------------------------------------------
+# Cover classes using shapefiles -------------------------------------
 
 load('./data/cleanData.Rdata') #Load site, trap, arth data
 
@@ -92,7 +93,7 @@ trapList <- lapply(1:nrow(trapU),function(x) trapU[x,])
 coverList <- list(allEphemeral,allGrass,allShrubs,allTrees,allWetlands,allNonCrop)
 names(coverList) <- c('ephemeral','grass','shrubs','trees','wetlands','noncrop')
 
-# Get nearest-neighbour distances from various features -------------------
+# Get nearest-neighbour distances from various features
 
 nnDistMat <- lapply(coverList,function(x){ #Get nearest distance
   as.numeric(st_distance(trapU,x))})
@@ -101,7 +102,7 @@ nnDistMat <- do.call('cbind',nnDistMat)
 rownames(nnDistMat) <- trapU$ID
 colnames(nnDistMat) <- names(coverList)
 
-# Get onion-ring distances from trapping points from 2016-2017 ---------------------------
+# Get onion-ring distances from trapping points from 2016-2017 
 
 #Ring distances
 rDists <- seq(20,1000,20)
@@ -141,11 +142,22 @@ for(j in 1:length(oRingMat)){ #Looks OK
 }
 par(mfrow=c(1,1))
 
-# Save results ------------------------------------------------------------
-
+# Save results
 save(nnDistMat,oRingMat,oRingArea,file='./data/geoData.Rdata') #Saves to geodata file
 
-# Other geoprocessing code snippets -----------------------
+
+# Cover classes using cropland rasters ------------------------------------
+rm(list=ls())
+
+#Load site, trap, arth data
+load('./data/cleanData.Rdata') 
+#Set coordinates
+site <- st_as_sf(site,coords=c('lon','lat'),crs=4326) %>% st_transform(3403)
+trap <- st_as_sf(trap,coords=c('lonTrap','latTrap'),crs=4326) %>% st_transform(3403)
+
+# aci2017 <- 
+
+# Other code snippets -----------------------
 
 # Create new shapefiles for 2018 data
  
