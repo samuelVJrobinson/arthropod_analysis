@@ -6,6 +6,7 @@ theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
 library(raster)
+library(rgeos)
 library(parallel)
 library(beepr)
 
@@ -80,10 +81,10 @@ trapU <- trap %>%
   #group_by(BLID) %>% #Get rid of sites with only 1 trap
   #mutate(nDist=length(unique(dist))) %>% ungroup() %>%
   # filter(nDist>1) %>% 
-  select(ID,geometry) %>%
+  dplyr::select(ID,geometry) %>%
   unique.data.frame() %>% #Problem: 1 trap (31161-0-2018) has 2 different geometry 
   group_by(ID) %>% mutate(ntraps=1:n()) %>% 
-  filter(ntraps==1) %>% select(-ntraps)
+  filter(ntraps==1) %>% dplyr::select(-ntraps)
 # trapU %>% filter(ID=='31161-0-2018') 
 
 #Convert trap locations to list form
@@ -151,11 +152,70 @@ rm(list=ls())
 
 #Load site, trap, arth data
 load('./data/cleanData.Rdata') 
-#Set coordinates
-site <- st_as_sf(site,coords=c('lon','lat'),crs=4326) %>% st_transform(3403)
-trap <- st_as_sf(trap,coords=c('lonTrap','latTrap'),crs=4326) %>% st_transform(3403)
 
-# aci2017 <- 
+#2017 cropland raster
+aci2017 <- raster('~/Documents/shapefiles/croplandInventory/aci_2017_ab.tif')
+
+#Trap coordinates, crs 3403 = AB mercator
+trap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>% #Get only pitfall data from 2017
+  st_as_sf(coords=c('lonTrap','latTrap'),crs=4326) %>% 
+  mutate(ID=paste(BLID,dist,startYear,sep='-'))%>% #Create ID in trap df to pair with geodata surrounding sites
+  dplyr::select(ID,geometry) %>% #Get unique trap locations from 2016-2017
+  unique.data.frame() %>% #Problem: 1 trap (31161-0-2018) has 2 different geometry 
+  group_by(ID) %>% mutate(ntraps=1:n()) %>% 
+  filter(ntraps==1) %>% dplyr::select(-ntraps) %>% 
+  as_Spatial() %>% spTransform(crs(aci2017))
+
+#Crop raster to extent of traps (+10000m)
+aci2017 <- crop(aci2017,buffer(trap,10000))
+
+#Raster attribute table
+aafcTable <- read.csv('~/Documents/shapefiles/croplandInventory/featureTableAAFC.csv',header=T)
+aafcTable$Description <- NULL
+
+#Create set of ring distances
+ringDist <- seq(0,1200,30)
+
+#Make rings around centre location
+mkRings <- function(centre,ringDist){
+  bTrap <- lapply(ringDist,function(x) buffer(centre,x)) #Buffer circles
+  rings <- lapply(2:length(ringDist),function(x){
+    gDifference(bTrap[[x]],bTrap[[x-1]])
+  })
+  return(rings)
+}
+
+#Convert trap locations to list form
+trapList <- lapply(1:nrow(trap),function(x) trap[x,])
+#Make rings around each trap (~5 seconds)
+rings <- lapply(trapList,function(x) mkRings(x,ringDist))
+ 
+#Get rasterSet composition within rings (~30 seconds)
+oRingMat2 <- lapply(rings,function(trapLoc){
+  rC <- lapply(trapLoc,function(x) extract(aci2017,x)[[1]]) #Composition codes
+  rC <- lapply(rC,function(x) aafcTable$Label2[match(x,aafcTable$Code)]) #Convert to labels
+  rC <- sapply(rC,table) #Counts of cells in each cover category
+  colnames(rC) <- paste0('d',ringDist[2:length(ringDist)]) #Column names
+  return(rC)
+})
+
+names(oRingMat2) <- paste0('ID-',trap$ID)
+
+# Check results
+oRingMat2Prop <- lapply(oRingMat2,function(x){
+  x/matrix(rep(colSums(x),each=nrow(x)),ncol=ncol(x))
+})
+par(mfrow=c(4,2))
+coverClasses <- names(sort(rowSums(sapply(oRingMat2Prop,rowSums)),T)[1:8])
+for(i in 1:length(coverClasses)){
+  plot(0,0,type='n',xlim=range(ringDist),ylim=c(0,1),main=coverClasses[i])
+  for(j in 1:length(oRingMat2Prop)){
+    lines(ringDist[2:length(ringDist)],oRingMat2Prop[[j]][rownames(oRingMat2Prop[[j]])==coverClasses[i]],col=alpha('black',0.1))
+  }
+}
+
+#Save list of matrices
+save(oRingMat2,file='./data/geoDataAAFC.Rdata')
 
 # Other code snippets -----------------------
 
@@ -164,14 +224,14 @@ trap <- st_as_sf(trap,coords=c('lonTrap','latTrap'),crs=4326) %>% st_transform(3
 # #Add ditch sites from 2015/2016/2018
 # for(i in c(2015,2016,2018)){
 #   trapSf %>% filter(startYear==i,trapLoc=='ditch') %>% 
-#     select(BLID,replicate,trapType) %>% unique() %>% 
+#     dplyr::select(BLID,replicate,trapType) %>% unique() %>% 
 #     st_transform(3403) %>% 
 #     st_write(paste0('~/Documents/shapefiles/digitizedFeaturesSR/DitchSites_',i,'.shp'),delete_dsn=TRUE)
 # }
 # 
 # #Add infields from 2018
 # trapSf %>% filter(startYear==2018,trapLoc!='ditch') %>%
-#   select(BLID,BTID,trapType,trapLoc,dist,distFrom) %>% unique() %>%
+#   dplyr::select(BLID,BTID,trapType,trapLoc,dist,distFrom) %>% unique() %>%
 #   st_transform(3403) %>%
 #   st_write('~/Documents/shapefiles/digitizedFeaturesSR/InfieldSites_2018.shp',delete_dsn=TRUE)
 # 
