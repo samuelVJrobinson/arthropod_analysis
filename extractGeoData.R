@@ -157,7 +157,7 @@ load('./data/cleanData.Rdata')
 aci2017 <- raster('~/Documents/shapefiles/croplandInventory/aci_2017_ab.tif')
 
 #Trap coordinates, crs 3403 = AB mercator
-trap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>% #Get only pitfall data from 2017
+trapCoords <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>% #Get only pitfall data from 2017
   st_as_sf(coords=c('lonTrap','latTrap'),crs=4326) %>% 
   mutate(ID=paste(BLID,dist,startYear,sep='-'))%>% #Create ID in trap df to pair with geodata surrounding sites
   dplyr::select(ID,geometry) %>% #Get unique trap locations from 2016-2017
@@ -167,7 +167,7 @@ trap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>% #Get only pitfall 
   as_Spatial() %>% spTransform(crs(aci2017))
 
 #Crop raster to extent of traps (+10000m)
-aci2017 <- crop(aci2017,buffer(trap,10000))
+aci2017 <- crop(aci2017,buffer(trapCoords,10000))
 
 #Raster attribute table
 aafcTable <- read.csv('~/Documents/shapefiles/croplandInventory/featureTableAAFC.csv',header=T)
@@ -186,8 +186,8 @@ mkRings <- function(centre,ringDist){
 }
 
 #Convert trap locations to list form
-trapList <- lapply(1:nrow(trap),function(x) trap[x,])
-#Make rings around each trap (~5 seconds)
+trapList <- lapply(1:nrow(trapCoords),function(x) trapCoords[x,])
+#Make rings around each trap (~15 seconds)
 rings <- lapply(trapList,function(x) mkRings(x,ringDist))
  
 #Get rasterSet composition within rings (~30 seconds)
@@ -198,19 +198,37 @@ oRingMat2 <- lapply(rings,function(trapLoc){
   colnames(rC) <- paste0('d',ringDist[2:length(ringDist)]) #Column names
   return(rC)
 })
+beep(1)
 
-names(oRingMat2) <- paste0('ID-',trap$ID)
-
-# Check results
-oRingMat2Prop <- lapply(oRingMat2,function(x){
-  x/matrix(rep(colSums(x),each=nrow(x)),ncol=ncol(x))
+#Re-arrange to match earlier list
+coverNames <- rownames(oRingMat2[[1]]) #Get cover class names
+oRingMat2 <- lapply(rownames(oRingMat2[[1]]),function(name){ #Convert to different format
+  temp <- t(sapply(oRingMat2,function(site) site[rownames(site)==name,]))
+  rownames(temp) <- trapCoords$ID
+  return(temp)
 })
-par(mfrow=c(4,2))
-coverClasses <- names(sort(rowSums(sapply(oRingMat2Prop,rowSums)),T)[1:8])
-for(i in 1:length(coverClasses)){
-  plot(0,0,type='n',xlim=range(ringDist),ylim=c(0,1),main=coverClasses[i])
-  for(j in 1:length(oRingMat2Prop)){
-    lines(ringDist[2:length(ringDist)],oRingMat2Prop[[j]][rownames(oRingMat2Prop[[j]])==coverClasses[i]],col=alpha('black',0.1))
+names(oRingMat2) <- coverNames #Apply cover class names
+
+oRingMat2 <- oRingMat2[sapply(oRingMat2,sum)>0] #Get rid of nonexistent cover classes
+coverNames <- names(oRingMat2)
+#Rearrange in descending order
+oRingMat2 <- oRingMat2[order(sapply(oRingMat2,sum),decreasing=T)]
+#First 10 categories (Grassland:Forest) represent about 98% of total cover
+sapply(oRingMat2,sum)/sum(sapply(oRingMat2,sum))
+
+
+# Convert to proportions
+
+oRingMat2Prop <- lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
+
+par(mfrow=c(5,2))
+for(i in 1:10){
+  covClass <- sapply(oRingMat2,sum)[order(sapply(oRingMat2,sum),decreasing=T)][i]
+  percCover <- covClass/sum(sapply(oRingMat2,sum))
+  plot(0,0,type='n',xlim=range(ringDist),ylim=c(0,1),
+       main=paste(names(covClass),': ',round(percCover*100,2),'% cover',sep=''),xlab='Distance',ylab='Proportion cover')
+  for(j in 1:nrow(oRingMat2Prop[[i]])){
+    lines(ringDist[2:length(ringDist)],oRingMat2Prop[[names(covClass)]][j,],col=alpha('black',0.3))
   }
 }
 

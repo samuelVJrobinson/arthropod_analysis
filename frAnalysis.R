@@ -11,6 +11,7 @@ library(gstat)
 # Load everything ---------------------------------------------------------
 load('./data/cleanData.Rdata') #Load site, trap, arth data
 load('./data/geoData.Rdata') #Load NNdist and oring data
+load('./data/geoDataAAFC.Rdata') #Load oring data extracted from AAFC data
 
 # Pterostichus ----------------------------------
 
@@ -23,6 +24,7 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
   group_by(genus) %>% summarize(n=n()) %>% data.frame() %>% 
   arrange(desc(n))
 
+#Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
 #Only using pitfall traps from 2017
@@ -43,17 +45,6 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
   mutate_at(vars(easting,northing),scale) #Scale coordinates to be a reasonable range
 
-#Arrange oRing cover matrix to correspond with correct rows
-tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
-#Total area of each ring in matrix form
-tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-#Matrix of distance values
-tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
-noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
-grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
-noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
-
 #Model of landscape effect (nnDist only)
 #Appears that distance to grass has a positive effect, and distance to noncrop a negative effect 
 #Spatio-temporal tensor doesn't fit as well as straightforward random effects. Investigate this later.
@@ -61,10 +52,11 @@ noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 #Is this a "cultural" species?
 mod1 <- gam(count~offset(log(trapdays))+s(endjulian)+
               trapLoc+
-              s(BLID,bs='re')
+              # s(BLID,bs='re')
+              te(BLID,bs='re')
               # s(grass)+s(wetlands)+
             ,
-            data=tempTrap,family='nb',method='REML')
+            data=tempTrap,family='nb',method='ML')
 gam.check(mod1)
 summary(mod1)  
 plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
@@ -95,21 +87,32 @@ p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
   labs(x='Trap location',y='Catches/week',title='P. melanarius ~ offset + s(time) + s(BLID,type=re) + trapLoc')
 ggsave('./figures/01_P_melanarius_trapLoc.png',p1,height=6,width=6)
 
-p2 <- tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% 
-  # mutate(trapLoc=ifelse(trapLoc=='ditch',trapLoc,'inField')) %>% 
-  distinct() %>%
-  mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>%
-  st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% 
-  ggplot(aes(col=ranef))+
+p2 <- tempTrap %>% #Trap table
+  select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% #Get BLID and location data
+  distinct() %>% #Get only distinct values
+  mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>% #Get random intercepts from mod1
+  st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% #Convert df to spatial object
+  ggplot(aes(col=ranef))+ #Plot intercepts, using intercept as colour
   geom_sf(aes(size=abs(ranef)*0.4),alpha=0.5,show.legend=T)+
-  # facet_wrap(~trapLoc,ncol=1)+
   scale_colour_gradient(low='blue',high='red')+
   scale_size(guide='none')+
   labs(title='P. melanarius random intercepts')
 ggsave('./figures/01_P_melanarius_intercepts.png',p2,height=6,width=8)
 
 
-#Model of landscape effect (ring composition)
+#Model of landscape effect (ring composition from shapefiles)
+
+#Arrange oRing cover matrix to correspond with correct rows
+tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
+#Total area of each ring in matrix form
+tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+#Matrix of distance values
+tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
+noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
+grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
+noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
+
 mod2 <- gam(count~offset(log(trapdays))+s(endjulian)+s(tempRingMat,by=grassMat)+s(BLID,bs='re'),data=tempTrap,family='nb',method='ML')
 
 #Looks like distance is the only important factor in this
@@ -122,8 +125,6 @@ plot(mod1$model$count,fitted(mod1),ylab='Predicted',xlab='Actual',pch=19,cex=0.5
 points(mod2$model$count,fitted(mod2),pch=19,cex=0.5,col='red')
 abline(0,1,lty='dashed')
 legend('bottomright',c('Distance','Ring comp'),fill=c('black','red'))
-
-#Summary for Pterostichus melanarius: appears to be more individuals at the centre of the fields
 
 #Messing around with data display
 ggplot(tempTrap,aes(x=midjulian,y=count+1,col=distFrom))+
@@ -142,44 +143,12 @@ ggplot(tempTrap,aes(x=dist,y=count+1,col=distFrom))+
   # theme(legend.position='bottom')+
   labs(x='Dist',col='Distance from',lty='Trap location',shape='Trap location')
 
-# #This model doesn't make any sense, because distance means different things depending on whether trap was in "normal" field (control) or in a field near a pivot corner or wetland. Better to use above model
-# mod3 <- gam(count~offset(log(trapdays))+s(endjulian)+
-#               dist*distFrom+trapLoc+
-#               s(BLID,bs='re'),data=tempTrap,family='nb')
-# summary(mod3) #Once again, distance from the edge seems to be the biggest fixed effect predictor for P.melanarius. Larg
-# plot(mod3,all.terms=T,pages=1)
-# 
-# #Random intercept plots - doesn't look too bad
-# tempTrap %>% select(BLID,lonSite,latSite) %>% distinct() %>% 
-#   mutate(ranef=coef(mod3)[grepl('BLID',names(coef(mod3)))]) %>% 
-#   st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% st_transform(3403) %>% 
-#   ggplot()+geom_sf(aes(size=abs(ranef),col=ranef))+
-#   scale_colour_gradient(low='blue',high='red')
-# 
-# #Distance-only variogram - need
-# tempTrap %>% select(BLID,lonTrap,latTrap) %>%
-#   mutate(resid=resid(mod3)) %>%
-#   st_as_sf(coords=c('lonTrap','latTrap'),crs=4326) %>%
-#   st_transform(3403) %>%
-#   variogram(resid~1,data=.) %>% plot()
-# 
-# #Spatio-temporal variogram for residuals - need to look into this more
-# library(sp)
-# library(spacetime)
-#  
-# temp <- tempTrap %>% data.frame()
-# coordinates(temp) <- ~lonTrap+latTrap
-# proj4string(temp) <- CRS("+init=epsg:4326") #Convert to SpatialPointsDataFrame
-# temp <- spTransform(temp,CRS("+init=epsg:3403")) #Convert to UTM
-# temp <- SpatialPoints(temp@coords,CRS("+init=epsg:3403"))
-# 
-# timeDF <- STIDF(sp=temp,
-#                 time=as.POSIXct(paste(tempTrap$endjulian,'2017',sep='-'),format='%j-%Y'),
-#                 data=data.frame(resid=resid(mod3)))
-# stplot(timeDF)
-# stVar <- variogramST(resid~1,data=timeDF,tunit='days',assumeRegular=T) #Fit spatiotemporal variogram
-# plot(stVar,map=T)
+#Model of landscape effect (ring composition from AAFC rasters)
 
+names(oRingMat2)
+
+
+#Summary for Pterostichus melanarius: appears to be more individuals at the centre of the fields
 
 # Wolf spiders -----------------------------------------------------------------
 
