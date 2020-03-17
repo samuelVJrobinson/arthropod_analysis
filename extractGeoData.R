@@ -173,8 +173,8 @@ aci2017 <- crop(aci2017,buffer(trapCoords,10000))
 aafcTable <- read.csv('~/Documents/shapefiles/croplandInventory/featureTableAAFC.csv',header=T)
 aafcTable$Description <- NULL
 
-#Create set of ring distances
-ringDist <- seq(0,1200,30)
+#Create set of ring distances (1.5 km)
+ringDist <- seq(0,1500,30)
 
 #Make rings around centre location
 mkRings <- function(centre,ringDist){
@@ -209,6 +209,8 @@ oRingMat2 <- lapply(rownames(oRingMat2[[1]]),function(name){ #Convert to differe
 })
 names(oRingMat2) <- coverNames #Apply cover class names
 
+
+
 oRingMat2 <- oRingMat2[sapply(oRingMat2,sum)>0] #Get rid of nonexistent cover classes
 coverNames <- names(oRingMat2)
 #Rearrange in descending order
@@ -216,9 +218,7 @@ oRingMat2 <- oRingMat2[order(sapply(oRingMat2,sum),decreasing=T)]
 #First 10 categories (Grassland:Forest) represent about 98% of total cover
 sapply(oRingMat2,sum)/sum(sapply(oRingMat2,sum))
 
-
 # Convert to proportions
-
 oRingMat2Prop <- lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 
 par(mfrow=c(5,2))
@@ -226,7 +226,8 @@ for(i in 1:10){
   covClass <- sapply(oRingMat2,sum)[order(sapply(oRingMat2,sum),decreasing=T)][i]
   percCover <- covClass/sum(sapply(oRingMat2,sum))
   plot(0,0,type='n',xlim=range(ringDist),ylim=c(0,1),
-       main=paste(names(covClass),': ',round(percCover*100,2),'% cover',sep=''),xlab='Distance',ylab='Proportion cover')
+       main=paste(names(covClass),': ',round(percCover*100,2),'% cover',sep=''),
+       xlab='Distance',ylab='Proportion cover')
   for(j in 1:nrow(oRingMat2Prop[[i]])){
     lines(ringDist[2:length(ringDist)],oRingMat2Prop[[names(covClass)]][j,],col=alpha('black',0.3))
   }

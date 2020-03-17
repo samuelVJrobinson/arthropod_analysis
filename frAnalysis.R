@@ -8,6 +8,37 @@ library(mgcv)
 library(sf)
 library(gstat)
 
+# Helper functions --------------------------------------------------------
+
+#Function to display matrix (m) with row/column names (nam)
+matrixplot <- function(m,nam){
+  #Dark colours indicate high multicollinearity
+  image(m,axes=F,col=gray.colors(12,start=0.2,end=1,rev=T))
+  mtext(text=nam, side=2, line=0.3, at=seq(0,1,length.out=nrow(m)), las=1, cex=0.8)
+  mtext(text=nam, side=3, line=0.3, at=seq(0,1,length.out=nrow(m)), las=2, cex=0.8)
+  
+  # #shadowtext trick from:
+  # #https://stackoverflow.com/questions/25631216/r-plots-is-there-any-way-to-draw-border-shadow-or-buffer-around-text-labels/39002911
+  # theta <-  seq(0, 2*pi, length.out=60) #Vector of angles to use
+  # r <- 0.15 #Proportion of character size to extend
+  # x0 <- r*strwidth('0')
+  # y0 <- r*strheight('0')
+
+  for(i in 1:nrow(m)){ #Add row text
+    (rpos <- (i-1)/(nrow(m)-1)) #Row position
+    # for(j in 1:ncol(m)){
+    j <- 1:ncol(m)
+    (cpos <- (j-1)/(ncol(m)-1)) #Column position
+    # #White background text
+    # for(k in 1:length(theta)){
+    #   text(cpos+cos(k)*x0,rpos+sin(k)*y0,round(m[j,i],2),col='white')
+    # }
+    #Actual text
+    text(cpos,rpos,round(m[j,i],2),col='darkred')
+    # }
+  }
+}
+
 # Load everything ---------------------------------------------------------
 load('./data/cleanData.Rdata') #Load site, trap, arth data
 load('./data/geoData.Rdata') #Load NNdist and oring data
@@ -45,7 +76,7 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
   mutate_at(vars(easting,northing),scale) #Scale coordinates to be a reasonable range
 
-#Model of landscape effect (nnDist only)
+#Model of landscape effect (trap location only)
 #Appears that distance to grass has a positive effect, and distance to noncrop a negative effect 
 #Spatio-temporal tensor doesn't fit as well as straightforward random effects. Investigate this later.
 #When using trap location, canola clearly has the most 
@@ -53,7 +84,7 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
 mod1 <- gam(count~offset(log(trapdays))+s(endjulian)+
               trapLoc+
               # s(BLID,bs='re')
-              te(BLID,bs='re')
+              s(BLID,bs='re')
               # s(grass)+s(wetlands)+
             ,
             data=tempTrap,family='nb',method='ML')
@@ -107,16 +138,84 @@ tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
 #Total area of each ring in matrix form
 tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 #Matrix of distance values
-tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
 noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
 grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
 noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 
-mod2 <- gam(count~offset(log(trapdays))+s(endjulian)+s(tempRingMat,by=grassMat)+s(BLID,bs='re'),data=tempTrap,family='nb',method='ML')
+mod2 <- gam(count~offset(log(trapdays))+s(endjulian)+
+              s(distMat,by=grassMat)+
+              s(BLID,bs='re'),
+            data=tempTrap,family='nb',method='ML')
+
+#Model of landscape effect (ring composition from AAFC rasters)
+#Proportion area within each ring
+oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
+
+#Arrange matrices from oRingMat2 to correspond with rows of tempTrap
+oRingMat2Prop <- lapply(oRingMat2Prop,function(x){
+  x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
+    left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
+    select(-ID) %>% as.matrix() })
+
+#Simplify to proportion noncrop
+nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren')
+oRingNoncropProp <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonCropClasses])
+
+#Selects top 10 cover classes from full oRing set
+oRingMat2 <- oRingMat2[1:10]
+oRingMat2Prop <- oRingMat2Prop[1:10]
+
+#Distance matrix to use in functional regression
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),
+    each=nrow(oRingMat2Prop[[1]])),ncol=ncol(oRingMat2Prop[[1]]))
+
+#Entire set of cover classes - "kitchen sink model"
+#Looks like this model doesn't do any better than earlier models
+mod3 <- gam(count~offset(log(trapdays))+s(endjulian)+
+              # trapLoc+
+              s(distMat,by=oRingMat2Prop$Grassland)+
+              s(distMat,by=oRingMat2Prop$Canola)+
+              # s(distMat,by=oRingMat2Prop$Cereal)+
+              s(distMat,by=oRingMat2Prop$Pasture)+
+              s(distMat,by=oRingMat2Prop$Wetland)+
+              s(distMat,by=oRingMat2Prop$Pulses)+
+              s(distMat,by=oRingMat2Prop$Urban)+
+              s(distMat,by=oRingMat2Prop$Shrubland)+
+              # s(distMat,by=oRingMat2Prop$Flax)+
+              # s(distMat,by=oRingMat2Prop$Forest)+
+              te(easting,northing,bs='gp',m=c(3),k=10), #Gaussian process basis function (Matern correlation)
+              # te(easting,northing,bs='gp',m=c(3)), #Gaussian process basis function
+              # s(BLID,bs='re'),
+            data=tempTrap,family='nb',method='ML')
+summary(mod3)
+plot(mod3,pages=1,scale=0,scheme=2)
+# gam.check(mod3)
+
+#Check for multicollinearity
+checkMC <- concurvity(mod3,full=F)$estimate
+matrixplot(checkMC,gsub('s\\(distMat\\)\\:oRingMat2Prop\\$','f:',rownames(checkMC)))
+
+
+
+
+#Seems like some of these categories are important, but possible issues with collinearity?
+
+#Noncrop only:
+mod4 <- gam(count~offset(log(trapdays))+s(endjulian)+
+              trapLoc+ #Trap location
+              s(distMat,by=oRingNoncropProp)+ #Proportion noncrop
+              s(BLID,bs='re'), #Site random intercept
+            data=tempTrap,family='nb',method='ML')
+summary(mod4)
+plot(mod4,pages=1,scale=0)
+
+#How do the 4 models compare?
+AIC(mod1,mod2,mod3,mod4)
 
 #Looks like distance is the only important factor in this
-AIC(mod1,mod2,update(mod2,.~.-s(tempRingMat,by=grassMat)+s(tempRingMat,by=grassMatPerc)),update(mod2,.~.+s(grass)))
+AIC(mod1,mod2,update(mod2,.~.-s(distMat,by=grassMat)+s(distMat,by=grassMatPerc)),update(mod2,.~.+s(grass)))
 summary(mod2)
 plot(mod2,scheme=2,pages=1)
 gam.check(mod2)
@@ -143,9 +242,9 @@ ggplot(tempTrap,aes(x=dist,y=count+1,col=distFrom))+
   # theme(legend.position='bottom')+
   labs(x='Dist',col='Distance from',lty='Trap location',shape='Trap location')
 
-#Model of landscape effect (ring composition from AAFC rasters)
+plot(mod1,scale=0)
 
-names(oRingMat2)
+
 
 
 #Summary for Pterostichus melanarius: appears to be more individuals at the centre of the fields
@@ -177,7 +276,7 @@ tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
 #Total area of each ring in matrix form
 tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 #Matrix of distance values
-tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
 noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
 grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
@@ -245,7 +344,7 @@ tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
 #Total area of each ring in matrix form
 tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 #Matrix of distance values
-tempRingMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
 grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
 noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
 grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
