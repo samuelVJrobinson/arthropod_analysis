@@ -7,6 +7,7 @@ theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()
 library(mgcv)
 library(sf)
 library(gstat)
+library(beepr)
 
 # Helper functions --------------------------------------------------------
 
@@ -173,28 +174,47 @@ distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),
 
 #Entire set of cover classes - "kitchen sink model"
 #Looks like this model doesn't do any better than earlier models
-mod3 <- gam(count~offset(log(trapdays))+s(endjulian)+
+
+# r <- seq(1,20,1)
+# mod3reml <- sapply(r,function(x){
+mod3 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=20,m=c(2,6))+
               # trapLoc+
               s(distMat,by=oRingMat2Prop$Grassland)+
               s(distMat,by=oRingMat2Prop$Canola)+
               # s(distMat,by=oRingMat2Prop$Cereal)+
               s(distMat,by=oRingMat2Prop$Pasture)+
               s(distMat,by=oRingMat2Prop$Wetland)+
-              s(distMat,by=oRingMat2Prop$Pulses)+
-              s(distMat,by=oRingMat2Prop$Urban)+
-              s(distMat,by=oRingMat2Prop$Shrubland)+
+              # s(distMat,by=oRingMat2Prop$Pulses)+
+              # s(distMat,by=oRingMat2Prop$Urban)+
+              # s(distMat,by=oRingMat2Prop$Shrubland)+
               # s(distMat,by=oRingMat2Prop$Flax)+
               # s(distMat,by=oRingMat2Prop$Forest)+
-              te(easting,northing,bs='gp',m=c(3),k=10), #Gaussian process basis function (Matern correlation)
-              # te(easting,northing,bs='gp',m=c(3)), #Gaussian process basis function
-              # s(BLID,bs='re'),
-            data=tempTrap,family='nb',method='ML')
+              # s(easting,northing,k=40), #Spline basis function
+              s(easting,northing,bs='gp',k=30,m=c(2,0.1)), #Gaussian process basis function (Matern correlation)
+            # te(easting,northing,bs='gp',m=c(3)), #Gaussian process basis function
+            # s(BLID,bs='re'),
+            data=tempTrap,family='nb')
+#     return(mod3$gcv)
+# })
+# beep(1)
+# plot(r,mod3reml)
+gam.check(mod3)
+plot(mod3,pages=1,scale=0,scheme=2,resid=F)
+plot(mod3,select=6,scheme=2,cex=3)
 summary(mod3)
-plot(mod3,pages=1,scale=0,scheme=2)
-# gam.check(mod3)
+
+weirdPoints <- c(11891,12000,12754,13825,14025,17882,20007,25196) %>% 
+  factor(.,levels=levels(tempTrap$BLID))
+
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  # filter(BLID %in% weirdPoints) %>% 
+  ggplot(aes(endjulian,resid))+geom_point()+
+  facet_wrap(~BLID)+geom_hline(yintercept=0)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$estimate
+#Looks OK. Come correlation between grassland and wetland
 matrixplot(checkMC,gsub('s\\(distMat\\)\\:oRingMat2Prop\\$','f:',rownames(checkMC)))
 
 

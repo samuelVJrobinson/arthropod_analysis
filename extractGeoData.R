@@ -175,6 +175,7 @@ aafcTable$Description <- NULL
 
 #Create set of ring distances (1.5 km)
 ringDist <- seq(0,1500,30)
+ringDist[1] <- 0.1 #"Local" area
 
 #Make rings around centre location
 mkRings <- function(centre,ringDist){
@@ -182,20 +183,22 @@ mkRings <- function(centre,ringDist){
   rings <- lapply(2:length(ringDist),function(x){
     gDifference(bTrap[[x]],bTrap[[x-1]])
   })
+  rings <- c(bTrap[[1]],rings)
   return(rings)
 }
 
 #Convert trap locations to list form
 trapList <- lapply(1:nrow(trapCoords),function(x) trapCoords[x,])
+
 #Make rings around each trap (~15 seconds)
 rings <- lapply(trapList,function(x) mkRings(x,ringDist))
- 
+
 #Get rasterSet composition within rings (~30 seconds)
 oRingMat2 <- lapply(rings,function(trapLoc){
   rC <- lapply(trapLoc,function(x) extract(aci2017,x)[[1]]) #Composition codes
   rC <- lapply(rC,function(x) aafcTable$Label2[match(x,aafcTable$Code)]) #Convert to labels
   rC <- sapply(rC,table) #Counts of cells in each cover category
-  colnames(rC) <- paste0('d',ringDist[2:length(ringDist)]) #Column names
+  colnames(rC) <- paste0('d',round(ringDist[1:length(ringDist)])) #Column names
   return(rC)
 })
 beep(1)
@@ -208,8 +211,6 @@ oRingMat2 <- lapply(rownames(oRingMat2[[1]]),function(name){ #Convert to differe
   return(temp)
 })
 names(oRingMat2) <- coverNames #Apply cover class names
-
-
 
 oRingMat2 <- oRingMat2[sapply(oRingMat2,sum)>0] #Get rid of nonexistent cover classes
 coverNames <- names(oRingMat2)
@@ -229,9 +230,10 @@ for(i in 1:10){
        main=paste(names(covClass),': ',round(percCover*100,2),'% cover',sep=''),
        xlab='Distance',ylab='Proportion cover')
   for(j in 1:nrow(oRingMat2Prop[[i]])){
-    lines(ringDist[2:length(ringDist)],oRingMat2Prop[[names(covClass)]][j,],col=alpha('black',0.3))
+    lines(round(ringDist[1:length(ringDist)]),oRingMat2Prop[[names(covClass)]][j,],col=alpha('black',0.3))
   }
 }
+par(mfrow=c(1,1))
 
 #Save list of matrices
 save(oRingMat2,file='./data/geoDataAAFC.Rdata')
