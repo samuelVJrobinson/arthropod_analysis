@@ -13,6 +13,7 @@ library(beepr)
 
 #Function to display matrix (m) with row/column names (nam)
 matrixplot <- function(m,nam){
+  par(mfrow=c(1,1))
   #Dark colours indicate high multicollinearity
   image(m,axes=F,col=gray.colors(12,start=0.2,end=1,rev=T))
   mtext(text=nam, side=2, line=0.3, at=seq(0,1,length.out=nrow(m)), las=1, cex=0.8)
@@ -38,6 +39,14 @@ matrixplot <- function(m,nam){
     text(cpos,rpos,round(m[j,i],2),col='darkred')
     # }
   }
+}
+
+#Function to examine correlation between % landscape categories at different distances
+corplot <- function(l,nam){ #Requires list of matrices, and names to use
+  plot(as.numeric(gsub('d','',colnames(l[[1]]))),
+       sapply(1:ncol(l[[1]]),function(x) summary(lm(l[[nam[1]]][,x]~l[[nam[2]]][,x]))$coefficients[2,3]),
+       xlab='Distance',ylab='Slope t-value',main=paste0(nam[1],':',nam[2]),pch=19,type='b')
+  abline(h=c(-1.96,0,1.96),lty=c('dashed','solid','dashed'),col='red')
 }
 
 # Load everything ---------------------------------------------------------
@@ -82,12 +91,12 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
 #Spatio-temporal tensor doesn't fit as well as straightforward random effects. Investigate this later.
 #When using trap location, canola clearly has the most 
 #Is this a "cultural" species?
-mod1 <- gam(count~offset(log(trapdays))+s(endjulian)+
-              trapLoc+
+mod1 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=20,m=c(2,6))+
+              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
+              trapLoc,
               # s(BLID,bs='re')
-              s(BLID,bs='re')
               # s(grass)+s(wetlands)+
-            ,
             data=tempTrap,family='nb',method='ML')
 gam.check(mod1)
 summary(mod1)  
@@ -145,12 +154,14 @@ noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
 grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
 noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 
-mod2 <- gam(count~offset(log(trapdays))+s(endjulian)+
-              s(distMat,by=grassMat)+
-              s(BLID,bs='re'),
+mod2 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=20,m=c(2,6))+
+              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
+              s(distMat,by=grassMat),
             data=tempTrap,family='nb',method='ML')
 
 #Model of landscape effect (ring composition from AAFC rasters)
+
 #Proportion area within each ring
 oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 
@@ -160,50 +171,91 @@ oRingMat2Prop <- lapply(oRingMat2Prop,function(x){
     left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
     select(-ID) %>% as.matrix() })
 
-#Simplify to proportion noncrop
+#Add proportion "noncrop"
 nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren')
 oRingNoncropProp <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonCropClasses])
 
-#Selects top 10 cover classes from full oRing set
-oRingMat2 <- oRingMat2[1:10]
-oRingMat2Prop <- oRingMat2Prop[1:10]
+# #Selects top 10 cover classes from full oRing set
+# oRingMat2 <- oRingMat2[1:10]
+# oRingMat2Prop <- oRingMat2Prop[1:10]
+
+#Add proportion (Trees + Shrubs)
+oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
 
 #Distance matrix to use in functional regression
-distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),
-    each=nrow(oRingMat2Prop[[1]])),ncol=ncol(oRingMat2Prop[[1]]))
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),each=nrow(oRingMat2Prop[[1]])),
+                  ncol=ncol(oRingMat2Prop[[1]]))
+#Matrix of end ("julian") days
+endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
+                    ncol=ncol(oRingMat2Prop[[1]]))
 
 #Entire set of cover classes - "kitchen sink model"
 #Looks like this model doesn't do any better than earlier models
 
 # r <- seq(1,20,1)
 # mod3reml <- sapply(r,function(x){
+#Cereals/canola are somewhat collinear. Pulses, urban, flax, forest were not very important
+
 mod3 <- gam(count~offset(log(trapdays))+
               s(endjulian,bs='gp',k=20,m=c(2,6))+
+              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
               # trapLoc+
-              s(distMat,by=oRingMat2Prop$Grassland)+
+              # s(distMat,by=oRingMat2Prop$Grassland)+
               s(distMat,by=oRingMat2Prop$Canola)+
               # s(distMat,by=oRingMat2Prop$Cereal)+
-              s(distMat,by=oRingMat2Prop$Pasture)+
-              s(distMat,by=oRingMat2Prop$Wetland)+
+              te(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
+              te(distMat,endDayMat,by=oRingMat2Prop$Wetland)+
+              s(distMat,by=oRingMat2Prop$TreeShrub),
               # s(distMat,by=oRingMat2Prop$Pulses)+
               # s(distMat,by=oRingMat2Prop$Urban)+
               # s(distMat,by=oRingMat2Prop$Shrubland)+
               # s(distMat,by=oRingMat2Prop$Flax)+
               # s(distMat,by=oRingMat2Prop$Forest)+
-              # s(easting,northing,k=40), #Spline basis function
-              s(easting,northing,bs='gp',k=30,m=c(2,0.1)), #Gaussian process basis function (Matern correlation)
-            # te(easting,northing,bs='gp',m=c(3)), #Gaussian process basis function
-            # s(BLID,bs='re'),
             data=tempTrap,family='nb')
 #     return(mod3$gcv)
 # })
 # beep(1)
 # plot(r,mod3reml)
-gam.check(mod3)
-plot(mod3,pages=1,scale=0,scheme=2,resid=F)
-plot(mod3,select=6,scheme=2,cex=3)
-summary(mod3)
 
+#Check k values
+gam.check(mod3)
+#Check for multicollinearity
+checkMC <- concurvity(mod3,full=F)$estimate
+#Looks OK. Some correlation between grassland and wetland
+termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
+matrixplot(checkMC,termNames)
+
+#Some landscape categories seem to be correlated at certain distances:
+corplot(oRingMat2Prop,c('Canola','Cereal')) #Negative, then positive
+corplot(oRingMat2Prop,c('Grassland','Wetland')) #Positive
+corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
+
+summary(mod3)
+AIC(mod3)
+
+#Plot spatial/temporal effects
+par(mfrow=c(2,1))
+plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect')
+plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect')
+
+par(mfrow=c(2,2))
+plot(mod3,scale=0,shade=T,rug=F,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=0,rug=F,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
+plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
+plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
+
+{par(mfrow=c(3,2)) 
+  for(i in 1:length(mod3$sp)){
+  plot(mod3,scale=0,scheme=2,resid=F,select=i,trans=I)
+  if(!grepl('easting',names(mod3$sp)[i])) abline(h=0,lty='dashed',col='red')
+} 
+par(mfrow=c(1,1))}
+
+
+
+
+
+#A bunch of weird outliers
 weirdPoints <- c(11891,12000,12754,13825,14025,17882,20007,25196) %>% 
   factor(.,levels=levels(tempTrap$BLID))
 
@@ -212,24 +264,19 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
   ggplot(aes(endjulian,resid))+geom_point()+
   facet_wrap(~BLID)+geom_hline(yintercept=0)
 
-#Check for multicollinearity
-checkMC <- concurvity(mod3,full=F)$estimate
-#Looks OK. Come correlation between grassland and wetland
-matrixplot(checkMC,gsub('s\\(distMat\\)\\:oRingMat2Prop\\$','f:',rownames(checkMC)))
 
-
-
-
-#Seems like some of these categories are important, but possible issues with collinearity?
 
 #Noncrop only:
-mod4 <- gam(count~offset(log(trapdays))+s(endjulian)+
-              trapLoc+ #Trap location
-              s(distMat,by=oRingNoncropProp)+ #Proportion noncrop
-              s(BLID,bs='re'), #Site random intercept
-            data=tempTrap,family='nb',method='ML')
+mod4 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=20,m=c(2,6))+
+              # trapLoc+ #Trap location
+              te(distMat,endDayMat,by=oRingNoncropProp)+
+              # s(distMat,by=oRingNoncropProp)+ #Proportion noncrop
+              s(easting,northing,bs='gp',k=30,m=c(2,0.1)),
+              # s(BLID,bs='re'), #Site random intercept
+            data=tempTrap,family='nb')
 summary(mod4)
-plot(mod4,pages=1,scale=0)
+plot(mod4,pages=1,scale=0,scheme=2)
 
 #How do the 4 models compare?
 AIC(mod1,mod2,mod3,mod4)
