@@ -20,7 +20,7 @@ coefs <- c(2,1.5)
 theta <- 2
 yhat <- exp(modMat %*% coefs)
 counts <- rnbinom(Nsamp,mu=yhat,size=theta)
-plot(modMat[,2],counts)
+plot(modMat[,2],counts,xlab='Linear predictor')
 
 #Create model
 compile('negBinTest.cpp')
@@ -52,6 +52,14 @@ data.frame(par=c('int','slope','logTheta'),actual=c(2,1.5,log(2)),est=opt$par,
   mutate(upr=est+1.96*se,lwr=est-1.96*se) %>% 
   ggplot(aes(x=par))+geom_pointrange(aes(y=est,ymax=upr,ymin=lwr),col='red')+
   geom_point(aes(y=actual))+labs(x='Parameter',y='Estimate')
+
+data.frame(x=modMat[,2],counts=counts,pred=exp(modMat %*% obj$par[c(1,2)])) %>% 
+  arrange(x) %>% 
+  ggplot(aes(x=x))+geom_point(aes(y=counts))+
+  geom_line(aes(y=pred),col='red')+
+  labs(x='Linear predictor',y='Counts')
+
+
 
 # Radial NB regression ----------------------------------------------------
 
