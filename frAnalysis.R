@@ -44,7 +44,8 @@ matrixplot <- function(m,nam){
 #Function to examine correlation between % landscape categories at different distances
 corplot <- function(l,nam){ #Requires list of matrices, and names to use
   plot(as.numeric(gsub('d','',colnames(l[[1]]))),
-       sapply(1:ncol(l[[1]]),function(x) summary(lm(l[[nam[1]]][,x]~l[[nam[2]]][,x]))$coefficients[2,3]),
+       sapply(1:ncol(l[[1]]),function(x) summary(lm(l[[nam[1]]][,x]~l[[nam[2]]][,x]))$coefficients[2,3]), #Linear slope estimate
+       # zPrime <- 0.5*log((1+r)/(1-r))
        xlab='Distance',ylab='Slope t-value',main=paste0(nam[1],':',nam[2]),pch=19,type='b')
   abline(h=c(-1.96,0,1.96),lty=c('dashed','solid','dashed'),col='red')
 }
@@ -117,7 +118,7 @@ plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
 #Random BLID intercept with value closest to zero
 midBLID <- levels(tempTrap$BLID)[which.min(abs(coef(mod1)[grepl('BLID',names(coef(mod1)))]))]
 #Effect of trapLoc
-p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
+p1 <- with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
                  endjulian=mean(endjulian),grass=mean(grass),
                  wetlands=mean(wetlands),
                  trapLoc=unique(trapLoc))) %>% 
@@ -128,15 +129,27 @@ p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
   labs(x='Trap location',y='Catches/week',title='P. melanarius ~ offset + s(time) + s(BLID,type=re) + trapLoc')
 ggsave('./figures/01_P_melanarius_trapLoc.png',p1,height=6,width=6)
 
-p2 <- tempTrap %>% #Trap table
-  select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% #Get BLID and location data
-  distinct() %>% #Get only distinct values
-  mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>% #Get random intercepts from mod1
-  st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% #Convert df to spatial object
-  ggplot(aes(col=ranef))+ #Plot intercepts, using intercept as colour
-  geom_sf(aes(size=abs(ranef)*0.4),alpha=0.5,show.legend=T)+
-  scale_colour_gradient(low='blue',high='red')+
-  scale_size(guide='none')+
+# p2 <- tempTrap %>% #Trap table
+#   select(easting,northing,lonSite,latSite) %>% st_drop_geometry() %>% #Get BLID and location data
+#   distinct() %>% #Get only distinct values
+#   # mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>% #Get random intercepts from mod1
+#   st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% #Convert df to spatial object
+#   ggplot(aes(col=ranef))+ #Plot intercepts, using intercept as colour
+#   geom_sf(aes(size=abs(ranef)*0.4),alpha=0.5,show.legend=T)+
+#   scale_colour_gradient(low='blue',high='red')+
+#   scale_size(guide='none')+
+#   labs(title='P. melanarius random intercepts')
+
+p2 <- with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
+                          northing=seq(min(northing),max(northing),0.05),
+                          trapdays=7,endjulian=mean(endjulian),grass=mean(grass),
+                          wetlands=mean(wetlands),trapLoc='canola')) %>% 
+  mutate(pred=predict(mod1,newdata=.),se=predict(mod1,newdata=.,se.fit=T)$se.fit) %>% 
+  mutate(upr=pred+se,lwr=pred-se) %>% 
+  # mutate_at(vars(pred,upr,lwr),exp) %>% 
+  ggplot(aes(x=easting,y=northing))+geom_raster(aes(fill=pred))+
+  scale_fill_gradient(low='blue',high='red')+
+  geom_point(data=unique(select(tempTrap,easting,northing)),shape=4)+
   labs(title='P. melanarius random intercepts')
 ggsave('./figures/01_P_melanarius_intercepts.png',p2,height=6,width=8)
 
@@ -240,13 +253,13 @@ plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect')
 
 par(mfrow=c(2,2))
 plot(mod3,scale=0,shade=T,rug=F,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=0,rug=F,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
+plot(mod3,scale=0,scheme=2,rug=F,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
 plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
 plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
 
 {par(mfrow=c(3,2)) 
   for(i in 1:length(mod3$sp)){
-  plot(mod3,scale=0,scheme=2,resid=F,select=i,trans=I)
+  plot(mod3,scale=0,scheme=2,rug=F,select=i,trans=I)
   if(!grepl('easting',names(mod3$sp)[i])) abline(h=0,lty='dashed',col='red')
 } 
 par(mfrow=c(1,1))}
