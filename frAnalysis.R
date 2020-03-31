@@ -72,7 +72,7 @@ tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% gro
 #Only using pitfall traps from 2017
 tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
-  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>% 
+  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>%
   mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
   left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
   left_join(tempArth,by='BTID') %>% mutate(n=ifelse(is.na(n),0,n)) %>% filter(!is.na(grass)) %>% 
@@ -118,7 +118,7 @@ plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
 #Random BLID intercept with value closest to zero
 midBLID <- levels(tempTrap$BLID)[which.min(abs(coef(mod1)[grepl('BLID',names(coef(mod1)))]))]
 #Effect of trapLoc
-p1 <- with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
+with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
                  endjulian=mean(endjulian),grass=mean(grass),
                  wetlands=mean(wetlands),
                  trapLoc=unique(trapLoc))) %>% 
@@ -127,7 +127,7 @@ p1 <- with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
   mutate_at(vars(pred,upr,lwr),exp) %>%
   ggplot(aes(x=trapLoc))+geom_pointrange(aes(y=pred,ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Catches/week',title='P. melanarius ~ offset + s(time) + s(BLID,type=re) + trapLoc')
-ggsave('./figures/01_P_melanarius_trapLoc.png',p1,height=6,width=6)
+# ggsave('./figures/01_P_melanarius_trapLoc.png',p1,height=6,width=6)
 
 # p2 <- tempTrap %>% #Trap table
 #   select(easting,northing,lonSite,latSite) %>% st_drop_geometry() %>% #Get BLID and location data
@@ -140,7 +140,7 @@ ggsave('./figures/01_P_melanarius_trapLoc.png',p1,height=6,width=6)
 #   scale_size(guide='none')+
 #   labs(title='P. melanarius random intercepts')
 
-p2 <- with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
+with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
                           northing=seq(min(northing),max(northing),0.05),
                           trapdays=7,endjulian=mean(endjulian),grass=mean(grass),
                           wetlands=mean(wetlands),trapLoc='canola')) %>% 
@@ -151,7 +151,29 @@ p2 <- with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
   scale_fill_gradient(low='blue',high='red')+
   geom_point(data=unique(select(tempTrap,easting,northing)),shape=4)+
   labs(title='P. melanarius random intercepts')
-ggsave('./figures/01_P_melanarius_intercepts.png',p2,height=6,width=8)
+# ggsave('./figures/01_P_melanarius_intercepts.png',p2,height=6,width=8)
+
+plot(mod1$model$count,fitted(mod1),ylab='Predicted',xlab='Actual',pch=19,cex=0.5)
+points(mod2$model$count,fitted(mod2),pch=19,cex=0.5,col='red')
+abline(0,1,lty='dashed')
+legend('bottomright',c('Distance','Ring comp'),fill=c('black','red'))
+
+# #Messing around with data display
+# ggplot(tempTrap,aes(x=midjulian,y=count+1,col=distFrom))+
+#   geom_point(aes(shape=trapLoc))+
+#   facet_wrap(~BLID)+
+#   geom_smooth(method='gam',se=F,aes(lty=trapLoc))+
+#   scale_y_log10()+
+#   theme(legend.position='bottom')+
+#   labs(x='DOY',col='Feature')
+# 
+# ggplot(tempTrap,aes(x=dist,y=count+1,col=distFrom))+
+#   geom_point(aes(shape=trapLoc))+
+#   facet_wrap(~BLID)+
+#   geom_smooth(method='gam',se=F,aes(lty=trapLoc))+
+#   scale_y_log10()+
+#   # theme(legend.position='bottom')+
+#   labs(x='Dist',col='Distance from',lty='Trap location',shape='Trap location')
 
 
 #Model of landscape effect (ring composition from shapefiles)
@@ -203,15 +225,15 @@ endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
                     ncol=ncol(oRingMat2Prop[[1]]))
 
 #Entire set of cover classes - "kitchen sink model"
-#Looks like this model doesn't do any better than earlier models
 
 # r <- seq(1,20,1)
 # mod3reml <- sapply(r,function(x){
 #Cereals/canola are somewhat collinear. Pulses, urban, flax, forest were not very important
 
 mod3 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,6))+
-              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
+              s(endjulian,bs='gp',k=30,m=c(2,6))+ #Gaussian process temporal smoother
+              s(easting,northing,bs='gp',k=34,m=c(2,0.1))+ #Gaussian process spatial smoother (Matern correlation), AIC minimized at k~=34
+              # s(northing,easting,endjulian,bs='gp')+ #Using this doesn't improve fit by a large amount
               # trapLoc+
               # s(distMat,by=oRingMat2Prop$Grassland)+
               s(distMat,by=oRingMat2Prop$Canola)+
@@ -219,16 +241,16 @@ mod3 <- gam(count~offset(log(trapdays))+
               te(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
               te(distMat,endDayMat,by=oRingMat2Prop$Wetland)+
               s(distMat,by=oRingMat2Prop$TreeShrub),
-              # s(distMat,by=oRingMat2Prop$Pulses)+
-              # s(distMat,by=oRingMat2Prop$Urban)+
-              # s(distMat,by=oRingMat2Prop$Shrubland)+
-              # s(distMat,by=oRingMat2Prop$Flax)+
-              # s(distMat,by=oRingMat2Prop$Forest)+
-            data=tempTrap,family='nb')
-#     return(mod3$gcv)
-# })
+            # s(distMat,by=oRingMat2Prop$Pulses)+
+            # s(distMat,by=oRingMat2Prop$Urban)+
+            # s(distMat,by=oRingMat2Prop$Shrubland)+
+            # s(distMat,by=oRingMat2Prop$Flax)+
+            # s(distMat,by=oRingMat2Prop$Forest)+
+            data=tempTrap,family='nb',select=T)
+
 # beep(1)
 # plot(r,mod3reml)
+summary(mod3)
 
 #Check k values
 gam.check(mod3)
@@ -244,12 +266,11 @@ corplot(oRingMat2Prop,c('Grassland','Wetland')) #Positive
 corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
 
 summary(mod3)
-AIC(mod3)
 
 #Plot spatial/temporal effects
-par(mfrow=c(2,1))
+par(mfrow=c(1,2))
 plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect')
-plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect')
+plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4)
 
 par(mfrow=c(2,2))
 plot(mod3,scale=0,shade=T,rug=F,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
@@ -257,36 +278,38 @@ plot(mod3,scale=0,scheme=2,rug=F,select=4,xlab='Distance',ylab='Day of year',mai
 plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
 plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
 
-{par(mfrow=c(3,2)) 
-  for(i in 1:length(mod3$sp)){
-  plot(mod3,scale=0,scheme=2,rug=F,select=i,trans=I)
-  if(!grepl('easting',names(mod3$sp)[i])) abline(h=0,lty='dashed',col='red')
-} 
-par(mfrow=c(1,1))}
-
-
-
-
-
-#A bunch of weird outliers
-weirdPoints <- c(11891,12000,12754,13825,14025,17882,20007,25196) %>% 
-  factor(.,levels=levels(tempTrap$BLID))
-
+#Outlier plot over time at each site
 tempTrap %>% mutate(resid=resid(mod3)) %>% 
-  # filter(BLID %in% weirdPoints) %>% 
   ggplot(aes(endjulian,resid))+geom_point()+
   facet_wrap(~BLID)+geom_hline(yintercept=0)
 
+#Summed outlier plot (like RSS but in log-space) over space
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  group_by(ID) %>% summarize(sumRes=sum(abs(resid))) %>% ungroup() %>% 
+  # filter(sumRes>quantile(sumRes,0.2)) %>% 
+  ggplot()+
+  geom_sf(aes(size=sumRes,col=sumRes),alpha=0.5,show.legend=F)+
+  scale_colour_gradient(low='blue',high='red')
 
+#Variogram of summed residuals - not much of a pattern?
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  group_by(ID) %>% summarize(sumRes=sum(abs(resid))) %>% ungroup() %>% 
+  as_Spatial() %>% variogram(sumRes~1,.) %>% plot()
 
-#Noncrop only:
+#Look at locations with weird temporal outliers only
+weirdPoints <- c(10348,11891,12000,12754,13825,14025,17882,20007,25196) %>% 
+  factor(.,levels=levels(tempTrap$BLID))
+
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  filter(BLID %in% weirdPoints) %>%
+  ggplot(aes(endjulian,resid))+geom_point()+
+  facet_wrap(~BLID)+geom_hline(yintercept=0)
+
+#Model using "Noncrop" only:
 mod4 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,6))+
-              # trapLoc+ #Trap location
-              te(distMat,endDayMat,by=oRingNoncropProp)+
-              # s(distMat,by=oRingNoncropProp)+ #Proportion noncrop
-              s(easting,northing,bs='gp',k=30,m=c(2,0.1)),
-              # s(BLID,bs='re'), #Site random intercept
+              s(endjulian,bs='gp',k=20,m=c(2,6))+ #Gaussian process temporal smoother
+              s(easting,northing,bs='gp',k=50,m=c(2,0.1))+ #Gaussian process spatial smoother (Matern correlation)
+              te(distMat,endDayMat,by=oRingNoncropProp),
             data=tempTrap,family='nb')
 summary(mod4)
 plot(mod4,pages=1,scale=0,scheme=2)
@@ -294,40 +317,7 @@ plot(mod4,pages=1,scale=0,scheme=2)
 #How do the 4 models compare?
 AIC(mod1,mod2,mod3,mod4)
 
-#Looks like distance is the only important factor in this
-AIC(mod1,mod2,update(mod2,.~.-s(distMat,by=grassMat)+s(distMat,by=grassMatPerc)),update(mod2,.~.+s(grass)))
-summary(mod2)
-plot(mod2,scheme=2,pages=1)
-gam.check(mod2)
-
-plot(mod1$model$count,fitted(mod1),ylab='Predicted',xlab='Actual',pch=19,cex=0.5)
-points(mod2$model$count,fitted(mod2),pch=19,cex=0.5,col='red')
-abline(0,1,lty='dashed')
-legend('bottomright',c('Distance','Ring comp'),fill=c('black','red'))
-
-#Messing around with data display
-ggplot(tempTrap,aes(x=midjulian,y=count+1,col=distFrom))+
-  geom_point(aes(shape=trapLoc))+
-  facet_wrap(~BLID)+
-  geom_smooth(method='gam',se=F,aes(lty=trapLoc))+
-  scale_y_log10()+
-  theme(legend.position='bottom')+
-  labs(x='DOY',col='Feature')
-
-ggplot(tempTrap,aes(x=dist,y=count+1,col=distFrom))+
-  geom_point(aes(shape=trapLoc))+
-  facet_wrap(~BLID)+
-  geom_smooth(method='gam',se=F,aes(lty=trapLoc))+
-  scale_y_log10()+
-  # theme(legend.position='bottom')+
-  labs(x='Dist',col='Distance from',lty='Trap location',shape='Trap location')
-
-plot(mod1,scale=0)
-
-
-
-
-#Summary for Pterostichus melanarius: appears to be more individuals at the centre of the fields
+#Looks like the ring model does better
 
 # Wolf spiders -----------------------------------------------------------------
 
@@ -374,7 +364,7 @@ plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
 #Random BLID intercept with value closest to zero
 midBLID <- levels(tempTrap$BLID)[which.min(abs(coef(mod1)[grepl('BLID',names(coef(mod1)))]))]
 #Effect of trapLoc
-p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
+with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
                           endjulian=mean(endjulian),grass=mean(grass),
                           wetlands=mean(wetlands),
                           trapLoc=unique(trapLoc))) %>% 
@@ -383,9 +373,9 @@ p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
   mutate_at(vars(pred,upr,lwr),exp) %>%
   ggplot(aes(x=trapLoc))+geom_pointrange(aes(y=pred,ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Catches/week',title='Lycosidae ~ offset + s(time) + s(BLID,type=re) + trapLoc')
-ggsave('./figures/02_Lycosidae_trapLoc.png',p1,height=6,width=6)
+# ggsave('./figures/02_Lycosidae_trapLoc.png',p1,height=6,width=6)
 
-p2 <- tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% 
+tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% 
   # mutate(trapLoc=ifelse(trapLoc=='ditch',trapLoc,'inField')) %>% 
   distinct() %>%
   mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>%
@@ -394,7 +384,7 @@ p2 <- tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>%
   # facet_wrap(~trapLoc,ncol=1)+
   scale_colour_gradient(low='blue',high='red')+
   labs(title='Lycosidae random intercepts')
-ggsave('./figures/02_Lycosidae_intercepts.png',p2,height=6,width=8)
+# ggsave('./figures/02_Lycosidae_intercepts.png',p2,height=6,width=8)
 
 
 # Harvestmen -------------------------------------------------------------
