@@ -239,10 +239,10 @@ plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',mai
 plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect')
 
 par(mfrow=c(2,2))
-plot(mod3,scale=0,shade=T,rug=F,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=0,rug=F,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
-plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
-plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,shade=T,rug=T,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=T,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
+plot(mod3,scale=0,scheme=2,rug=T,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
+plot(mod3,scale=0,shade=T,rug=T,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
 
 {par(mfrow=c(3,2)) 
   for(i in 1:length(mod3$sp)){
