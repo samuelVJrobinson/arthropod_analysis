@@ -193,24 +193,24 @@ abline(0,1,lty='dashed')
 #   labs(x='Dist',col='Distance from',lty='Trap location',shape='Trap location')
 
 
-#Model of landscape effect (ring composition from shapefiles)
+##Model of landscape effect (ring composition from shapefiles)
+# #Arrange oRing cover matrix to correspond with correct rows
+# tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
+# #Total area of each ring in matrix form
+# tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+# #Matrix of distance values
+# distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
+# grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
+# noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
+# grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
+# noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 
-#Arrange oRing cover matrix to correspond with correct rows
-tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
-#Total area of each ring in matrix form
-tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-#Matrix of distance values
-distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
-noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
-grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
-noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
-
+#"Null model" of just spatiotemporal random effects
 mod2 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
-              s(easting,northing,bs='gp',k=30,m=c(2,5))+
-              ti(northing,easting,endjulian)+
-              s(distMat,by=grassMat),
+              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
+              ti(northing,easting,endjulian) #Spatiotemporal interaction              
+            ,
             data=tempTrap,family='nb',method='ML')
 summary(mod2)
 
@@ -339,7 +339,7 @@ plot(mod4,pages=1,scale=0,scheme=2)
 #How do the 4 models compare?
 AIC(mod1,mod2,mod3,mod4)
 
-#Looks like the ring model does better
+#Looks like the ring model of landscape does better
 
 # Wolf spiders -----------------------------------------------------------------
 
@@ -432,7 +432,7 @@ endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
 #"Null model" - just spatiotemporal component
 mod2 <- gam(count~offset(log(trapdays))+
               s(endjulian,bs='gp',k=30,m=c(2,80,2))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=40,m=c(2,exp(-2),2))+ #Spatial gaussian process
+              s(easting,northing,bs='gp',k=50,m=c(2,0.1,2))+ #Spatial gaussian process
               # s(endjulian,k=20)+s(easting,northing,k=50)+
               ti(northing,easting,endjulian), #Spatiotemporal interaction
             data=tempTrap,family='nb',select=F,method='ML')
@@ -440,6 +440,48 @@ summary(mod2); AIC(mod2)
 plot(mod2,pages=1,scheme=2,resid=F)
 gam.check(mod2)
 
+#Landscape model
+mod3 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=30,m=c(2,80,2))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=60,m=c(2,0.1,2))+ #Spatial gaussian process
+              ti(northing,easting,endjulian)+ #Spatiotemporal interaction
+              # te(distMat,endDayMat,by=oRingMat2Prop$Grassland)+
+              s(distMat,by=oRingMat2Prop$Canola)+
+              te(distMat,endDayMat,by=oRingMat2Prop$Wetland)+
+              # te(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
+              # te(distMat,endDayMat,by=oRingMat2Prop$TreeShrub)+
+              s(distMat,by=oRingMat2Prop$Pulses)+
+              te(distMat,endDayMat,by=oRingMat2Prop$Urban)
+              # te(distMat,endDayMat,by=oRingMat2Prop$Flax)
+            ,
+            data=tempTrap,family='nb',select=F,method='REML')
+summary(mod3); AIC(mod3)
+plot(mod3,pages=1,scheme=2,resid=F,scale=0)
+gam.check(mod3)
+
+#Check for multicollinearity
+checkMC <- concurvity(mod3,full=F)$worst
+#Looks OK. Some correlation between grassland and wetland
+termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
+matrixplot(checkMC,termNames)
+
+
+#Plot spatial/temporal effects
+png(file = './figures/Lycosidae_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,3))
+plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
+plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
+plot(mod3,scale=0,scheme=2,resid=F,select=3,main='Spatiotemporal interaction',shift=coef(mod3)[1])
+dev.off()
+
+#Plot landscape effects
+png(file = './figures/Lycosidae_fixef.png',width=1200,height=1200,pointsize=20)
+par(mfrow=c(2,2))
+plot(mod3,scale=0,shade=T,rug=F,select=4,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
+plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Pulses'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=7,xlab='Distance',ylab='Day of year',main='Urban')
+dev.off()
 
 
 
