@@ -85,23 +85,40 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
   st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
   st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
-  mutate_at(vars(easting,northing),scale) #Scale coordinates to be a reasonable range
+  mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
 
 #Model of landscape effect (trap location only)
 #Appears that distance to grass has a positive effect, and distance to noncrop a negative effect 
 #Spatio-temporal tensor doesn't fit as well as straightforward random effects. Investigate this later.
 #When using trap location, canola clearly has the most 
 #Is this a "cultural" species?
+
+# #Function for optimizing range values for gp models
+# rAIC <- function(r,t){
+#   f1 <- gam(count~offset(log(trapdays))+
+#               s(endjulian,bs='gp',k=20,m=c(2,exp(r[1])))+ #Gaussian process basis function (powExp correlation)
+#               s(easting,northing,bs='gp',m=c(2,exp(r[2])))+
+#               ti(northing,easting,endjulian)+
+#               trapLoc,
+#             # s(BLID,bs='re')
+#             # s(grass)+s(wetlands)+
+#             data=t,family='nb',method='ML')
+#   return(f1$aic)
+# }
+# optR <- optim(c(6,1),rAIC,t=tempTrap)
+
 mod1 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,6))+
-              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
+              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
+              s(easting,northing,bs='gp',k=30,m=c(2,5))+
+              ti(northing,easting,endjulian)+
               trapLoc,
               # s(BLID,bs='re')
               # s(grass)+s(wetlands)+
             data=tempTrap,family='nb',method='ML')
-gam.check(mod1)
+
 summary(mod1)  
-plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
+gam.check(mod1)
+plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F,pch=4,cex=0.5)
 
 # #Trick to do multiple comparisons with GAM
 # library(multcomp)
@@ -140,23 +157,23 @@ with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
 #   scale_size(guide='none')+
 #   labs(title='P. melanarius random intercepts')
 
-with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
-                          northing=seq(min(northing),max(northing),0.05),
-                          trapdays=7,endjulian=mean(endjulian),grass=mean(grass),
-                          wetlands=mean(wetlands),trapLoc='canola')) %>% 
-  mutate(pred=predict(mod1,newdata=.),se=predict(mod1,newdata=.,se.fit=T)$se.fit) %>% 
-  mutate(upr=pred+se,lwr=pred-se) %>% 
-  # mutate_at(vars(pred,upr,lwr),exp) %>% 
-  ggplot(aes(x=easting,y=northing))+geom_raster(aes(fill=pred))+
-  scale_fill_gradient(low='blue',high='red')+
-  geom_point(data=unique(select(tempTrap,easting,northing)),shape=4)+
-  labs(title='P. melanarius random intercepts')
+# with(tempTrap,expand.grid(easting=seq(min(easting),max(easting),0.05),
+#                           northing=seq(min(northing),max(northing),0.05),
+#                           trapdays=7,endjulian=mean(endjulian),grass=mean(grass),
+#                           wetlands=mean(wetlands),trapLoc='canola')) %>% 
+#   mutate(pred=predict(mod1,newdata=.),se=predict(mod1,newdata=.,se.fit=T)$se.fit) %>% 
+#   mutate(upr=pred+se,lwr=pred-se) %>% 
+#   # mutate_at(vars(pred,upr,lwr),exp) %>% 
+#   ggplot(aes(x=easting,y=northing))+geom_raster(aes(fill=pred))+
+#   scale_fill_gradient(low='blue',high='red')+
+#   geom_point(data=unique(select(tempTrap,easting,northing)),shape=4)+
+#   labs(title='P. melanarius random intercepts')
 # ggsave('./figures/01_P_melanarius_intercepts.png',p2,height=6,width=8)
 
 plot(mod1$model$count,fitted(mod1),ylab='Predicted',xlab='Actual',pch=19,cex=0.5)
-points(mod2$model$count,fitted(mod2),pch=19,cex=0.5,col='red')
+# points(mod2$model$count,fitted(mod2),pch=19,cex=0.5,col='red')
 abline(0,1,lty='dashed')
-legend('bottomright',c('Distance','Ring comp'),fill=c('black','red'))
+# legend('bottomright',c('Distance','Ring comp'),fill=c('black','red'))
 
 # #Messing around with data display
 # ggplot(tempTrap,aes(x=midjulian,y=count+1,col=distFrom))+
@@ -190,10 +207,12 @@ grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
 noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 
 mod2 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,6))+
-              s(easting,northing,bs='gp',k=30,m=c(2,0.1))+ #Gaussian process basis function (Matern correlation)
+              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
+              s(easting,northing,bs='gp',k=30,m=c(2,5))+
+              ti(northing,easting,endjulian)+
               s(distMat,by=grassMat),
             data=tempTrap,family='nb',method='ML')
+summary(mod2)
 
 #Model of landscape effect (ring composition from AAFC rasters)
 
@@ -231,10 +250,9 @@ endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
 #Cereals/canola are somewhat collinear. Pulses, urban, flax, forest were not very important
 
 mod3 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=30,m=c(2,6))+ #Gaussian process temporal smoother
-              s(easting,northing,bs='gp',k=34,m=c(2,0.1))+ #Gaussian process spatial smoother (Matern correlation), AIC minimized at k~=34
-              # s(northing,easting,endjulian,bs='gp')+ #Using this doesn't improve fit by a large amount
-              # trapLoc+
+              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
+              ti(northing,easting,endjulian)+ #Spatiotemporal interaction
               # s(distMat,by=oRingMat2Prop$Grassland)+
               s(distMat,by=oRingMat2Prop$Canola)+
               # s(distMat,by=oRingMat2Prop$Cereal)+
@@ -246,16 +264,13 @@ mod3 <- gam(count~offset(log(trapdays))+
             # s(distMat,by=oRingMat2Prop$Shrubland)+
             # s(distMat,by=oRingMat2Prop$Flax)+
             # s(distMat,by=oRingMat2Prop$Forest)+
-            data=tempTrap,family='nb',select=T)
-
-# beep(1)
-# plot(r,mod3reml)
+            data=tempTrap,family='nb',select=F)
 summary(mod3)
 
 #Check k values
-gam.check(mod3)
+par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
 #Check for multicollinearity
-checkMC <- concurvity(mod3,full=F)$estimate
+checkMC <- concurvity(mod3,full=F)$worst
 #Looks OK. Some correlation between grassland and wetland
 termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
 matrixplot(checkMC,termNames)
@@ -268,15 +283,21 @@ corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
 summary(mod3)
 
 #Plot spatial/temporal effects
-par(mfrow=c(1,2))
-plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect')
-plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4)
+png(file = './figures/P_melanarius_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,3))
+plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
+plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
+plot(mod3,scale=0,scheme=2,resid=F,select=3,main='Spatiotemporal interaction',shift=coef(mod3)[1])
+dev.off()
 
+#Plot landscape effects
+png(file = './figures/P_melanarius_fixef.png',width=1200,height=1200,pointsize=20)
 par(mfrow=c(2,2))
-plot(mod3,scale=0,shade=T,rug=F,select=3,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=4,xlab='Distance',ylab='Day of year',main='Pasture')
-plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
-plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,shade=T,rug=F,select=4,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Pasture')
+plot(mod3,scale=0,scheme=2,rug=F,select=6,xlab='Distance',ylab='Day of year',main='Wetland')
+plot(mod3,scale=0,shade=T,rug=F,select=7,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
+dev.off()
 
 #Outlier plot over time at each site
 tempTrap %>% mutate(resid=resid(mod3)) %>% 
@@ -307,8 +328,9 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
 
 #Model using "Noncrop" only:
 mod4 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,6))+ #Gaussian process temporal smoother
-              s(easting,northing,bs='gp',k=50,m=c(2,0.1))+ #Gaussian process spatial smoother (Matern correlation)
+              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
+              ti(northing,easting,endjulian)+ #Spatiotemporal interaction
               te(distMat,endDayMat,by=oRingNoncropProp),
             data=tempTrap,family='nb')
 summary(mod4)
@@ -326,7 +348,7 @@ tempArth <- arth %>% filter(family=='Lycosidae') %>% group_by(BTID) %>% summariz
 #Only using pitfall traps from 2017
 tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
-  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>% 
+  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>%
   mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
   left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
   left_join(tempArth,by='BTID') %>% mutate(n=ifelse(is.na(n),0,n)) %>% filter(!is.na(grass)) %>% 
@@ -334,12 +356,12 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   mutate_at(vars(ephemeral:noncrop),function(x) ifelse(x>1500,1500,x)) %>% 
   rename('count'='n') %>% 
   #Converts 0 dist trapLoc to distFrom - pitfall at 0 m are "in" feature
-  mutate(trapLoc=ifelse(dist==0 & distFrom!='control',distFrom,trapLoc)) %>% 
+  mutate(trapLoc=factor(ifelse(dist==0 & distFrom!='control',distFrom,trapLoc))) %>% 
   #Get UTM coordinates for traps
   mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
   st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
   st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
-  mutate_at(vars(easting,northing),scale) #Scale coordinates to be a reasonable range
+  mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
 
 #Arrange oRing cover matrix to correspond with correct rows
 tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
@@ -385,6 +407,41 @@ tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>%
   scale_colour_gradient(low='blue',high='red')+
   labs(title='Lycosidae random intercepts')
 # ggsave('./figures/02_Lycosidae_intercepts.png',p2,height=6,width=8)
+
+#Model of landscape effect (ring composition from AAFC rasters)
+
+#Proportion area within each ring
+oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
+#Arrange matrices from oRingMat2 to correspond with rows of tempTrap
+oRingMat2Prop <- lapply(oRingMat2Prop,function(x){
+  x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
+    left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
+    select(-ID) %>% as.matrix() })
+#Add proportion "noncrop"
+nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren')
+oRingNoncropProp <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonCropClasses])
+#Add proportion Trees + Shrubs
+oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
+#Distance matrix to use in functional regression
+distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),each=nrow(oRingMat2Prop[[1]])),
+                  ncol=ncol(oRingMat2Prop[[1]]))
+#Matrix of end ("julian") days
+endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
+                    ncol=ncol(oRingMat2Prop[[1]]))
+
+#"Null model" - just spatiotemporal component
+mod2 <- gam(count~offset(log(trapdays))+
+              s(endjulian,bs='gp',k=30,m=c(2,80,2))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=40,m=c(2,exp(-2),2))+ #Spatial gaussian process
+              # s(endjulian,k=20)+s(easting,northing,k=50)+
+              ti(northing,easting,endjulian), #Spatiotemporal interaction
+            data=tempTrap,family='nb',select=F,method='ML')
+summary(mod2); AIC(mod2)
+plot(mod2,pages=1,scheme=2,resid=F)
+gam.check(mod2)
+
+
+
 
 
 # Harvestmen -------------------------------------------------------------
