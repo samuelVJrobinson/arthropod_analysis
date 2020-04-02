@@ -206,13 +206,17 @@ abline(0,1,lty='dashed')
 # noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
 
 #"Null model" of just spatiotemporal random effects
+#Appropriate range parameters for gp processes seem to be ~72 days, ~5 km
 mod2 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
-              ti(northing,easting,endjulian) #Spatiotemporal interaction              
+              s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
+              ti(northing,easting,endjulian) #Spatiotemporal interaction           
             ,
-            data=tempTrap,family='nb',method='ML')
-summary(mod2)
+            data=tempTrap,family='nb',method='REML')
+summary(mod2); AIC(mod2)
+plot(mod2,scheme=2,pages=1,resid=T)
+par(mfrow=c(2,2)); gam.check(mod2); par(mfrow=c(1,1))
+
 
 #Model of landscape effect (ring composition from AAFC rasters)
 
@@ -244,31 +248,26 @@ endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
                     ncol=ncol(oRingMat2Prop[[1]]))
 
 #Entire set of cover classes - "kitchen sink model"
-
-# r <- seq(1,20,1)
-# mod3reml <- sapply(r,function(x){
-#Cereals/canola are somewhat collinear. Pulses, urban, flax, forest were not very important
+#Cereals/canola are somewhat collinear.
 
 mod3 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
+              s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
               ti(northing,easting,endjulian)+ #Spatiotemporal interaction
-              # s(distMat,by=oRingMat2Prop$Grassland)+
-              s(distMat,by=oRingMat2Prop$Canola)+
-              # s(distMat,by=oRingMat2Prop$Cereal)+
-              te(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
-              te(distMat,endDayMat,by=oRingMat2Prop$Wetland)+
-              s(distMat,by=oRingMat2Prop$TreeShrub),
-            # s(distMat,by=oRingMat2Prop$Pulses)+
-            # s(distMat,by=oRingMat2Prop$Urban)+
-            # s(distMat,by=oRingMat2Prop$Shrubland)+
-            # s(distMat,by=oRingMat2Prop$Flax)+
-            # s(distMat,by=oRingMat2Prop$Forest)+
+              # s(distMat,by=oRingMat2Prop$Grassland)+ti(distMat,endDayMat,by=oRingMat2Prop$Grassland)+ #Partialed out
+              # s(distMat,by=oRingMat2Prop$Canola)+ti(distMat,endDayMat,by=oRingMat2Prop$Canola)+
+              s(distMat,by=oRingMat2Prop$Pasture)+#ti(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
+              # s(distMat,by=oRingMat2Prop$Wetland)+ti(distMat,endDayMat,by=oRingMat2Prop$Wetland)+ #Partialed out
+              s(distMat,by=oRingMat2Prop$TreeShrub)+#ti(distMat,endDayMat,by=oRingMat2Prop$TreeShrub)+
+              s(distMat,by=oRingMat2Prop$Pulses)+#ti(distMat,endDayMat,by=oRingMat2Prop$Pulses)+
+              s(distMat,by=oRingMat2Prop$Urban)+ti(distMat,endDayMat,by=oRingMat2Prop$Urban)
+            ,
             data=tempTrap,family='nb',select=F)
 summary(mod3)
 
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
 #Looks OK. Some correlation between grassland and wetland
@@ -279,7 +278,6 @@ matrixplot(checkMC,termNames)
 corplot(oRingMat2Prop,c('Canola','Cereal')) #Negative, then positive
 corplot(oRingMat2Prop,c('Grassland','Wetland')) #Positive
 corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
-
 summary(mod3)
 
 #Plot spatial/temporal effects
@@ -288,17 +286,17 @@ par(mfrow=c(1,3))
 plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
 plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
 plot(mod3,scale=0,scheme=2,resid=F,select=3,main='Spatiotemporal interaction',shift=coef(mod3)[1])
-dev.off()
+dev.off(); par(mfrow=c(1,1))
 
 #Plot landscape effects
 png(file = './figures/P_melanarius_fixef.png',width=1200,height=1200,pointsize=20)
-par(mfrow=c(2,2))
-plot(mod3,scale=0,shade=T,rug=F,select=4,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Pasture')
-plot(mod3,scale=0,scheme=2,rug=F,select=6,xlab='Distance',ylab='Day of year',main='Wetland')
-plot(mod3,scale=0,shade=T,rug=F,select=7,xlab='Distance',ylab='Effect',main='Trees/Shrubs'); abline(h=0,lty='dashed',col='red')
-dev.off()
-
+par(mfrow=c(3,2))
+plot(mod3,scale=0,scheme=1,rug=F,select=7,xlab='Distance',ylab='Coefficient',main='Urban (s)'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=8,xlab='Distance',ylab='Day of year',main='Urban (ti)'); 
+plot(mod3,scale=0,scheme=1,rug=F,select=4,xlab='Distance',ylab='Coefficient',main='Pasture'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=1,rug=F,select=6,xlab='Distance',ylab='Coefficient',main='Pulses'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=1,rug=F,select=5,xlab='Distance',ylab='Coefficient',main='Tree/Shrub'); abline(h=0,lty='dashed',col='red')
+dev.off(); par(mfrow=c(1,1))
 
 #Outlier plot over time at each site
 tempTrap %>% mutate(resid=resid(mod3)) %>% 
@@ -329,10 +327,10 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
 
 #Model using "Noncrop" only:
 mod4 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=40,m=c(2,5))+ #Spatial gaussian process
+              s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
+              s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
               ti(northing,easting,endjulian)+ #Spatiotemporal interaction
-              te(distMat,endDayMat,by=oRingNoncropProp),
+              s(distMat,by=oRingNoncropProp)+ti(distMat,endDayMat,by=oRingNoncropProp), #Noncrop
             data=tempTrap,family='nb')
 summary(mod4)
 plot(mod4,pages=1,scale=0,scheme=2)
@@ -340,7 +338,8 @@ plot(mod4,pages=1,scale=0,scheme=2)
 #How do the 4 models compare?
 AIC(mod1,mod2,mod3,mod4)
 
-#Looks like the ring model of landscape does better
+#Looks like the ring model of landscape does better. Important landscape features seem to be:
+# Urban (spatial + temporal), Pasture, Pulses, Tree/Shrubs (weak)
 
 # Wolf spiders -----------------------------------------------------------------
 

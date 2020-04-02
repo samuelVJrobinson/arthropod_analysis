@@ -120,7 +120,7 @@ trap <- trap %>% mutate_if(is.factor,as.character) %>% #Convert all factors to c
     TRUE ~ trapType)) %>% 
   left_join(select(site,BLID,lon,lat),by='BLID') %>% #Joins site latitudes to traps
   rename('lonSite'='lon','latSite'='lat') %>% 
-  mutate(deployedhours=ifelse(deployedhours==0,NA,deployedhours)) #Some traps have errors in deployed hours
+  mutate(deployedhours=ifelse(deployedhours==0,NA,deployedhours)) #Some traps have errors in deployed hours - looks like collection errors
 
 #Problem: only latTrap/latSite from 2016 are entered
 #Solution: get lat/lon values from infield trap shapefiles. DitchSites can be ignored, as their trap lat/lon matches site lat/lon
@@ -171,7 +171,8 @@ rm(filePaths,i,trapLocs)
 #Looks OK
 trap %>% select(startYear,trapLoc,replicate,dist,distFrom,trapType) %>% distinct() %>% as.data.frame()
 
-trap %>% group_by(trapType,endYear) %>% summarize(nPasses=n(),daysDeployed=round(sum(deployedhours)/24),
+trap %>% filter(!is.na(deployedhours)) %>% 
+  group_by(trapType,endYear) %>% summarize(nPasses=n(),daysDeployed=round(sum(deployedhours)/24),
         nLocs=length(unique(BLID))) %>% ungroup() %>%
   mutate(daysPerLoc=daysDeployed/nLocs)
 
@@ -280,5 +281,4 @@ closestMatch <- function(target,possible){
 # closestMatch('abcd',testPoss)
 
 # Save to file ------------------------------------------------------------
-
 save(site,trap,arth,file='./data/cleanData.Rdata') #Saves to cleaned data file
