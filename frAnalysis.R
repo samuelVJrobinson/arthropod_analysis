@@ -108,15 +108,16 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
 # optR <- optim(c(6,1),rAIC,t=tempTrap)
 
 mod1 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
-              s(easting,northing,bs='gp',k=30,m=c(2,5))+
-              ti(northing,easting,endjulian)+
+              # s(endjulian,bs='gp',k=10,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
+              # s(easting,northing,bs='gp',k=30,m=c(2,5))+
+              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
+              s(easting,northing,bs='ts',k=100)+
+              ti(northing,easting,endjulian,bs='ts')+
               trapLoc,
               # s(BLID,bs='re')
               # s(grass)+s(wetlands)+
             data=tempTrap,family='nb',method='ML')
-
-summary(mod1)  
+summary(mod1); AIC(mod1)
 gam.check(mod1)
 plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F,pch=4,cex=0.5)
 
@@ -208,9 +209,11 @@ abline(0,1,lty='dashed')
 #"Null model" of just spatiotemporal random effects
 #Appropriate range parameters for gp processes seem to be ~72 days, ~5 km
 mod2 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
-              ti(northing,easting,endjulian) #Spatiotemporal interaction           
+              # s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
+              # s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
+              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
+              s(easting,northing,bs='ts',k=100)+
+              ti(northing,easting,endjulian,bs='ts') #Spatiotemporal interaction           
             ,
             data=tempTrap,family='nb',method='REML')
 summary(mod2); AIC(mod2)
@@ -250,23 +253,28 @@ endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
 #Entire set of cover classes - "kitchen sink model"
 #Cereals/canola are somewhat collinear.
 
+#Model with extra shrinkage takes longer to run. Maybe 3-5 mins?
 mod3 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
-              s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
-              ti(northing,easting,endjulian)+ #Spatiotemporal interaction
-              # s(distMat,by=oRingMat2Prop$Grassland)+ti(distMat,endDayMat,by=oRingMat2Prop$Grassland)+ #Partialed out
-              # s(distMat,by=oRingMat2Prop$Canola)+ti(distMat,endDayMat,by=oRingMat2Prop$Canola)+
-              s(distMat,by=oRingMat2Prop$Pasture)+#ti(distMat,endDayMat,by=oRingMat2Prop$Pasture)+
-              # s(distMat,by=oRingMat2Prop$Wetland)+ti(distMat,endDayMat,by=oRingMat2Prop$Wetland)+ #Partialed out
-              s(distMat,by=oRingMat2Prop$TreeShrub)+#ti(distMat,endDayMat,by=oRingMat2Prop$TreeShrub)+
-              s(distMat,by=oRingMat2Prop$Pulses)+#ti(distMat,endDayMat,by=oRingMat2Prop$Pulses)+
-              s(distMat,by=oRingMat2Prop$Urban)+ti(distMat,endDayMat,by=oRingMat2Prop$Urban)
+              # s(endjulian,bs='gp',k=20,m=c(2,71.8,1))+ #Temporal gaussian process
+              # s(easting,northing,bs='gp',k=50,m=c(2,5,1))+ #Spatial gaussian process
+              # ti(northing,easting,endjulian)+ #Spatiotemporal interaction
+              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
+              s(easting,northing,bs='ts',k=70)+
+              ti(northing,easting,endjulian,bs='ts')+ #Spatiotemporal interaction          
+              s(distMat,by=oRingMat2Prop$Grassland,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Grassland,bs='ts')+ #Partialed out
+              s(distMat,by=oRingMat2Prop$Canola,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Canola,bs='ts')+
+              s(distMat,by=oRingMat2Prop$Pasture,bs='ts')+ti(distMat,endDayMat,by=oRingMat2Prop$Pasture,bs='ts')+
+              s(distMat,by=oRingMat2Prop$Wetland,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Wetland,bs='ts')+ 
+              s(distMat,by=oRingMat2Prop$TreeShrub,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$TreeShrub,bs='ts')+
+              s(distMat,by=oRingMat2Prop$Pulses,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Pulses,bs='ts')+
+              s(distMat,by=oRingMat2Prop$Urban,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Urban,bs='ts')
             ,
-            data=tempTrap,family='nb',select=F)
-summary(mod3)
+            data=tempTrap,family='nb')
+summary(mod3); AIC(mod3)
 
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+plot(mod3,scheme=2,shade=T,pages=1)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
@@ -280,6 +288,9 @@ corplot(oRingMat2Prop,c('Grassland','Wetland')) #Positive
 corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
 summary(mod3)
 
+#Names of coefficients
+unique(gsub('.\\d{1,2}','',names(mod3$coefficients)))[-1]
+
 #Plot spatial/temporal effects
 png(file = './figures/P_melanarius_raneff.png',width=2000,height=800,pointsize=20)
 par(mfrow=c(1,3))
@@ -290,12 +301,13 @@ dev.off(); par(mfrow=c(1,1))
 
 #Plot landscape effects
 png(file = './figures/P_melanarius_fixef.png',width=1200,height=1200,pointsize=20)
-par(mfrow=c(3,2))
-plot(mod3,scale=0,scheme=1,rug=F,select=7,xlab='Distance',ylab='Coefficient',main='Urban (s)'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=8,xlab='Distance',ylab='Day of year',main='Urban (ti)'); 
-plot(mod3,scale=0,scheme=1,rug=F,select=4,xlab='Distance',ylab='Coefficient',main='Pasture'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=1,rug=F,select=6,xlab='Distance',ylab='Coefficient',main='Pulses'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=1,rug=F,select=5,xlab='Distance',ylab='Coefficient',main='Tree/Shrub'); abline(h=0,lty='dashed',col='red')
+par(mfrow=c(2,2))
+plot(mod3,scale=0,scheme=2,rug=F,select=13,xlab='Distance',ylab='Day of year',main='Tree/Shrub (p=0.004)')
+plot(mod3,scale=0,scheme=1,rug=F,select=14,xlab='Distance',ylab='Coefficient',main='Pulses (p=0.003)'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=1,rug=F,select=16,xlab='Distance',ylab='Coefficient',main='Urban (s) (p<0.001)'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=17,xlab='Distance',ylab='Day of year',main='Urban (ti) (p<0.001)'); # 
+# plot(mod3,scale=0,scheme=1,rug=F,select=4,xlab='Distance',ylab='Coefficient',main='Pasture'); abline(h=0,lty='dashed',col='red')
+# plot(mod3,scale=0,scheme=1,rug=F,select=6,xlab='Distance',ylab='Coefficient',main='Pulses'); abline(h=0,lty='dashed',col='red')
 dev.off(); par(mfrow=c(1,1))
 
 #Outlier plot over time at each site
