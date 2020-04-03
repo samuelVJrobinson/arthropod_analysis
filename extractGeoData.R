@@ -238,6 +238,13 @@ par(mfrow=c(1,1))
 #Save list of matrices
 save(oRingMat2,file='./data/geoDataAAFC.Rdata')
 
+# Collinearity plots for different land cover classes ---------------------
+
+#Problem: some land cover types are collinear with each other, but differs based on distances. Need to create a figure to properly visualize this
+
+
+
+
 # Other code snippets -----------------------
 
 # Create new shapefiles for 2018 data

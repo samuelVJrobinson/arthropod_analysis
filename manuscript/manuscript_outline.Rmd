@@ -1,0 +1,49 @@
+---
+title: "Landscape composition and beneficial insects"
+author: "Sam Robinson, Paul Galpern, others"
+date: "03/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+* Arthropod diversity is important to understand in agricultural systems
+  + Pests can cause large amounts of damage
+  + Beneficial insects can offset this
+  + Important for global biodiversity - insects may be declining globally
+  + Agriculture is ~36% of land worldwide
+  + Potential for win-win scenarios
+  
+* We don't have a good understanding of what drives arthropod abundance
+  + Bees are generally driven by flower/nest abundance
+  + Limited understanding of other arthropods
+  + Beetles are limited by water, food, oviposition sites, etc.
+  + Arachnids are similarly limited by food, shelter
+  
+* Landscape structure can influence abundance of beneficial arthropods in agricultural areas
+  + No-till agriculture 
+  + How can we design landscapes to benefit both farmers and insects?
+  
+* Point estimates of abundance are influenced by spatio-temporal processes 
+  + Arthropods move between landscape components depending on their life history
+  + e.g. Carabid beetles are thought to reproduce in field margins, but adults feed in fields (Desender and Alderweireldt 1988, J. of App. Ent.)
+  + Counts are a proxy of activity density, not necessarily abundance
+  + Nevertheless, this is an OK measure (_need to justify this_)
+  
+* In this study, we used pitfall trap counts of three species of beneficial arthropod to determine how landscape composition affects activity density of arthropods
+  + We hypothesized that:
+  1. Abundance of semi-natural land would result in increased arthropod abundance
+  2. Other things...
+
+# Methods
+
+* We used a system of pitfall traps located in southern Alberta in 2017
+
+# Results
+
+# Discussion
+

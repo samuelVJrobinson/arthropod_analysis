@@ -93,26 +93,12 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
 #When using trap location, canola clearly has the most 
 #Is this a "cultural" species?
 
-# #Function for optimizing range values for gp models
-# rAIC <- function(r,t){
-#   f1 <- gam(count~offset(log(trapdays))+
-#               s(endjulian,bs='gp',k=20,m=c(2,exp(r[1])))+ #Gaussian process basis function (powExp correlation)
-#               s(easting,northing,bs='gp',m=c(2,exp(r[2])))+
-#               ti(northing,easting,endjulian)+
-#               trapLoc,
-#             # s(BLID,bs='re')
-#             # s(grass)+s(wetlands)+
-#             data=t,family='nb',method='ML')
-#   return(f1$aic)
-# }
-# optR <- optim(c(6,1),rAIC,t=tempTrap)
-
 mod1 <- gam(count~offset(log(trapdays))+
               # s(endjulian,bs='gp',k=10,m=c(2,80))+ #Gaussian process basis function (powExp correlation)
               # s(easting,northing,bs='gp',k=30,m=c(2,5))+
               s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
               s(easting,northing,bs='ts',k=100)+
-              ti(northing,easting,endjulian,bs='ts')+
+              ti(northing,easting,endjulian,bs='ts')+ #Spatiotemporal interaction   
               trapLoc,
               # s(BLID,bs='re')
               # s(grass)+s(wetlands)+
@@ -220,9 +206,7 @@ summary(mod2); AIC(mod2)
 plot(mod2,scheme=2,pages=1,resid=T)
 par(mfrow=c(2,2)); gam.check(mod2); par(mfrow=c(1,1))
 
-
 #Model of landscape effect (ring composition from AAFC rasters)
-
 #Proportion area within each ring
 oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 
@@ -231,6 +215,22 @@ oRingMat2Prop <- lapply(oRingMat2Prop,function(x){
   x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
     left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
     select(-ID) %>% as.matrix() })
+
+#Problem with landscape matrix: mismatches between "trapLoc" and landscape composition at "0m" (cell that trap is located in)
+tempTrap %>% st_drop_geometry() %>% select(trapLoc,ID) %>% cbind(.,sapply(oRingMat2Prop,function(x) x[,1])) %>% distinct() %>% 
+  pivot_longer(cols=Grassland:Hemp) %>% filter(value!=0) %>% group_by(trapLoc,name) %>% summarize(s=sum(value)) %>% data.frame()
+
+#Solution: change Om column to match trapLoc column. ditch -> Urban, native -> Grassland, pivot -> Grassland, canola -> Canola, wetland -> Wetland
+
+oRingMat2Prop <- lapply(oRingMat2Prop,function(x){x[,1] <- rep(0,nrow(x)); return(x)}) #Change 0m values to 0
+
+#Dataframe of 0m values
+zeroCol <- tempTrap %>% st_drop_geometry() %>% select(trapLoc) %>% cbind(.,model.matrix(~trapLoc+0,data=tempTrap)) %>% 
+  rename(Canola=trapLoccanola,Urban=trapLocditch,Grassland=trapLocnative,Grassland2=trapLocpivot,Wetland=trapLocwetland) %>% 
+  mutate(Grassland=Grassland+Grassland2) %>% select(-Grassland2)
+
+for(i in 1:length(names(zeroCol[,-1]))) oRingMat2Prop[[names(zeroCol[,-1])[i]]][,1] <- zeroCol[,-1][,i] #Replace 0m values
+remove(zeroCol) #Cleanup
 
 #Add proportion "noncrop"
 nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren')
@@ -270,11 +270,12 @@ mod3 <- gam(count~offset(log(trapdays))+
               s(distMat,by=oRingMat2Prop$Urban,bs='ts')+ ti(distMat,endDayMat,by=oRingMat2Prop$Urban,bs='ts')
             ,
             data=tempTrap,family='nb')
+beep(1)
 summary(mod3); AIC(mod3)
 
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
-plot(mod3,scheme=2,shade=T,pages=1)
+plot(mod3,scheme=2,shade=T,pages=1,all.terms=T)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
@@ -301,9 +302,13 @@ dev.off(); par(mfrow=c(1,1))
 
 #Plot landscape effects
 png(file = './figures/P_melanarius_fixef.png',width=1200,height=1200,pointsize=20)
-par(mfrow=c(2,2))
-plot(mod3,scale=0,scheme=2,rug=F,select=13,xlab='Distance',ylab='Day of year',main='Tree/Shrub (p=0.004)')
-plot(mod3,scale=0,scheme=1,rug=F,select=14,xlab='Distance',ylab='Coefficient',main='Pulses (p=0.003)'); abline(h=0,lty='dashed',col='red')
+par(mfrow=c(3,2))
+
+plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Grassland (p=0.002)')
+plot(mod3,scale=0,scheme=1,rug=F,select=8,xlab='Distance',ylab='Coefficient',main='Pasture (p=0.05)'); abline(h=0,lty='dashed',col='red')
+# plot(mod3,scale=0,scheme=1,rug=F,select=12,xlab='Distance',ylab='Coefficient',main='Tree/Shrub (s) (p=0.06)'); abline(h=0,lty='dashed',col='red')
+plot(mod3,scale=0,scheme=2,rug=F,select=13,xlab='Distance',ylab='Day of year',main='Tree/Shrub (ti) (p<0.001)');  
+plot(mod3,scale=0,scheme=1,rug=F,select=14,xlab='Distance',ylab='Coefficient',main='Pulses (p=0.004)'); abline(h=0,lty='dashed',col='red')
 plot(mod3,scale=0,scheme=1,rug=F,select=16,xlab='Distance',ylab='Coefficient',main='Urban (s) (p<0.001)'); abline(h=0,lty='dashed',col='red')
 plot(mod3,scale=0,scheme=2,rug=F,select=17,xlab='Distance',ylab='Day of year',main='Urban (ti) (p<0.001)'); # 
 # plot(mod3,scale=0,scheme=1,rug=F,select=4,xlab='Distance',ylab='Coefficient',main='Pasture'); abline(h=0,lty='dashed',col='red')
@@ -440,6 +445,22 @@ distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),each
 #Matrix of end ("julian") days
 endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
                     ncol=ncol(oRingMat2Prop[[1]]))
+
+#Problem with landscape matrix: mismatches between "trapLoc" and landscape composition at "0m" (cell that trap is located in)
+tempTrap %>% st_drop_geometry() %>% select(trapLoc,ID) %>% cbind(.,sapply(oRingMat2Prop,function(x) x[,1])) %>% distinct() %>% 
+  pivot_longer(cols=Grassland:TreeShrub) %>% filter(value!=0) %>% group_by(trapLoc,name) %>% summarize(s=sum(value)) %>% data.frame()
+
+#Solution: change Om column to match trapLoc column. ditch -> Urban, native -> Grassland, pivot -> Grassland, canola -> Canola, wetland -> Wetland
+
+oRingMat2Prop <- lapply(oRingMat2Prop,function(x){x[,1] <- rep(0,nrow(x)); return(x)}) #Change 0m values to 0
+
+#Dataframe of 0m values
+zeroCol <- tempTrap %>% st_drop_geometry() %>% select(trapLoc) %>% cbind(.,model.matrix(~trapLoc+0,data=tempTrap)) %>% 
+  rename(Canola=trapLoccanola,Urban=trapLocditch,Grassland=trapLocnative,Grassland2=trapLocpivot,Wetland=trapLocwetland) %>% 
+  mutate(Grassland=Grassland+Grassland2) %>% select(-Grassland2)
+
+for(i in 1:length(names(zeroCol[,-1]))) oRingMat2Prop[[names(zeroCol[,-1])[i]]][,1] <- zeroCol[,-1][,i] #Replace 0m values
+remove(zeroCol) #Cleanup
 
 #"Null model" - just spatiotemporal component
 mod2 <- gam(count~offset(log(trapdays))+
