@@ -41,18 +41,9 @@ matrixplot <- function(m,nam){
   }
 }
 
-#Function to examine correlation between % landscape categories at different distances
-corplot <- function(l,nam){ #Requires list of matrices, and names to use
-  plot(as.numeric(gsub('d','',colnames(l[[1]]))),
-       sapply(1:ncol(l[[1]]),function(x) summary(lm(l[[nam[1]]][,x]~l[[nam[2]]][,x]))$coefficients[2,3]), #Linear slope estimate
-       # zPrime <- 0.5*log((1+r)/(1-r))
-       xlab='Distance',ylab='Slope t-value',main=paste0(nam[1],':',nam[2]),pch=19,type='b')
-  abline(h=c(-1.96,0,1.96),lty=c('dashed','solid','dashed'),col='red')
-}
-
 #Takes a df of arthropod counts at each site (unique to each spp), then runs 4 landscape-level models of abundance
-runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NA){
-  if(is.na(Kvals)) Kvals <- rep(list(c(10,30,5)),4) #Make list of default knot values for spatio-temporal smoothers
+runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL){
+  if(is.null(Kvals)) Kvals <- rep(list(c(10,30,5)),4) #Make list of default knot values for spatio-temporal smoothers
   
   #Only use pitfall traps from 2017
   tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
@@ -211,6 +202,7 @@ load('./data/geoData.Rdata') #Load NNdist and oring data
 load('./data/geoDataAAFC.Rdata') #Load oring data extracted from AAFC data
 
 oRingMat2 <- lapply(oRingMat2,function(x) x[,-1]) #Remove distance=0 measurements (already in trapLoc category)
+
 # Pterostichus ----------------------------------
 
 #What spp of beetles are present?
@@ -225,59 +217,29 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-#Run all 4 models for P. melanarius
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2)
+#Get all 4 models for P. melanarius
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2,Kvals=rep(list(c(5,70,4)),4))
+# save(PteMelMod,file='./data/PteMelMod.Rdata')
+load('./data/PteMelMod.Rdata')
 
 #Check models
 attach(PteMelMod)
 
-AIC(mod1,mod2,mod3,mod4)
+AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
+#However, model with non-agricultural cover is fairly close, 
 
-#Model 1 - large effect of space/time
-summary(mod1); AIC(mod1)
-plot(mod1,scheme=2,pages=1,resid=F,pch=1)
-par(mfrow=c(2,2)); gam.check(mod1); par(mfrow=c(1,1))
-
-#Model 2 - large effect of space/time and trapping location
-summary(mod2); AIC(mod2)
-gam.check(mod2)
-plot(mod2,scheme=2,pages=1,all.terms=F,rug=F,pch=4,cex=0.5)
-
-#Effect of trapLoc - lots of catches in canola fields, but this doesn't really say what else is around
-with(tempTrap,expand.grid(easting=0,northing=0,trapdays=7,
-                          endjulian=mean(endjulian),grass=mean(grass),
-                          wetlands=mean(wetlands),
-                          trapLoc=unique(trapLoc))) %>% 
-  mutate(pred=predict(mod2,newdata=.),se=predict(mod2,newdata=.,se.fit=T)$se.fit) %>% 
-  mutate(upr=pred+se,lwr=pred-se) %>% 
-  mutate_at(vars(pred,upr,lwr),exp) %>%
-  ggplot(aes(x=trapLoc))+geom_pointrange(aes(y=pred,ymax=upr,ymin=lwr))+
-  labs(x='Trap location',y='Catches/week',title='P. melanarius ~ offset + s(time) + s(BLID,type=re) + trapLoc')
-
-plot(fitted(mod2),mod2$model$count,xlab='Predicted',ylab='Actual',pch=19,cex=0.5)
-abline(0,1,lty='dashed')
-
-beep(1)
+#Model 3 - 
 summary(mod3); AIC(mod3)
 
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
-plot(mod3,scheme=2,shade=T,pages=1,all.terms=T)
+plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
 #Looks OK. Some correlation between grassland and wetland
 termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
 matrixplot(checkMC,termNames)
-
-#Some landscape categories seem to be correlated at certain distances:
-corplot(oRingMat2Prop,c('Canola','Cereal')) #Negative, then positive
-corplot(oRingMat2Prop,c('Grassland','Wetland')) #Positive
-corplot(oRingMat2Prop,c('Forest','Shrubland')) #Positive
-summary(mod3)
-
-#Names of coefficients
-unique(gsub('.\\d{1,2}','',names(mod3$coefficients)))[-1]
 
 #Plot spatial/temporal effects
 png(file = './figures/P_melanarius_raneff.png',width=2000,height=800,pointsize=20)
@@ -337,6 +299,7 @@ AIC(mod1,mod2,mod3,mod4)
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
 # Urban (spatial + temporal), Pasture, Pulses, Tree/Shrubs (weak)
+detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
