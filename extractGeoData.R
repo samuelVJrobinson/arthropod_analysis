@@ -244,8 +244,10 @@ load('./data/geoDataAAFC.Rdata')
 #Problem: some land cover types are collinear with each other, but differs based on distances. Need to create a figure to properly visualize this
 
 #Function to examine correlation between % landscape categories at different distances
-corplot <- function(l,nam,tVal=F,xlabel=NULL){ #Requires list of matrices, names to use, and whether to use t-values or r values
-  if(tVal){
+corplot <- function(l,nam,value=NULL,xlabel=NULL){ #Requires list of matrices, names to use, and whether to use t-values or r values
+  if(is.null(value)) stop('Type of correlation value not found')
+  
+  if(value=='t'){
     slopes <- sapply(1:ncol(l[[1]]),function(x) { #Linear slope estimate
       coefs <- summary(lm(l[[nam[1]]][,x]~l[[nam[2]]][,x]))$coefficients #Get t-value of slope term (if possible)
       if(nrow(coefs)==2) return(coefs[2,3]) else return(0)
@@ -257,10 +259,15 @@ corplot <- function(l,nam,tVal=F,xlabel=NULL){ #Requires list of matrices, names
          type='b')
     abline(h=c(-2,0,2),lty=c('dashed','solid','dashed'),col=c('red','black','red')) #Standard deviations
   } else {
+    corvals <- lapply(1:ncol(l[[1]]),function(x) cor.test(l[[nam[1]]][,x],l[[nam[2]]][,x],method=value)) #Kendall correlation
+    y <- sapply(corvals,function(x) x$statistic)
+    sig <- sapply(corvals,function(x) x$p.value<0.05)
+    
     plot(as.numeric(gsub('d','',colnames(l[[1]]))),
-         sapply(1:ncol(l[[1]]),function(x) cor(l[[nam[1]]][,x],l[[nam[2]]][,x],method='kendall')), #Correlation
-         # zPrime <- 0.5*log((1+r)/(1-r))
-         xlab=xlabel,ylab='Correlation',main=paste0(nam[1],':',nam[2]),pch=19,type='b')
+         y,
+         xlab=xlabel,ylab=corvals[[1]]$method,main=paste0(nam[1],':',nam[2]),
+         pch=ifelse(sig,19,1),
+         type='b')
     abline(h=c(0),lty=c('dashed'),col='black')
   }
 }
@@ -269,30 +276,31 @@ corplot <- function(l,nam,tVal=F,xlabel=NULL){ #Requires list of matrices, names
 #Proportion area within each ring
 oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 
-#Using top 10 most-abundant categories, in descending order
-top10 <- names(sort(sapply(oRingMat2Prop,sum),T))[1:10]
-oRingMat2Prop <- oRingMat2Prop[top10]
+# #Using top 12 most-abundant categories, in descending order
+# top12 <- names(sort(sapply(oRingMat2Prop,sum),T))[1:12]
+# oRingMat2Prop <- oRingMat2Prop[top12]
 
-#number of bivariate plots required
+#number of unique bivariate plots required
 length(oRingMat2Prop)*(length(oRingMat2Prop)+1)/2
 
 savePar <- par() #Save plotting parameters
 
-#Make figure
-png('./figures/classCorPlot.png',width=2000,height=1500,pointsize=20)
-par(mfrow=c(8,6),mar=c(2,2,2,1)+0.1)
-for(i in 1:(length(oRingMat2Prop)-1)){
-  for(j in (i+1):length(oRingMat2Prop))
-    corplot(oRingMat2Prop,c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),xlabel='Distance (m)',tVal=T) #Negative, then positive
+#Make figures
+for(i in 1:length(oRingMat2Prop)){
+  png(paste0('./figures/coverCorPlots/',formatC(i,width=2,format="d",flag = "0"),
+             names(oRingMat2Prop)[i],'.png'),width=2000,height=1500,pointsize=20)
+  par(mfrow=c(5,4),mar=c(2,2,2,1)+0.1)
+  for(j in c(1:length(oRingMat2Prop))[-i]){
+    # corplot(oRingMat2Prop,c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),xlabel='Distance (m)',value='t') 
+    corplot(oRingMat2Prop,c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),xlabel='Distance (m)',value='kendall') 
+  }
+  mainlab <- paste0(names(oRingMat2Prop)[i],' (',round(100*sapply(oRingMat2Prop,sum)[i]/sum(unlist(oRingMat2Prop)),3),'% total cover)')
+  plot(0,0,type='n',axes=FALSE,xlim=c(-1,1),ylim=c(-1,1))
+  text(0,0.5,mainlab,cex=2)
+  text(0,0,'x = Distance',cex=2); text(0,-0.5,'y = Kendall tau',cex=2)
+  dev.off()
 }
-# plot(0,0,type='n',xlim=c(-1,1),ylim=c(-1,1))
-plot(0,0,type='n',axes=FALSE,xlim=c(-1,1),ylim=c(-1,1))
-text(0,0.5,'x = Distance',cex=2)
-text(0,-0.5,'y = t-value of Slope',cex=2)
-dev.off()
-
 par(savePar) #Reset parameters
-
 
 # Other code snippets -----------------------
 

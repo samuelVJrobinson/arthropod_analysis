@@ -32,7 +32,7 @@ knitr::opts_chunk$set(echo = TRUE)
   + Arthropods move between landscape components depending on their life history
   + e.g. Carabid beetles are thought to reproduce in field margins, but adults feed in fields (Desender and Alderweireldt 1988, J. of App. Ent.)
   + Counts are a proxy of activity density, not necessarily abundance
-  + Nevertheless, this is an OK measure (_need to justify this_)
+  + Nevertheless, this is probably an OK measure (_need to justify this_)
   
 * In this study, we used pitfall trap counts of three species of beneficial arthropod to determine how landscape composition affects activity density of arthropods
   + We hypothesized that:
@@ -41,7 +41,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Methods
 
-* We used a system of pitfall traps located in southern Alberta in 2017
+##Data collection
+
+* We used a system of pitfall traps installed in ditches, field margins, wetlands, and in-field sites across southern Alberta in 2017 (_need a map here_)
+  + Traps at in-field sites were installed 20, 100, 200m (?) along a transect from the nearest non-crop feature (wetland, grassland, pivot)
+  + 
+  
+* To characterize landscape composition surrounding the traps, we used classified landscape data from AAFC
+  + Classifications are very accurate for fields (~90%), but less accurate for non-crop areas (~70%)
+  + Landscape studies often use the landscape composition within a circle of a fixed radius surrounding each point
+  + However, the radius of the circle depends on the grain of the landscape that is relevant to the abundance of a given organism.
+  + We used a novel method 
+  + Instead, we divided the landscape into annuli (rings) surrounding each trap location.
+  + Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
+  
+##Statistics
+
+
 
 # Results
 
