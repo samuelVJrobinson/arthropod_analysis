@@ -12,7 +12,7 @@ library(beepr)
 # Functions --------------------------------------------------------
 
 #Function to display matrix (m) with row/column names (nam)
-matrixplot <- function(m,nam=NULL,mar=NULL,showNums=T){
+matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
   if(ncol(m)!=nrow(m)) stop('Matrix not square')
   if(!is.null(nam)){
     if(ncol(m)!=length(nam)) stop('Length of name vector != matrix dimension')
@@ -35,7 +35,7 @@ matrixplot <- function(m,nam=NULL,mar=NULL,showNums=T){
   # x0 <- r*strwidth('0')
   # y0 <- r*strheight('0')
 
-  if(showNums){
+  if(numSize>0){
     #Add row text
     for(i in 1:n){ #Column of matrix to access
       cpos <- (i-1)/(n-1) #Col position in figure
@@ -45,7 +45,7 @@ matrixplot <- function(m,nam=NULL,mar=NULL,showNums=T){
       # for(k in 1:length(theta)){
       #   text(cpos+cos(k)*x0,rpos+sin(k)*y0,round(m[j,i],2),col='white')
       # }
-      text(cpos,rpos,round(m[j,i],2),col='darkred') #Text
+      text(cpos,rpos,round(m[j,i],2),col=numCol,cex=numSize) #Text
       # }
     }
   }
@@ -56,7 +56,8 @@ matrixplot <- function(m,nam=NULL,mar=NULL,showNums=T){
 #Takes a df of arthropod counts at each site (unique to each spp), then runs 4 landscape-level models of abundance
 #mod3Vars = vector of landscape cover types contained in oRingMat2
 #mod4Var = name of "noncrop" cover type to use
-runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,mod4Var=NULL){
+runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,mod4Var=NULL,
+                    fitMethod='REML',fitFam='nb',basisFun='ts',doublePenalize=F){
   if(is.null(Kvals)) Kvals <- rep(list(c(10,30,5)),4) #Make list of default knot values for spatio-temporal smoothers
   
   #Only use pitfall traps from 2017
@@ -112,31 +113,31 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,m
   
   #"Null model" of just spatiotemporal random effects
   # mod1 <- gam(count~offset(log(trapdays))+
-  #               s(endjulian,bs='ts',k=Kvals[[2]][1])+ #Thin plate spline with shrinkage
-  #               s(easting,northing,bs='ts',k=Kvals[[2]][2])+
-  #               ti(northing,easting,endjulian,bs='ts',k=Kvals[[2]][3]), #Spatiotemporal interaction   
+  #               s(endjulian,bs=basisFun,k=Kvals[[2]][1])+ #Thin plate spline with shrinkage
+  #               s(easting,northing,bs=basisFun,k=Kvals[[2]][2])+
+  #               ti(northing,easting,endjulian,bs=basisFun,k=Kvals[[2]][3]), #Spatiotemporal interaction   
   #             data=datList,family='nb',method='REML')
   mod1 <- gam(count~offset(log(trapdays))+
-                s(day,k=Kvals[[2]][1])+ #Thin plate spline with shrinkage
-                s(E,N,k=Kvals[[2]][2])+
-                ti(N,E,day,k=Kvals[[2]][3]), #Spatiotemporal interaction
-              data=datList,family='nb',select=T,method='ML')
+                s(day,k=Kvals[[1]][1],bs=basisFun)+ #Temporal smoother
+                s(E,N,k=Kvals[[1]][2],bs=basisFun)+ #Spatial smoother
+                ti(N,E,day,k=Kvals[[1]][3],bs=basisFun), #Spatiotemporal interaction
+              data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod1. ')
   
   
   #Model of landscape effect (trap location only)
   # mod2 <- gam(count~offset(log(trapdays))+
-  #               s(day,bs='ts',k=Kvals[[1]][1])+ #Thin plate spline with shrinkage
-  #               s(E,N,bs='ts',k=Kvals[[1]][2])+
-  #               ti(N,E,day,bs='ts',k=Kvals[[1]][3])+ #Spatiotemporal interaction   
+  #               s(day,bs=basisFun,k=Kvals[[1]][1])+ #Thin plate spline with shrinkage
+  #               s(E,N,bs=basisFun,k=Kvals[[1]][2])+
+  #               ti(N,E,day,bs=basisFun,k=Kvals[[1]][3])+ #Spatiotemporal interaction   
   #               trapLoc,
   #             data=datList,family='nb',method='REML',select=T)
   mod2 <- gam(count~offset(log(trapdays))+
-                s(day,k=Kvals[[1]][1])+ #Thin plate spline with shrinkage
-                s(E,N,k=Kvals[[1]][2])+
-                ti(N,E,day,k=Kvals[[1]][3])+ #Spatiotemporal interaction   
+                s(day,k=Kvals[[2]][1],bs=basisFun)+ #Thin plate spline with shrinkage
+                s(E,N,k=Kvals[[2]][2],bs=basisFun)+
+                ti(N,E,day,k=Kvals[[2]][3],bs=basisFun)+ #Spatiotemporal interaction   
                 trapLoc,
-              data=datList,family='nb',select=T,method='ML')
+              data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod2. ')
 
   #Entire set of cover classes - "kitchen sink model"
@@ -144,41 +145,41 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,m
   
   #Create model formula
   # mod3Formula <- "count~offset(log(trapdays))+
-  #   s(day,bs='ts',k=Kvals[[3]][1])+ 
-  #   s(E,N,bs='ts',k=Kvals[[3]][2])+
-  #   ti(N,E,day,bs='ts',k=Kvals[[3]][3])+ 
+  #   s(day,bs=basisFun,k=Kvals[[3]][1])+ 
+  #   s(E,N,bs=basisFun,k=Kvals[[3]][2])+
+  #   ti(N,E,day,bs=basisFun,k=Kvals[[3]][3])+ 
   #   trapLoc"
   # for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
-  #   mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],",bs='ts')",
-  #                        " + ti(distMat,endDayMat,by=",mod3Vars[i],",bs='ts')")
+  #   mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)",
+  #                        " + ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
   # }
   mod3Formula <- "count~offset(log(trapdays))+
-    s(day,k=Kvals[[3]][1])+
-    s(E,N,k=Kvals[[3]][2])+
-    ti(N,E,day,k=Kvals[[3]][3])+
+    s(day,k=Kvals[[3]][1],bs=basisFun)+
+    s(E,N,k=Kvals[[3]][2],bs=basisFun)+
+    ti(N,E,day,k=Kvals[[3]][3],bs=basisFun)+
     trapLoc"
   for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
-    mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],")",
-                         " + ti(distMat,endDayMat,by=",mod3Vars[i],")")
+    mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)",
+                         " + ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
   }
   
   mod3Formula <- as.formula(mod3Formula) #Convert to formula object
   
-  mod3 <- gam(formula=mod3Formula,data=datList,family='nb',select=T,method='ML')
+  mod3 <- gam(formula=mod3Formula,data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod3. ')
   
   #Model using "Noncrop" only:
   if(!is.null(mod4Var)){ #If mod4Var is defined
     #Assemble formula
-    # mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,bs='ts',k=Kvals[[4]][1])+ 
-    # s(E,N,bs='ts',k=Kvals[[4]][2])+ti(N,E,day,bs='ts',k=Kvals[[4]][3])+ 
-    # trapLoc + ","+ s(distMat,by=",mod4Var,",bs='ts')"," + ti(distMat,endDayMat,by=",mod4Var,",bs='ts')"))
-    mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,k=Kvals[[4]][1])+
-    s(E,N,k=Kvals[[4]][2])+ti(N,E,day,k=Kvals[[4]][3])+
-    trapLoc + ","+ s(distMat,by=",mod4Var,")"," + ti(distMat,endDayMat,by=",mod4Var,")"))
+    # mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,bs=basisFun,k=Kvals[[4]][1])+ 
+    # s(E,N,bs=basisFun,k=Kvals[[4]][2])+ti(N,E,day,bs=basisFun,k=Kvals[[4]][3])+ 
+    # trapLoc + ","+ s(distMat,by=",mod4Var,",bs=basisFun)"," + ti(distMat,endDayMat,by=",mod4Var,",bs=basisFun)"))
+    mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,k=Kvals[[4]][1],bs=basisFun)+
+    s(E,N,k=Kvals[[4]][2],bs=basisFun)+ti(N,E,day,k=Kvals[[4]][3],bs=basisFun)+
+    trapLoc + ","+ s(distMat,by=",mod4Var,",bs=basisFun)"," + ti(distMat,endDayMat,by=",mod4Var,",bs=basisFun)"))
     
     #Fit model
-    mod4 <- gam(formula=mod4Formula,data=datList,family='nb',select=T,method='ML')
+    mod4 <- gam(formula=mod4Formula,data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
     cat('Finished mod4.')
   } else { #If variable not defined
     cat('Variable for mod4 not found.')
@@ -195,17 +196,17 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,m
   # names(mmat) <- levels(tempTrap$trapLoc)
   # 
   # mod5 <- gam(count~offset(log(trapdays))+
-  #               s(day,bs='ts',k=Kvals[[4]][1])+ #Thin plate spline with shrinkage
-  #               s(E,N,bs='ts',k=Kvals[[4]][2])+
-  #               ti(N,E,day,bs='ts',k=Kvals[[4]][3])+ #Spatiotemporal interaction   
+  #               s(day,bs=basisFun,k=Kvals[[4]][1])+ #Thin plate spline with shrinkage
+  #               s(E,N,bs=basisFun,k=Kvals[[4]][2])+
+  #               ti(N,E,day,bs=basisFun,k=Kvals[[4]][3])+ #Spatiotemporal interaction   
   #               trapLoc+ 
-  #               s(distMat,by=oRingNoncropProp,bs='ts')+ 
-  #               s(distMat,by=mmat$canola,bs='ts')+
-  #               s(distMat,by=mmat$ditch,bs='ts')+
-  #               s(distMat,by=mmat$native,bs='ts')+
-  #               s(distMat,by=mmat$pivot,bs='ts')+
-  #               s(distMat,by=mmat$wetland,bs='ts')+
-  #               ti(distMat,endDayMat,by=oRingNoncropProp,bs='ts') #Noncrop
+  #               s(distMat,by=oRingNoncropProp,bs=basisFun)+ 
+  #               s(distMat,by=mmat$canola,bs=basisFun)+
+  #               s(distMat,by=mmat$ditch,bs=basisFun)+
+  #               s(distMat,by=mmat$native,bs=basisFun)+
+  #               s(distMat,by=mmat$pivot,bs=basisFun)+
+  #               s(distMat,by=mmat$wetland,bs=basisFun)+
+  #               ti(distMat,endDayMat,by=oRingNoncropProp,bs=basisFun) #Noncrop
   #             ,data=datList,family='nb')
   # summary(mod5)
   # plot(mod5,rug=F,scheme=2,pages=1,all.terms=T)
@@ -255,22 +256,18 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
 #Get all 4 models for P. melanarius
-mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban')
+mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban','Water')
 mod4Var <- 'NonCrop'
 
-debugonce(runMods)
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,
-                     Kvals=rep(list(c(5,70,4)),4),mod3Vars=mod3Vars,mod4Var=mod4Var)
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,
+#                      Kvals=rep(list(c(5,70,4)),4),mod3Vars=mod3Vars,mod4Var=mod4Var); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
-load('./data/PteMelMod.Rdata')
+# load('./data/PteMelMod.Rdata')
 
 #Check models
 attach(PteMelMod)
 
 AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
-
-
-
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -281,20 +278,18 @@ plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F)
 
 #Check for multicollinearity
 concurvity(mod3)
-checkMC <- concurvity(saveMod,full=F)$worst
+checkMC <- concurvity(mod3,full=F)$worst
 termNames <- gsub('s\\(distMat(,endDayMat)?\\)','s',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
 termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
 termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
+#High concurvity b/w some terms. Water and TreeShrub are very spatially dependent
+matrixplot(checkMC,mar=c(1, 6, 6, 1),termNames)
 
-# c(5, 4, 4, 2) + 0.1. #Default mar
-par(mar=c(1, 6, 6, 1)); matrixplot(checkMC,termNames); par(mar=c(5, 4, 4, 2) + 0.1)
+#Check for correlation in smoothers
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,6,6,1))
 
-
-coef(mod1)
-
-
-
+varcomp <- gam.vcomp(mod2) #Large amount of variation explained by easting
 
 
 #Plot spatial/temporal effects
@@ -350,8 +345,6 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
 summary(mod4)
 plot(mod4,pages=1,scale=0,scheme=2)
 
-#How do the 4 models compare?
-AIC(mod1,mod2,mod3,mod4)
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
 # Urban (spatial + temporal), Pasture, Pulses, Tree/Shrubs (weak)
@@ -363,120 +356,30 @@ detach(PteMelMod)
 arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
   mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
   summarize(n=n()) %>% arrange(family,genus,desc(n)) %>% data.frame()
-#Lots of Pardosa distincta and P. moesta
+#Lots of Pardosa distincta and P. moesta. Could try all lycosids at once, but this might be a stretch
 
 # #Select only wolf spiders
 # tempArth <- arth %>% filter(family=='Lycosidae') %>% group_by(BTID) %>% summarize(n=n())
 
 #Select only Pardosa distincta
 tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
-tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta') %>% group_by(BTID) %>% summarize(n=n())
 
-#Only using pitfall traps from 2017
-tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
-  # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
-  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>%
-  mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
-  left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
-  left_join(tempArth,by='BTID') %>% mutate(n=ifelse(is.na(n),0,n)) %>% filter(!is.na(grass)) %>% 
-  arrange(BLID,dist,pass) %>% mutate(BLID=factor(BLID)) %>% 
-  mutate_at(vars(ephemeral:noncrop),function(x) ifelse(x>1500,1500,x)) %>% 
-  rename('count'='n') %>% 
-  #Converts 0 dist trapLoc to distFrom - pitfall at 0 m are "in" feature
-  mutate(trapLoc=factor(ifelse(dist==0 & distFrom!='control',distFrom,trapLoc))) %>% 
-  #Get UTM coordinates for traps
-  mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
-  st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
-  st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
-  mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
+#Get all 4 models for P. distincta
+mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban','Water')
+mod4Var <- 'NonCrop'
 
-#Arrange oRing cover matrix to correspond with correct rows
-tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
-#Total area of each ring in matrix form
-tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-#Matrix of distance values
-distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
-noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
-grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
-noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
+ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,
+                     Kvals=rep(list(c(5,70,4)),4),mod3Vars=mod3Vars,mod4Var=mod4Var); beep(1)
+save(ParDisMod,file='./data/ParDisMod.Rdata')
+# load('./data/ParDisMod.Rdata')
 
-mod1 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
-              s(easting,northing,bs='gp',k=10)+
-              ti(northing,easting,endjulian,bs='ts')+ #Spatiotemporal interaction   
-              # s(grass)+s(wetlands)+
-              trapLoc,
-            data=tempTrap,family='nb',method='REML')
-par(mfrow=c(2,2)); gam.check(mod1); par(mfrow=c(1,1))
-summary(mod1)  
-plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
+#Check models
+attach(ParDisMod)
 
-#Model of landscape effect (ring composition from AAFC rasters)
+AIC(mod1,mod2,mod3,mod4) 
 
-#Proportion area within each ring
-oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
-#Arrange matrices from oRingMat2 to correspond with rows of tempTrap
-oRingMat2Prop <- lapply(oRingMat2Prop,function(x){
-  x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
-    left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
-    select(-ID) %>% as.matrix() })
-#Add proportion "noncrop"
-nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren')
-oRingNoncropProp <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonCropClasses])
-#Add proportion Trees + Shrubs
-oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
-#Distance matrix to use in functional regression
-distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2Prop[[1]]))),each=nrow(oRingMat2Prop[[1]])),
-                  ncol=ncol(oRingMat2Prop[[1]]))
-#Matrix of end ("julian") days
-endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2Prop[[1]])),
-                    ncol=ncol(oRingMat2Prop[[1]]))
-
-#Problem with landscape matrix: mismatches between "trapLoc" and landscape composition at "0m" (cell that trap is located in)
-tempTrap %>% st_drop_geometry() %>% select(trapLoc,ID) %>% cbind(.,sapply(oRingMat2Prop,function(x) x[,1])) %>% distinct() %>% 
-  pivot_longer(cols=Grassland:TreeShrub) %>% filter(value!=0) %>% group_by(trapLoc,name) %>% summarize(s=sum(value)) %>% data.frame()
-
-#Solution: change Om column to match trapLoc column. ditch -> Urban, native -> Grassland, pivot -> Grassland, canola -> Canola, wetland -> Wetland
-oRingMat2Prop <- lapply(oRingMat2Prop,function(x){x[,1] <- rep(0,nrow(x)); return(x)}) #Change 0m values to 0
-
-#Dataframe of 0m values
-zeroCol <- tempTrap %>% st_drop_geometry() %>% select(trapLoc) %>% cbind(.,model.matrix(~trapLoc+0,data=tempTrap)) %>% 
-  rename(Canola=trapLoccanola,Urban=trapLocditch,Grassland=trapLocnative,Grassland2=trapLocpivot,Wetland=trapLocwetland) %>% 
-  mutate(Grassland=Grassland+Grassland2) %>% select(-Grassland2)
-
-for(i in 1:length(names(zeroCol[,-1]))) oRingMat2Prop[[names(zeroCol[,-1])[i]]][,1] <- zeroCol[,-1][,i] #Replace 0m values
-remove(zeroCol,i) #Cleanup
-
-
-
-#"Null model" - just spatiotemporal component
-mod2 <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
-              s(easting,northing,bs='gp',k=10)+
-              ti(northing,easting,endjulian,bs='ts'), #Spatiotemporal interaction   
-            data=tempTrap,family='nb',select=F,method='REML')
-summary(mod2); AIC(mod2)
-plot(mod2,pages=1,scheme=2,resid=F)
-par(mfrow=c(2,2)); gam.check(mod2); par(mfrow=c(1,1))
-
-#Landscape model
-mod3b <- gam(count~offset(log(trapdays))+
-              s(endjulian,bs='ts',k=10)+ #Thin plate spline with shrinkage
-              s(easting,northing,bs='ts',k=10)+
-              ti(northing,easting,endjulian,bs='ts')+ #Spatiotemporal interaction          
-              s(distMat,by=Grassland,bs='ts')+ ti(distMat,endDayMat,by=Grassland,bs='ts')+
-              s(distMat,by=Canola,bs='ts')+ ti(distMat,endDayMat,by=Canola,bs='ts')+
-              s(distMat,by=Pasture,bs='ts')+ti(distMat,endDayMat,by=Pasture,bs='ts')+
-              s(distMat,by=Wetland,bs='ts')+ ti(distMat,endDayMat,by=Wetland,bs='ts')+ 
-              s(distMat,by=TreeShrub,bs='ts')+ ti(distMat,endDayMat,by=TreeShrub,bs='ts')+
-              s(distMat,by=Pulses,bs='ts')+ ti(distMat,endDayMat,by=Pulses,bs='ts')+
-              s(distMat,by=Urban,bs='ts')+ ti(distMat,endDayMat,by=Urban,bs='ts')
-            ,
-            data=datList,family='nb',select=F,method='REML')
-summary(mod3b); AIC(mod3b)
-plot(mod3,pages=1,scheme=2,rug=F,scale=0)
-gam.check(mod3)
+#Model 3 
+summary(mod3); AIC(mod3)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
@@ -501,7 +404,7 @@ plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Pul
 plot(mod3,scale=0,scheme=2,rug=F,select=7,xlab='Distance',ylab='Day of year',main='Urban')
 dev.off()
 
-
+detach(ParDisMod)
 
 
 # Harvestmen -------------------------------------------------------------

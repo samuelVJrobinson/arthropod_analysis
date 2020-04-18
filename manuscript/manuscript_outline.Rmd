@@ -45,19 +45,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 * We used a system of pitfall traps installed in ditches, field margins, wetlands, and in-field sites across southern Alberta in 2017 (_need a map here_)
   + Traps at in-field sites were installed 20, 100, 200m (?) along a transect from the nearest non-crop feature (wetland, grassland, pivot)
-  + 
+  + Specimens were collected from the traps every 14 days, on average (SD: 2.9), and were identified to species
   
 * To characterize landscape composition surrounding the traps, we used classified landscape data from AAFC
   + Classifications are very accurate for fields (~90%), but less accurate for non-crop areas (~70%)
   + Landscape studies often use the landscape composition within a circle of a fixed radius surrounding each point
   + However, the radius of the circle depends on the grain of the landscape that is relevant to the abundance of a given organism.
-  + We used a novel method 
   + Instead, we divided the landscape into annuli (rings) surrounding each trap location.
   + Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
+  + Using functional regression (see below), we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition 
   
 ##Statistics
 
-
+* Function-on-scalar (FOS) regression is a special type of linear model ($\hat{y}=X\beta$), where the values of the coefficients ($\beta$) are defined by a smooth function
+  + In our case, the coefficients represent the effect of a given type of landscape cover, and are a smooth function of distance from the trap (i.e. $\beta_i = f(distance_i)$)
+  + This technique has been used by other authors; Galpern et al. called this ``onion-skin regression"
+  + We fit our functional regression models using _mgcv_ version XXX.
 
 # Results
 
