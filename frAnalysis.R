@@ -49,16 +49,19 @@ matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
       # }
     }
   }
-  
-  suppressWarnings(par(savepar))
+  par(mfrow=savepar$mfrow,mar=savepar$mar)
 }
 
 #Takes a df of arthropod counts at each site (unique to each spp), then runs 4 landscape-level models of abundance
-#mod3Vars = vector of landscape cover types contained in oRingMat2
-#mod4Var = name of "noncrop" cover type to use
-runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,mod4Var=NULL,
+
+
+#fitMethod = 'ML' or 'REML'
+#fitFam = family of distribution to use
+#basisFun = name of basis function to be used ('ts' = thin plate spline with extra shrinkage)
+#doublePenalize = should gam use double-penalization? (don't use if using 'ts' or 'cr' as basis functions)
+runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
                     fitMethod='REML',fitFam='nb',basisFun='ts',doublePenalize=F){
-  if(is.null(Kvals)) Kvals <- rep(list(c(10,30,5)),4) #Make list of default knot values for spatio-temporal smoothers
+  if(is.null(formulas)) stop('No gam formulas provided')
   
   #Only use pitfall traps from 2017
   tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
@@ -96,97 +99,30 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,m
                                 E=easting,N=northing,
                                 distMat=as.matrix(distMat),endDayMat=as.matrix(endDayMat)))
   
-  if(is.null(mod3Vars)) mod3Vars <- names(oRingMat2) #If no variables for mod3 are provided, uses all in oRingMat2
-  
-  #Check names of variables
-  if(any(!mod3Vars %in% names(oRingMat2))){
-    stop(c(paste0(mod3Vars[!mod3Vars %in% names(oRingMat2)],collapse=','),
-           paste(' not found in names(oRingMat2)')))
-  }
-  if(any(!mod4Var %in% names(oRingMat2))){
-    stop(c(paste0(mod4Var[!mod4Var %in% names(oRingMat2)],collapse=','),
-           paste(' not found in names(oRingMat2)')))
-  }
-  
   #Assemble data list
-  datList <- c(datList,oRingMat2[mod3Vars],oRingMat2[mod4Var])
+  datList <- c(datList,oRingMat2)
   
-  #"Null model" of just spatiotemporal random effects
-  # mod1 <- gam(count~offset(log(trapdays))+
-  #               s(endjulian,bs=basisFun,k=Kvals[[2]][1])+ #Thin plate spline with shrinkage
-  #               s(easting,northing,bs=basisFun,k=Kvals[[2]][2])+
-  #               ti(northing,easting,endjulian,bs=basisFun,k=Kvals[[2]][3]), #Spatiotemporal interaction   
-  #             data=datList,family='nb',method='REML')
-  mod1 <- gam(count~offset(log(trapdays))+
-                s(day,k=Kvals[[1]][1],bs=basisFun)+ #Temporal smoother
-                s(E,N,k=Kvals[[1]][2],bs=basisFun)+ #Spatial smoother
-                ti(N,E,day,k=Kvals[[1]][3],bs=basisFun), #Spatiotemporal interaction
+  #Fit models
+  mod1 <- gam(formula=as.formula(formulas[1]), 
               data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod1. ')
   
-  
-  #Model of landscape effect (trap location only)
-  # mod2 <- gam(count~offset(log(trapdays))+
-  #               s(day,bs=basisFun,k=Kvals[[1]][1])+ #Thin plate spline with shrinkage
-  #               s(E,N,bs=basisFun,k=Kvals[[1]][2])+
-  #               ti(N,E,day,bs=basisFun,k=Kvals[[1]][3])+ #Spatiotemporal interaction   
-  #               trapLoc,
-  #             data=datList,family='nb',method='REML',select=T)
-  mod2 <- gam(count~offset(log(trapdays))+
-                s(day,k=Kvals[[2]][1],bs=basisFun)+ #Thin plate spline with shrinkage
-                s(E,N,k=Kvals[[2]][2],bs=basisFun)+
-                ti(N,E,day,k=Kvals[[2]][3],bs=basisFun)+ #Spatiotemporal interaction   
-                trapLoc,
+  mod2 <- gam(formula=as.formula(formulas[2]),
               data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod2. ')
 
   #Entire set of cover classes - "kitchen sink model"
   #Model with extra shrinkage takes longer to run. Maybe 3-5 mins?
-  
-  #Create model formula
-  # mod3Formula <- "count~offset(log(trapdays))+
-  #   s(day,bs=basisFun,k=Kvals[[3]][1])+ 
-  #   s(E,N,bs=basisFun,k=Kvals[[3]][2])+
-  #   ti(N,E,day,bs=basisFun,k=Kvals[[3]][3])+ 
-  #   trapLoc"
-  # for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
-  #   mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)",
-  #                        " + ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
-  # }
-  mod3Formula <- "count~offset(log(trapdays))+
-    s(day,k=Kvals[[3]][1],bs=basisFun)+
-    s(E,N,k=Kvals[[3]][2],bs=basisFun)+
-    ti(N,E,day,k=Kvals[[3]][3],bs=basisFun)+
-    trapLoc"
-  for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
-    mod3Formula <- paste0(mod3Formula,"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)",
-                         " + ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
-  }
-  
-  mod3Formula <- as.formula(mod3Formula) #Convert to formula object
-  
-  mod3 <- gam(formula=mod3Formula,data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
+  mod3 <- gam(formula=as.formula(formulas[3]),
+              data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod3. ')
   
   #Model using "Noncrop" only:
-  if(!is.null(mod4Var)){ #If mod4Var is defined
-    #Assemble formula
-    # mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,bs=basisFun,k=Kvals[[4]][1])+ 
-    # s(E,N,bs=basisFun,k=Kvals[[4]][2])+ti(N,E,day,bs=basisFun,k=Kvals[[4]][3])+ 
-    # trapLoc + ","+ s(distMat,by=",mod4Var,",bs=basisFun)"," + ti(distMat,endDayMat,by=",mod4Var,",bs=basisFun)"))
-    mod4Formula <- as.formula(paste0("count~offset(log(trapdays))+s(day,k=Kvals[[4]][1],bs=basisFun)+
-    s(E,N,k=Kvals[[4]][2],bs=basisFun)+ti(N,E,day,k=Kvals[[4]][3],bs=basisFun)+
-    trapLoc + ","+ s(distMat,by=",mod4Var,",bs=basisFun)"," + ti(distMat,endDayMat,by=",mod4Var,",bs=basisFun)"))
-    
-    #Fit model
-    mod4 <- gam(formula=mod4Formula,data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
-    cat('Finished mod4.')
-  } else { #If variable not defined
-    cat('Variable for mod4 not found.')
-    mod4 <- NULL
-  }
+  mod4 <- gam(formula=as.formula(formulas[4]),
+              data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
+  cat('Finished mod4.')
   
-  # #What if there are interactions between trapping location and surrounding landscape? (eg. nearby wetlands only affect abundance in canola)
+    # #What if there are interactions between trapping location and surrounding landscape? (eg. nearby wetlands only affect abundance in canola)
   # #This requires some lengthy coding in mgcv, but can be done. Here's an example for noncrop land
   # 
   # #Set up matrix of distance values (composition values in rows with that trap location, 0 otherwise) 
@@ -210,10 +146,10 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,Kvals=NULL,mod3Vars=NULL,m
   #             ,data=datList,family='nb')
   # summary(mod5)
   # plot(mod5,rug=F,scheme=2,pages=1,all.terms=T)
-  # #Problem: this requires 5 new terms to be written for each cover category. Leaving this out for now.
+  # #Problem: requires 5 new terms to be written for each cover category, and is likely inestimable. Leaving this out for now.
   
   #List of objects to return
-  retList <- list(datList=datList,tempTrap=tempTrap,mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4,Kvals=Kvals)
+  retList <- list(datList=datList,tempTrap=tempTrap,mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
   return(retList)
 }
 
@@ -241,7 +177,7 @@ oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 # oRingMat2Prop$WetlandWater <- oRingMat2Prop$Wetland + oRingMat2Prop$Water
 # oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Water <- NULL
 
-# Pterostichus ----------------------------------
+# Pterostichus melanarius ----------------------------------
 
 #What spp of beetles are present?
 arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
@@ -255,26 +191,40 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-#Get all 4 models for P. melanarius
-mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban','Water')
-mod4Var <- 'NonCrop'
-
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,
-#                      Kvals=rep(list(c(5,70,4)),4),mod3Vars=mod3Vars,mod4Var=mod4Var); beep(1)
+#Create model formulas
+modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
+# modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
+modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
+mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
+#Cereal may be causing problems in estimation - collinear with canola
+for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
+  # modFormulas[3] <- paste0(modFormulas[3],"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)")
+  # modFormulas[3] <- paste0(modFormulas[3],"+ ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+  modFormulas[3] <- paste0(modFormulas[3],"+ te(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+}
+modFormulas[4] <- paste0(modFormulas[2],'+ te(distMat,endDayMat,by=NonCrop,bs=basisFun)')
+ 
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
-# load('./data/PteMelMod.Rdata')
+load('./data/PteMelMod.Rdata')
 
 #Check models
 attach(PteMelMod)
-
+# detach(PteMelMod)
 AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
 
 #Model 3 
 summary(mod3); AIC(mod3)
+anova(mod3)
+
+#Variogram of residuals - no pattern
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  # group_by(ID) %>% summarize(resid=sum(abs(resid))) %>% ungroup() %>% 
+  as_Spatial() %>% variogram(resid~1,.) %>% plot()
 
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
-plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F)
+plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
 #Check for multicollinearity
 concurvity(mod3)
@@ -284,35 +234,36 @@ termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
 termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
 #High concurvity b/w some terms. Water and TreeShrub are very spatially dependent
-matrixplot(checkMC,mar=c(1, 6, 6, 1),termNames)
+matrixplot(checkMC,mar=c(1, 10, 10, 1),termNames)
 
 #Check for correlation in smoothers
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,6,6,1))
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,10,10,1))
 
-varcomp <- gam.vcomp(mod2) #Large amount of variation explained by easting
-
+varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
 
 #Plot spatial/temporal effects
-png(file = './figures/P_melanarius_raneff.png',width=2000,height=800,pointsize=20)
-par(mfrow=c(1,3))
+png(file = './figures/Pterostichus_melanarius_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,2))
 plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
 plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
-plot(mod3,scale=0,scheme=2,resid=F,select=3,main='Spatiotemporal interaction',shift=coef(mod3)[1])
 dev.off(); par(mfrow=c(1,1))
 
-#Plot landscape effects
-png(file = './figures/P_melanarius_fixef.png',width=1200,height=1200,pointsize=20)
-par(mfrow=c(3,2))
+#Plot significant landscape effects
+(sumMod3 <-summary(mod3))
+termnames <- gsub('te\\(distMat,endDayMat\\)\\:','',
+                  rownames(sumMod3$s.table)[(sumMod3$s.table[,'p-value']<0.05)&grepl('te',rownames(sumMod3$s.table))])
 
-plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Grassland (p=0.002)')
-plot(mod3,scale=0,scheme=1,rug=F,select=8,xlab='Distance',ylab='Coefficient',main='Pasture (p=0.05)'); abline(h=0,lty='dashed',col='red')
-# plot(mod3,scale=0,scheme=1,rug=F,select=12,xlab='Distance',ylab='Coefficient',main='Tree/Shrub (s) (p=0.06)'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=13,xlab='Distance',ylab='Day of year',main='Tree/Shrub (ti) (p<0.001)');  
-plot(mod3,scale=0,scheme=1,rug=F,select=14,xlab='Distance',ylab='Coefficient',main='Pulses (p=0.004)'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=1,rug=F,select=16,xlab='Distance',ylab='Coefficient',main='Urban (s) (p<0.001)'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=17,xlab='Distance',ylab='Day of year',main='Urban (ti) (p<0.001)'); # 
-# plot(mod3,scale=0,scheme=1,rug=F,select=4,xlab='Distance',ylab='Coefficient',main='Pasture'); abline(h=0,lty='dashed',col='red')
-# plot(mod3,scale=0,scheme=1,rug=F,select=6,xlab='Distance',ylab='Coefficient',main='Pulses'); abline(h=0,lty='dashed',col='red')
+png(file = './figures/Pterostichus_melanarius_fixef.png',width=1800,height=1200,pointsize=20)
+par(mfrow=c(2,3))
+for(i in 1:length(termnames)){
+  whichRow <- which(grepl(termnames[i],rownames(sumMod3$s.table)))
+  pval <- round(sumMod3$s.table[,'p-value'][whichRow],3)
+  if(pval<0.001) pval <- '<0.001' else pval <- paste0('=',pval)
+  plot(mod3,scheme=2,rug=F,select=whichRow,xlab='Distance',ylab='Day of year',
+       main=paste0(termnames[i],' (p',pval,')'))
+}
+plot(mod3,rug=F,select=10,xlab='Distance',all.terms=T,main='Trap location (p<0.001)')
+rm(whichRow,pval,i)
 dev.off(); par(mfrow=c(1,1))
 
 #Outlier plot over time at each site
@@ -364,14 +315,23 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
 #Select only Pardosa distincta
 tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
 
-#Get all 4 models for P. distincta
-mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban','Water')
-mod4Var <- 'NonCrop'
+#Create model formulas
+modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
+# modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
+modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
+mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
+#Cereal may be causing problems in estimation - collinear with canola
+for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
+  # modFormulas[3] <- paste0(modFormulas[3],"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)")
+  # modFormulas[3] <- paste0(modFormulas[3],"+ ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+  modFormulas[3] <- paste0(modFormulas[3],"+ te(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+}
+modFormulas[4] <- paste0(modFormulas[2],'+ te(distMat,endDayMat,by=NonCrop,bs=basisFun)')
 
-ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,
-                     Kvals=rep(list(c(5,70,4)),4),mod3Vars=mod3Vars,mod4Var=mod4Var); beep(1)
+#Takes way longer to run. 5-10 mins +
+ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 save(ParDisMod,file='./data/ParDisMod.Rdata')
-# load('./data/ParDisMod.Rdata')
+load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
@@ -380,97 +340,144 @@ AIC(mod1,mod2,mod3,mod4)
 
 #Model 3 
 summary(mod3); AIC(mod3)
+plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 
 #Check for multicollinearity
 checkMC <- concurvity(mod3,full=F)$worst
 #Looks OK. Some correlation between grassland and wetland
 termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
-matrixplot(checkMC,termNames)
+matrixplot(checkMC,termNames,mar=c(1,6,6,1))
+
+#Smoothing term estimates
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
+
+plot(mod3$sp)
+round(diag(sp.vcov(mod3)))
+
+
+#Variance component
+varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
+round(varcomp,3)
+
 
 #Plot spatial/temporal effects
-png(file = './figures/Lycosidae_raneff.png',width=2000,height=800,pointsize=20)
-par(mfrow=c(1,3))
+png(file = './figures/Pardosa_distincta_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,2))
+plot(mod3,select=1,shade=T,xlab='Day of year',ylab='Effect',main='Temporal random effect')
+vis.gam(mod3,view=c('E','N'),plot.type='contour',too.far=0.1,main='Spatial random effect',xlab='Easting (km)',ylab='Northing (km)')
+tempTrap %>% select(easting,northing) %>% st_drop_geometry() %>% distinct() %>% 
+  with(.,points(easting,northing,pch=4))
+dev.off()
+
+#Plot spatial/temporal effects
+png(file = './figures/Pardosa_distincta_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,2))
 plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
 plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
-plot(mod3,scale=0,scheme=2,resid=F,select=3,main='Spatiotemporal interaction',shift=coef(mod3)[1])
-dev.off()
+dev.off(); par(mfrow=c(1,1))
 
-#Plot landscape effects
-png(file = './figures/Lycosidae_fixef.png',width=1200,height=1200,pointsize=20)
-par(mfrow=c(2,2))
-plot(mod3,scale=0,shade=T,rug=F,select=4,xlab='Distance',ylab='Effect',main='Canola'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=5,xlab='Distance',ylab='Day of year',main='Wetland')
-plot(mod3,scale=0,shade=T,rug=F,select=6,xlab='Distance',ylab='Effect',main='Pulses'); abline(h=0,lty='dashed',col='red')
-plot(mod3,scale=0,scheme=2,rug=F,select=7,xlab='Distance',ylab='Day of year',main='Urban')
-dev.off()
+#Plot significant landscape effects
+(sumMod3 <-summary(mod3))
+termnames <- gsub('te\\(distMat,endDayMat\\)\\:','',
+                  rownames(sumMod3$s.table)[(sumMod3$s.table[,'p-value']<0.05)&grepl('te',rownames(sumMod3$s.table))])
 
+png(file = './figures/Pardosa_distincta_fixef.png',width=1800,height=1200,pointsize=20)
+par(mfrow=c(2,3))
+for(i in 1:length(termnames)){
+  whichRow <- which(grepl(termnames[i],rownames(sumMod3$s.table)))
+  pval <- round(sumMod3$s.table[,'p-value'][whichRow],3)
+  if(pval<0.001) pval <- '<0.001' else pval <- paste0('=',pval)
+  plot(mod3,scheme=2,rug=F,select=whichRow,xlab='Distance',ylab='Day of year',
+       main=paste0(termnames[i],' (p',pval,')'))
+}
+plot(mod3,rug=F,select=10,xlab='Distance',all.terms=T,main='Trap location (p<0.001)')
+rm(whichRow,pval,i)
+dev.off(); par(mfrow=c(1,1))
 detach(ParDisMod)
 
 
 # Harvestmen -------------------------------------------------------------
 
+#Select only harvestmen
 tempArth <- arth %>% filter(arthOrder=='Opiliones') %>% group_by(BTID) %>% summarize(n=n())
 
-#Only using pitfall traps from 2017
-tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
-  # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
-  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>% 
-  mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
-  left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
-  left_join(tempArth,by='BTID') %>% mutate(n=ifelse(is.na(n),0,n)) %>% filter(!is.na(grass)) %>% 
-  arrange(BLID,dist,pass) %>% mutate(BLID=factor(BLID)) %>% 
-  mutate_at(vars(ephemeral:noncrop),function(x) ifelse(x>1500,1500,x)) %>% 
-  rename('count'='n') %>% 
-  #Converts 0 dist trapLoc to distFrom - pitfall at 0 m are "in" feature
-  mutate(trapLoc=ifelse(dist==0 & distFrom!='control',distFrom,trapLoc)) %>% 
-  #Get UTM coordinates for traps
-  mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
-  st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
-  st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
-  mutate_at(vars(easting,northing),scale) #Scale coordinates to be a reasonable range
+#Create model formulas
+modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
+# modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
+modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
+mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
+#Cereal may be causing problems in estimation - collinear with canola
+for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
+  # modFormulas[3] <- paste0(modFormulas[3],"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)")
+  # modFormulas[3] <- paste0(modFormulas[3],"+ ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+  modFormulas[3] <- paste0(modFormulas[3],"+ te(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+}
+modFormulas[4] <- paste0(modFormulas[2],'+ te(distMat,endDayMat,by=NonCrop,bs=basisFun)')
 
-#Arrange oRing cover matrix to correspond with correct rows
-tempORing <- lapply(oRingMat,function(x) x[match(tempTrap$ID,rownames(x)),])
-#Total area of each ring in matrix form
-tempRingArea <- matrix(rep((pi*seq(20,1000,20)^2)-(pi*(seq(20,1000,20)-20)^2),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-#Matrix of distance values
-distMat <- matrix(rep(as.numeric(gsub('d','',colnames(tempORing[[1]]))),each=nrow(tempORing[[1]])),ncol=ncol(tempORing[[1]]))
-grassMat <- tempORing$grass/10000 #hectares grass cover within each ring
-noncropMat <- tempORing$noncrop/10000 #Noncrop cover (very similar to grass)
-grassMatPerc <- grassMat/tempRingArea #prop cover within each ring
-noncropMatPerc <- noncropMat/tempRingArea #prop cover within each ring
+#Takes way longer to run. 5-10 mins +
+OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+save(OpilioMod,file='./data/OpilioMod.Rdata')
+load('./data/OpilioMod.Rdata')
 
-mod1 <- gam(count~offset(log(trapdays))+s(endjulian)+
-              s(BLID,bs='re')+
-              # s(grass)+s(wetlands)+
-              trapLoc,
-            data=tempTrap,family='nb',method='REML')
-gam.check(mod1)
-summary(mod1)  
-plot(mod1,scheme=2,pages=1,all.terms=F,residuals=F)
+#Check models
+attach(OpilioMod)
+# detach(OpilioMod)
 
-#Random BLID intercept with value closest to zero
-midBLID <- levels(tempTrap$BLID)[which.min(abs(coef(mod1)[grepl('BLID',names(coef(mod1)))]))]
-#Effect of trapLoc
-p1 <- with(tempTrap,expand.grid(BLID=unique(BLID[BLID==midBLID]),trapdays=7,
-                          endjulian=mean(endjulian),grass=mean(grass),
-                          wetlands=mean(wetlands),
-                          trapLoc=unique(trapLoc))) %>% 
-  mutate(pred=predict(mod1,newdata=.),se=predict(mod1,newdata=.,se.fit=T)$se.fit) %>% 
-  mutate(upr=pred+se,lwr=pred-se) %>% 
-  mutate_at(vars(pred,upr,lwr),exp) %>%
-  ggplot(aes(x=trapLoc))+geom_pointrange(aes(y=pred,ymax=upr,ymin=lwr))+
-  labs(x='Trap location',y='Catches/week',title='Opiliones ~ offset + s(time) + s(BLID,type=re) + trapLoc')
-ggsave('./figures/03_Opiliones_trapLoc.png',p1,height=6,width=6)
+AIC(mod1,mod2,mod3,mod4)  #Very little info beyond geography here
 
-p2 <- tempTrap %>% select(BLID,lonSite,latSite) %>% st_drop_geometry() %>% 
-  # mutate(trapLoc=ifelse(trapLoc=='ditch',trapLoc,'inField')) %>% 
-  distinct() %>%
-  mutate(ranef=coef(mod1)[grepl('BLID',names(coef(mod1)))]) %>%
-  st_as_sf(coords=c('lonSite','latSite'),crs=4326) %>% 
-  ggplot()+geom_sf(aes(col=ranef,size=abs(ranef)),alpha=0.5,show.legend=F)+
-  # facet_wrap(~trapLoc,ncol=1)+
-  scale_colour_gradient(low='blue',high='red')+
-  labs(title='Opiliones random intercepts')
-ggsave('./figures/03_Opiliones_intercepts.png',p2,height=6,width=8)
+#Model 3 - none of the fixed terms are super important
+#Model 4 - noncrop land
+summary(mod3); AIC(mod3)
+anova(mod3)
 
+plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
+
+#Check for multicollinearity
+checkMC <- concurvity(mod3,full=F)$worst
+#Looks OK. Some correlation between grassland and wetland
+termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
+matrixplot(checkMC,termNames,mar=c(1,6,6,1))
+
+#Smoothing term estimates
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
+
+plot(mod3$sp)
+round(diag(sp.vcov(mod2)))
+
+#Variance component
+varcomp <- gam.vcomp(mod3) 
+round(varcomp,3)
+
+#Plot spatial/temporal effects
+png(file = './figures/Pardosa_distincta_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,2))
+plot(mod3,select=1,shade=T,xlab='Day of year',ylab='Effect',main='Temporal random effect')
+vis.gam(mod3,view=c('E','N'),plot.type='contour',too.far=0.1,main='Spatial random effect',xlab='Easting (km)',ylab='Northing (km)')
+tempTrap %>% select(easting,northing) %>% st_drop_geometry() %>% distinct() %>% 
+  with(.,points(easting,northing,pch=4))
+dev.off()
+
+#Plot spatial/temporal effects
+png(file = './figures/Opiliones_raneff.png',width=2000,height=800,pointsize=20)
+par(mfrow=c(1,2))
+plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
+plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
+dev.off(); par(mfrow=c(1,1))
+
+#Plot significant landscape effects
+(sumMod3 <-summary(mod3))
+termnames <- gsub('te\\(distMat,endDayMat\\)\\:','',
+                  rownames(sumMod3$s.table)[(sumMod3$s.table[,'p-value']<0.06)&grepl('te',rownames(sumMod3$s.table))])
+
+png(file = './figures/Opiliones_fixef.png',width=1800,height=1200,pointsize=20)
+par(mfrow=c(1,2))
+for(i in 1:length(termnames)){
+  whichRow <- which(grepl(termnames[i],rownames(sumMod3$s.table)))
+  pval <- round(sumMod3$s.table[,'p-value'][whichRow],3)
+  if(pval<0.001) pval <- '<0.001' else pval <- paste0('=',pval)
+  plot(mod3,scheme=2,rug=F,select=whichRow,xlab='Distance',ylab='Day of year',
+       main=paste0(termnames[i],' (p',pval,')'))
+}
+plot(mod3,rug=F,select=10,xlab='Distance',all.terms=T,main='Trap location (p<0.001)')
+rm(whichRow,pval,i)
+dev.off(); par(mfrow=c(1,1))
