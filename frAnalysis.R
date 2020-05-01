@@ -2,8 +2,9 @@
 # SR WINTER 2020
 
 library(tidyverse)
+library(ggpubr)
 theme_set(theme_classic())
-theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
+maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(mgcv)
 library(sf)
 library(gstat)
@@ -53,8 +54,6 @@ matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
 }
 
 #Takes a df of arthropod counts at each site (unique to each spp), then runs 4 landscape-level models of abundance
-
-
 #fitMethod = 'ML' or 'REML'
 #fitFam = family of distribution to use
 #basisFun = name of basis function to be used ('ts' = thin plate spline with extra shrinkage)
@@ -153,6 +152,42 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
   return(retList)
 }
 
+#Extract data for partial effects plots from GAM model
+getPartialEffect <- function(mod){ 
+  #Trick from Paul to get smoother data from plot.gam
+  pdf(NULL)
+  plotDat <- plot(mod,pages=1,se=1.96) #Gets data for all smoothers
+  dev.off()
+  
+  tempFun <- function(d) {
+  if('y' %in% names(d)) y <- d$y else y <- NA
+    expand.grid(x=d$x,y=y) %>% 
+      mutate(pred=d$fit,se=d$se) %>% 
+      mutate(upr=pred+(se*1.96),lwr=pred-(se*1.96))
+  } 
+  plotDat <- lapply(plotDat,tempFun)
+  names(plotDat) <- sapply(mod$smooth,function(x) x$label) #Names of terms
+  
+  #Linear terms not included for in plotDat, for some reason. Extracting termplots:
+  linTerms <- attr(mod$pterms,'term.labels')
+  
+  for(i in 1:length(linTerms)){ #For each linear term
+    y <- NA
+    x <- mod$model[,linTerms[i]] #Uses existing predictors. Should probably make this a range of values for continuous predictors.
+    p <- predict(mod,type='terms',terms=linTerms[i],se.fit=T) #Predicted values of terms
+    d <- data.frame(x=x,y=y,pred=unname(p$fit),se=unname(p$se.fit)) %>%
+      mutate(upr=pred+(se*1.96),lwr=pred-(se*1.96)) %>% distinct()
+    plotDat[[linTerms[i]]] <- d
+  }
+  
+  return(plotDat)
+}
+
+#Capitalize first letter in a string (vector of strings)
+firstUpper <- function(x){
+  paste0(toupper(substring(x,1,1)),substring(x,2,nchar(x)))
+}
+
 # Load everything ---------------------------------------------------------
 load('./data/cleanData.Rdata') #Load site, trap, arth data
 load('./data/geoData.Rdata') #Load NNdist and oring data
@@ -198,13 +233,16 @@ modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
 mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
 for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
+  # #Main effects + interaction (s + ti)
   # modFormulas[3] <- paste0(modFormulas[3],"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)")
+  # modFormulas[3] <- paste0(modFormulas[3],"+ s(endDayMat,by=",mod3Vars[i],",bs=basisFun)")
   # modFormulas[3] <- paste0(modFormulas[3],"+ ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+  #Full interaction (te)
   modFormulas[3] <- paste0(modFormulas[3],"+ te(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
 }
 modFormulas[4] <- paste0(modFormulas[2],'+ te(distMat,endDayMat,by=NonCrop,bs=basisFun)')
- 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+
+PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -213,7 +251,7 @@ attach(PteMelMod)
 # detach(PteMelMod)
 AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
 
-#Model 3 
+#Model 3 - landscape effects matter quite a bit
 summary(mod3); AIC(mod3)
 anova(mod3)
 
@@ -225,6 +263,7 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
 #Check k values
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
+par(mfrow=c(3,1)); for(i in 12:14) plot(mod3,scheme=2,shade=T,rug=F,seWithMean=T,select=i); par(mfrow=c(1,1))
 
 #Check for multicollinearity
 concurvity(mod3)
@@ -241,64 +280,108 @@ matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,10,10,1
 
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
 
-#Plot spatial/temporal effects
-png(file = './figures/Pterostichus_melanarius_raneff.png',width=2000,height=800,pointsize=20)
-par(mfrow=c(1,2))
-plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
-plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
-dev.off(); par(mfrow=c(1,1))
+# png(file = './figures/Pterostichus_melanarius_raneff.png',width=2000,height=800,pointsize=20)
+# par(mfrow=c(1,2))
+# plot(mod3,scale=0,scheme=2,resid=F,select=1,xlab='Day of year',ylab='Effect',main='Temporal random effect',shade=T,shift=coef(mod3)[1])
+# plot(mod3,scale=0,scheme=2,resid=F,select=2,main='Spatial random effect',cex=0.5,pch=4,shift=coef(mod3)[1])
+# dev.off(); par(mfrow=c(1,1))
+# 
+# #Plot significant landscape effects
+# (sumMod3 <-summary(mod3))
+# termnames <- gsub('te\\(distMat,endDayMat\\)\\:','',
+#                   rownames(sumMod3$s.table)[(sumMod3$s.table[,'p-value']<0.05)&grepl('te',rownames(sumMod3$s.table))])
+# 
+# png(file = './figures/Pterostichus_melanarius_fixef.png',width=1800,height=1200,pointsize=20)
+# par(mfrow=c(2,3))
+# for(i in 1:length(termnames)){
+#   whichRow <- which(grepl(termnames[i],rownames(sumMod3$s.table)))
+#   pval <- round(sumMod3$s.table[,'p-value'][whichRow],3)
+#   if(pval<0.001) pval <- '<0.001' else pval <- paste0('=',pval)
+#   plot(mod3,scheme=2,rug=F,select=whichRow,xlab='Distance',ylab='Day of year',
+#        main=paste0(termnames[i],' (p',pval,')'))
+# }
+# plot(mod3,rug=F,select=10,xlab='Distance',all.terms=T,main='Trap location (p<0.001)')
+# rm(whichRow,pval,i)
+# dev.off(); par(mfrow=c(1,1))
+
+#Get data for plotting from mod3
+plotDat <- getPartialEffect(mod3)
+
+p1 <- plotDat[[which(grepl('s\\(day\\)',names(plotDat)))]] %>% #Temporal smoother
+  ggplot(aes(x=x,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+  geom_line()+
+  labs(x='Day of Year',y='Activity')
+
+p2 <- plotDat[[which(grepl('s\\(E,N\\)',names(plotDat)))]] %>% #Spatial smoother
+  ggplot(aes(x=x,y=y))+geom_raster(aes(fill=pred))+
+  geom_point(data=tempTrap,aes(x=easting,y=northing))+
+  scale_fill_gradient(low='blue',high='red')+
+  labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
+  theme(legend.position = c(0.85, 0.2),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
+  maptheme
+
+raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
+ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=8,height=4,scale=2)
 
 #Plot significant landscape effects
-(sumMod3 <-summary(mod3))
-termnames <- gsub('te\\(distMat,endDayMat\\)\\:','',
-                  rownames(sumMod3$s.table)[(sumMod3$s.table[,'p-value']<0.05)&grepl('te',rownames(sumMod3$s.table))])
 
-png(file = './figures/Pterostichus_melanarius_fixef.png',width=1800,height=1200,pointsize=20)
-par(mfrow=c(2,3))
-for(i in 1:length(termnames)){
-  whichRow <- which(grepl(termnames[i],rownames(sumMod3$s.table)))
-  pval <- round(sumMod3$s.table[,'p-value'][whichRow],3)
-  if(pval<0.001) pval <- '<0.001' else pval <- paste0('=',pval)
-  plot(mod3,scheme=2,rug=F,select=whichRow,xlab='Distance',ylab='Day of year',
-       main=paste0(termnames[i],' (p',pval,')'))
+#Days to display on plots (early,mid,late)
+dispDays <- data.frame(doy=c(173,203,232)) %>% 
+  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+
+p1 <- plotDat[[which(grepl('trapLoc',names(plotDat)))]] %>% #Trap location 
+  mutate(x=factor(x,labels=firstUpper(levels(x)))) %>% 
+  ggplot(aes(x=x,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  labs(x='Trap location',y='Activity')
+
+#Helper function to plot functional regression effects
+#Optional legend, and different colours
+effectPlot <- function(dat,leg=T,cols=NULL){
+  if(sum(is.na(dat$y))==nrow(dat)){ #B/W version
+   dat$y <- 'a'
+   cols <- 'black'
+  }
+  p <- ggplot(data=dat,aes(x=x,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr,fill=y),alpha=0.3,show.legend=leg)+
+    geom_line(aes(col=y),show.legend=leg)+geom_hline(yintercept=0,linetype='dashed')+
+    labs(y='Effect',fill='Date',col='Date')
+  if(!is.null(cols)) { #Change colours, if necessary
+    p <- p+scale_colour_manual(values=cols)+scale_fill_manual(values=cols)
+  }
+  return(p)
 }
-plot(mod3,rug=F,select=10,xlab='Distance',all.terms=T,main='Trap location (p<0.001)')
-rm(whichRow,pval,i)
-dev.off(); par(mfrow=c(1,1))
 
-#Outlier plot over time at each site
-tempTrap %>% mutate(resid=resid(mod3)) %>% 
-  ggplot(aes(endjulian,resid))+geom_point()+
-  facet_wrap(~BLID)+geom_hline(yintercept=0)
+p2 <- plotDat[[which(grepl('Pasture',names(plotDat)))[1]]] %>% #Pasture distance: p=0.018
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Pasture effect')
 
-#Summed outlier plot (like RSS but in log-space) over space
-tempTrap %>% mutate(resid=resid(mod3)) %>% 
-  group_by(ID) %>% summarize(sumRes=sum(abs(resid))) %>% ungroup() %>% 
-  # filter(sumRes>quantile(sumRes,0.2)) %>% 
-  ggplot()+
-  geom_sf(aes(size=sumRes,col=sumRes),alpha=0.5,show.legend=F)+
-  scale_colour_gradient(low='blue',high='red')
+p3 <- plotDat[[which(grepl('Wetland',names(plotDat)))[2]]] %>% #Wetland time: p=0.00160
+  effectPlot(leg=F)+labs(x='Day of year',y='Wetland effect')
 
-#Variogram of summed residuals - not much of a pattern?
-tempTrap %>% mutate(resid=resid(mod3)) %>% 
-  group_by(ID) %>% summarize(sumRes=sum(abs(resid))) %>% ungroup() %>% 
-  as_Spatial() %>% variogram(sumRes~1,.) %>% plot()
+plotDat[[which(grepl('TreeShrub',names(plotDat)))[3]]] %>% #TreeShrub: p=0.00058
+  left_join(plotDat[[which(grepl('TreeShrub',names(plotDat)))[2]]],by=c('y'='x'))
+  # effectPlot(leg=F)+labs(x='Day of year')
 
-#Look at locations with weird temporal outliers only
-weirdPoints <- c(10348,11891,12000,12754,13825,14025,17882,20007,25196) %>% 
-  factor(.,levels=levels(tempTrap$BLID))
+ # %>% #TreeShrub: p=0.00058
+  mutate(y=round(y)) %>% filter(y %in% dispDays$doy) %>%
+  mutate(y=factor(y,labels=dispDays$date)) %>% effectPlot(leg=F)+labs(x='% trees/shrubs at distance (m)')
 
-tempTrap %>% mutate(resid=resid(mod3)) %>% 
-  filter(BLID %in% weirdPoints) %>%
-  ggplot(aes(endjulian,resid))+geom_point()+
-  facet_wrap(~BLID)+geom_hline(yintercept=0)
+p5 <- plotDat[[which(grepl('Pulses',names(plotDat)))]] %>% #Pulses: p=0.026
+  mutate(y=round(y)) %>% filter(y %in% dispDays$doy) %>%
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
+  effectPlot(leg=F)+labs(x='% pulses at distance (m)')
 
-summary(mod4)
-plot(mod4,pages=1,scale=0,scheme=2)
+p6 <- plotDat[[which(grepl('Urban',names(plotDat)))]] %>% #Urban: p>0.0001
+  mutate(y=round(y)) %>% filter(y %in% dispDays$doy) %>%
+  mutate(y=factor(y,labels=dispDays$date)) %>% effectPlot(leg=T)+labs(x='% roadside at distance (m)')
 
+#Plot landscape effects
+fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,p6,
+                        labels=letters[1:6],nrow=2,ncol=3,
+                        legend='bottom',common.legend=T) 
+ggsave('./figures/Pterostichus_melanarius_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+rm(p1,p2,p3,p4,p5,p6,raneffPlot,fixeffPlot) #Cleanup
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
-# Urban (spatial + temporal), Pasture, Pulses, Tree/Shrubs (weak)
+# Urban (spatial + temporal), Pasture, Pulses (weak), Tree/Shrubs (weak)
 detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
