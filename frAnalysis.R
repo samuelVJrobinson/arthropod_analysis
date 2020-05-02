@@ -152,37 +152,6 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
   return(retList)
 }
 
-#Extract data for partial effects plots from GAM model
-getPartialEffect <- function(mod){ 
-  #Trick from Paul to get smoother data from plot.gam
-  pdf(NULL)
-  plotDat <- plot(mod,pages=1,se=1.96) #Gets data for all smoothers
-  dev.off()
-  
-  tempFun <- function(d) {
-  if('y' %in% names(d)) y <- d$y else y <- NA
-    expand.grid(x=d$x,y=y) %>% 
-      mutate(pred=d$fit,se=d$se) %>% 
-      mutate(upr=pred+(se*1.96),lwr=pred-(se*1.96))
-  } 
-  plotDat <- lapply(plotDat,tempFun)
-  names(plotDat) <- sapply(mod$smooth,function(x) x$label) #Names of terms
-  
-  #Linear terms not included for in plotDat, for some reason. Extracting termplots:
-  linTerms <- attr(mod$pterms,'term.labels')
-  
-  for(i in 1:length(linTerms)){ #For each linear term
-    y <- NA
-    x <- mod$model[,linTerms[i]] #Uses existing predictors. Should probably make this a range of values for continuous predictors.
-    p <- predict(mod,type='terms',terms=linTerms[i],se.fit=T) #Predicted values of terms
-    d <- data.frame(x=x,y=y,pred=unname(p$fit),se=unname(p$se.fit)) %>%
-      mutate(upr=pred+(se*1.96),lwr=pred-(se*1.96)) %>% distinct()
-    plotDat[[linTerms[i]]] <- d
-  }
-  
-  return(plotDat)
-}
-
 #Capitalize first letter in a string (vector of strings)
 firstUpper <- function(x){
   paste0(toupper(substring(x,1,1)),substring(x,2,nchar(x)))
@@ -242,7 +211,7 @@ for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
 }
 modFormulas[4] <- paste0(modFormulas[2],'+ te(distMat,endDayMat,by=NonCrop,bs=basisFun)')
 
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -304,16 +273,77 @@ varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
 # rm(whichRow,pval,i)
 # dev.off(); par(mfrow=c(1,1))
 
-#Get data for plotting from mod3
-plotDat <- getPartialEffect(mod3)
+#Problem: need partial effects plots for function regression of space, time, or both.
+# First two are doable, but interactions are tricky
 
-p1 <- plotDat[[which(grepl('s\\(day\\)',names(plotDat)))]] %>% #Temporal smoother
-  ggplot(aes(x=x,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+#Solution: get predictions for new data frame
+# Generate prediction matrix using PredictMat(smootherTerm,newdata)
+# Multiply by coefs to get predictions
+# If ti() is significant, add predictions together to get overall predictions
+#New problem: how to get SEs? Simulation? Figure out how Wood does it.
+#Solution: se = sqrt(New prediction matrix %*% Covariance matrix for predictors * New prediction matrix)
+
+debugonce(plot.gam)
+# debugonce(plot.mgcv.smooth) 
+plot(mod3,select=16)
+
+
+
+
+#Extract data for partial effects plots of smoothing terms
+# dat = dataframe of predictor data (think "newdata" from predict.gam) + column of ones with title of "by" matrix (if doing functional regression)
+#   * must have the same name as predictors
+# m = GAM model
+# whichSmooth = smoothing terms (numeric) to use; all terms are aggregated (useful for interaction plots)
+# ci = multiplicitive factor for SE bounds (default = 1.96)
+smoothPred <- function(dat,m,whichSmooth,ci=1.96){ 
+  #Predictor matrices
+  predMat <- lapply(whichSmooth,function(i) PredictMat(m$smooth[[i]],data=dat)) #Get predictor matrices from each smoother, using dat
+  predMat <- do.call('cbind',predMat) #Amalgamate into single matrix
+  #Coefficients
+  coefRange <- do.call('c',lapply(m$smooth[whichSmooth],function(x) x$first.para:x$last.para)) #Get coefficients to use
+  coefs <- coef(m)[coefRange] #Extract coefficient values
+  #Predicted value - predictor matrix X coefficients
+  dat$pred <- predMat %*% coefs
+  #SE - swiped from plot.gam code
+  dat$se <- sqrt(pmax(0,rowSums(predMat %*% m$Vp[coefRange,coefRange] * predMat)))
+  #Confidence intervals
+  dat$upr <- dat$pred + dat$se*ci; dat$lwr <- dat$pred - dat$se*ci 
+  return(dat) #Return entire matrix
+}
+
+#Tree/shrub effect
+smoothPred(expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1),
+       mod3,whichSmooth=15:17) %>% 
+  mutate(endDayMat=factor(endDayMat)) %>% 
+  ggplot(aes(distMat,pred))+
+  geom_ribbon(aes(ymax=upr,ymin=lwr,fill=endDayMat),alpha=0.3)+
+  geom_line(aes(col=endDayMat))+
+  geom_hline(yintercept=0,linetype='dashed')+
+  labs(x='Distance',y='Tree/Shrub Effect',col='Day',fill='Day')
+
+#Urban effect
+smoothPred(expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1),
+       mod3,whichSmooth=21:23) %>% 
+  mutate(endDayMat=factor(endDayMat)) %>% 
+  ggplot(aes(distMat,pred))+
+  geom_ribbon(aes(ymax=upr,ymin=lwr,fill=endDayMat),alpha=0.3)+
+  geom_line(aes(col=endDayMat))+
+  geom_hline(yintercept=0,linetype='dashed')+
+  labs(x='Distance',y='Urban Effect',col='Day',fill='Day')
+
+
+#Temporal smoother
+p1 <- data.frame(day=min(datList$day):max(datList$day)) %>% 
+  smoothPred(mod3,whichSmooth=1) %>% 
+  ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
   labs(x='Day of Year',y='Activity')
 
-p2 <- plotDat[[which(grepl('s\\(E,N\\)',names(plotDat)))]] %>% #Spatial smoother
-  ggplot(aes(x=x,y=y))+geom_raster(aes(fill=pred))+
+#Spatial smoother
+p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
+  smoothPred(mod3,whichSmooth=2) %>% 
+  ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
   scale_fill_gradient(low='blue',high='red')+
   labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
@@ -329,9 +359,12 @@ ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=8,height=
 dispDays <- data.frame(doy=c(173,203,232)) %>% 
   mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
 
-p1 <- plotDat[[which(grepl('trapLoc',names(plotDat)))]] %>% #Trap location 
-  mutate(x=factor(x,labels=firstUpper(levels(x)))) %>% 
-  ggplot(aes(x=x,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+#Trap location 
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
 #Helper function to plot functional regression effects
@@ -341,8 +374,10 @@ effectPlot <- function(dat,leg=T,cols=NULL){
    dat$y <- 'a'
    cols <- 'black'
   }
-  p <- ggplot(data=dat,aes(x=x,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr,fill=y),alpha=0.3,show.legend=leg)+
-    geom_line(aes(col=y),show.legend=leg)+geom_hline(yintercept=0,linetype='dashed')+
+  p <- ggplot(data=dat,aes(x=x,y=pred))+
+    geom_ribbon(aes(ymax=upr,ymin=lwr,fill=y),alpha=0.3,show.legend=leg)+
+    geom_line(aes(col=y),show.legend=leg)+
+    geom_hline(yintercept=0,linetype='dashed')+
     labs(y='Effect',fill='Date',col='Date')
   if(!is.null(cols)) { #Change colours, if necessary
     p <- p+scale_colour_manual(values=cols)+scale_fill_manual(values=cols)
