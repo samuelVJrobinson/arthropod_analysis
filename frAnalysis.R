@@ -306,8 +306,9 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
   labs(x='Day of Year',y='Activity')
 
 #Spatial smoother
-p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
+p2 <- with(datList,expand.grid(E=seq(from=min(E)-5,to=max(E)+5,length.out=100),N=seq(from=min(N)-5,to=max(N)+5,length.out=100))) %>%
   smoothPred(mod3,whichSmooth=2) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
   scale_fill_gradient(low='blue',high='red')+
@@ -426,6 +427,7 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
   smoothPred(mod3,whichSmooth=2) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
   scale_fill_gradient(low='blue',high='red')+
@@ -532,6 +534,7 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
   smoothPred(mod3,whichSmooth=2) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
   scale_fill_gradient(low='blue',high='red')+
