@@ -1,8 +1,8 @@
 ---
 title: "Landscape composition and beneficial insects"
 author: "Sam Robinson, Paul Galpern, et al."
-date: "03/04/2020"
-output: html_document
+date: "Spring 2020"
+output: bookdown::html_document2 
 bibliography: "/home/samuel/Documents/bibtexRefs/references.bib"
 csl: ecology-letters.csl
 ---
@@ -13,16 +13,27 @@ library(knitr)
 library(tidyverse)
 
 #Helper functions
+
+#Capitalize
 firstUpper <- function(x){
   paste0(toupper(substring(x,1,1)),substring(x,2,nchar(x)))
 }
 
-#Rounds to dig, converts to character, anything 
+#Rounds to dig digits, converts to character, anything less than digits becomes "<0.xx1"
+# Useful for tables
 roundLess <- function(x,dig){
   x <- as.character(round(x,dig))
   x[x=='0'] <- paste0('<0.',strrep('0',dig-1),'1',collapse='')
   return(x)
 }
+
+#Adds ** around text (makes it bold in RMarkdown)
+boldRMD <- function(x) paste0('**',x,'**')
+
+#Load models
+load('../data/PteMelMod.Rdata')
+load('../data/ParDisMod.Rdata')
+load('../data/OpilioMod.Rdata')
 
 ```
 
@@ -81,49 +92,111 @@ roundLess <- function(x,dig){
 
 ## _Pterostichus melanarius_
 
-* _P. melanarius_ activity density was strongly influenced by trap location and landscape composition.
-  + Canola crops had a higher activity density of _P. melanarius_ than any other trap location, indicating that (comparitively) low-density stands may allow faster movement of ground beetles.
-  + Ditches had the lowest level of activity density
-  + In landscape composition, proportion of urban land cover (roadside right-of-way) was the strongest predictor of activity density, and this varied across the season, with early-season (June) urban land acting as a sink, but becoming a source in the mid-season (July)
-  + trees and shrubs, pulse crops, and pasture.
-  + Overall wetland cover had a negative influence on _P. melanarius_ abundance, but only after mid-July, indicating that wetlands may act as a sink for _P. melanarius_ populations later in the season
-  + Finally, _P. melanarius_ had a very strong spatial component 
-  
-```{r PteMelCoefs, echo=FALSE, message=FALSE}
-load('../data/PteMelMod.Rdata')
+* _P. melanarius_ activity density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:PteMelCoefs-linTerms), \@ref(tab:PteMelCoefs-smoothTerms))
+  + Canola crops had a higher activity density of _P. melanarius_ than any other trap location, while roadside ditches had the lowest (Figure \@ref(fig:PteMelCoefs-fixeff)a)
+  + This indicates that low-density stands of canola may allow faster movement of ground beetles.
+  + In landscape composition, proportion of urban land cover (roadside right-of-way) was the strongest predictor of activity density, and this varied across the season, with urban land acting as a sink during June, but becoming a source during July (Figure \@ref(fig:PteMelCoefs-fixeff)f); trees and shrubs followed a similar pattern (Figure \@ref(fig:PteMelCoefs-fixeff)d)
+  + Wetland cover had a negative influence on _P. melanarius_ abundance, but only after mid-July, indicating that wetlands may act as a sink for _P. melanarius_ populations later in the season
+
+```{r PteMelCoefs-linTerms, echo=FALSE, warning=FALSE}
 pmelRes <- summary(PteMelMod$mod3)
 linTerms <- pmelRes$p.table %>% as.data.frame() %>% 
   rownames_to_column('loc') %>% 
   mutate(loc=firstUpper(gsub('trapLoc','',loc))) %>% 
-  rename(p='Pr(>|z|)') %>% mutate(p=roundLess(p,3)) 
-  
+  rename(p='Pr(>|z|)') %>% mutate(p=roundLess(p,3)) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(linTerms,caption='\\label{tab:PteMelCoefs-linTerms} Linear terms for _Pterostichus melanarius_. Line',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl')
+```
+
+```{r PteMelCoefs-smoothTerms, echo=FALSE, warning=FALSE}
+pmelRes <- summary(PteMelMod$mod3)
 smTerms <- pmelRes$s.table %>% as.data.frame() %>% 
   rownames_to_column('Smoother') %>% 
-  rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:3),roundLess,dig=2) 
-kable(linTerms,caption='Linear terms for _Pterostichus melanarius_',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
-        digits=c(1,2,2,2,2),align='rrrrl')
-kable(smTerms[c(1,2,4,5)],caption='Smooth terms for _Pterostichus melanarius_',col.names=c('Smoothing term','E.D.F.','$\\chi^2$','p'),
+  rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(smTerms[c(1,2,4,5)],caption='\\label{tab:PteMelCoefs-smoothTerms} Smooth terms for _Pterostichus melanarius_, with effective degrees of freedom, Chi-squared coefficient, and p-value. _s_ indicates a thin-plate spline, _ti_ indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',col.names=c('Smoothing term','Eff. _df_','$\\chi^2$','_p_'),
         digits=c(1,2,2,2),align='rrll')
-
-
 ```
-  
 
-![Landscape influence on _P. melanarius_ activity density](../figures/Pterostichus_melanarius_fixeff.png)
+```{r PteMelCoefs-fixeff, echo=FALSE, fig.cap='\\label{fig:PteMelCoefs-fixeff} Landscape influence on _Pterostichus melanarius_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Pterostichus_melanarius_fixeff.png')
+```
 
-![Temporal and spatial components of _P. melanarius_ activity density](../figures/Pterostichus_melanarius_raneff.png)
+*  _P. melanarius_ had a very strong random temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were strong drivers of ground beetle abundance (Figure \@ref(fig:PteMelCoefs-raneff))
+  + This could be related to climatic drivers (rainfall, growing degree days), or could simply represent a single yearly realization of a spatio-temporal random field 
+
+```{r PteMelCoefs-raneff, echo=FALSE, fig.cap='\\label{fig:PteMelCoefs-raneff} Temporal and spatial components of _Pterostichus melanarius_ activity density'}
+  include_graphics('../figures/Pterostichus_melanarius_raneff.png')
+```
 
 ## _Pardosa distincta_ 
 
-![Landscape influence on _P. distincta_ activity density](../figures/Pardosa_distincta_fixeff.png)
-![Temporal and spatial components of _P. distincta_ activity density](../figures/Pardosa_distincta_raneff.png)
+```{r ParDisCoefs-linTerms, echo=FALSE, warning=FALSE}
+pmelRes <- summary(ParDisMod$mod3)
+linTerms <- pmelRes$p.table %>% as.data.frame() %>% 
+  rownames_to_column('loc') %>% 
+  mutate(loc=firstUpper(gsub('trapLoc','',loc))) %>% 
+  rename(p='Pr(>|z|)') %>% mutate(p=roundLess(p,3)) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(linTerms,caption='\\label{tab:ParDisCoefs-linTerms} Linear terms for _Pardosa distincta_. Line',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl')
+```
+
+```{r ParDisCoefs-smoothTerms, echo=FALSE, warning=FALSE}
+pmelRes <- summary(ParDisMod$mod3)
+smTerms <- pmelRes$s.table %>% as.data.frame() %>% 
+  rownames_to_column('Smoother') %>% 
+  rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(smTerms[c(1,2,4,5)],caption='\\label{tab:ParDisCoefs-smoothTerms} Smooth terms for _Pardosa distincta_, with effective degrees of freedom, Chi-squared coefficient, and p-value. _s_ indicates a thin-plate spline, _ti_ indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',col.names=c('Smoothing term','Eff. _df_','$\\chi^2$','_p_'),
+        digits=c(1,2,2,2),align='rrll')
+```
+
+```{r ParDisCoefs-fixeff, echo=FALSE, fig.cap='\\label{fig:ParDisCoefs-fixeff} Landscape influence on _Pardosa distincta_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Pardosa_distincta_fixeff.png')
+```
+
+```{r ParDisCoefs-raneff, echo=FALSE, fig.cap='\\label{fig:ParDisCoefs-raneff} Temporal and spatial components of _Pardosa distincta_ activity density'}
+  include_graphics('../figures/Pardosa_distincta_raneff.png')
+```
+
 
 ## _Phalangium opilio_ 
 
-![Landscape influence on _P. opilio_ activity density](../figures/Opiliones_fixeff.png)
+```{r OpilioCoefs-linTerms, echo=FALSE, warning=FALSE}
+pmelRes <- summary(OpilioMod$mod3)
+linTerms <- pmelRes$p.table %>% as.data.frame() %>% 
+  rownames_to_column('loc') %>% 
+  mutate(loc=firstUpper(gsub('trapLoc','',loc))) %>% 
+  rename(p='Pr(>|z|)') %>% mutate(p=roundLess(p,3)) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(linTerms,caption='\\label{tab:OpilioCoefs-linTerms} Linear terms for _Phalangium opilio_. Line',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl')
+```
 
-![Temporal and spatial components of _P. opilio_ activity density](../figures/Opiliones_raneff.png)
+```{r OpilioCoefs-smoothTerms, echo=FALSE, warning=FALSE}
+pmelRes <- summary(OpilioMod$mod3)
+smTerms <- pmelRes$s.table %>% as.data.frame() %>% 
+  rownames_to_column('Smoother') %>% 
+  rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
+  mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
+  mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+kable(smTerms[c(1,2,4,5)],caption='\\label{tab:OpilioCoefs-smoothTerms} Smooth terms for _Phalangium opilio_, with effective degrees of freedom, Chi-squared coefficient, and p-value. _s_ indicates a thin-plate spline, _ti_ indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',col.names=c('Smoothing term','Eff. _df_','$\\chi^2$','_p_'),
+        digits=c(1,2,2,2),align='rrll')
+```
 
+```{r OpilioCoefs-fixeff, echo=FALSE, fig.cap='\\label{fig:OpilioCoefs-fixeff} Landscape influence on _Phalangium opilio_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Opiliones_fixeff.png')
+```
+
+```{r OpilioCoefs-raneff, echo=FALSE, fig.cap='\\label{fig:OpilioCoefs-raneff} Temporal and spatial components of _Phalangium opilio_ activity density'}
+  include_graphics('../figures/Opiliones_raneff.png')
 
 # Discussion
 
