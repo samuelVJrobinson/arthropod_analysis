@@ -31,7 +31,7 @@ oRingMat2Prop$NonCrop <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonC
 
 #Trees + Shrubs
 oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
-oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
+# oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 # #Water + Wetland
 # oRingMat2Prop$WetlandWater <- oRingMat2Prop$Wetland + oRingMat2Prop$Water
 # oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Water <- NULL
@@ -40,7 +40,8 @@ oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
 modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
-mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
+# mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
+mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','Forest','Shrubland','Pulses','Urban') #Variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
 for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
   #Main effects + interaction (s + ti)
@@ -66,7 +67,7 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -89,20 +90,35 @@ par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 par(mfrow=c(3,1)); for(i in 12:14) plot(mod3,scheme=2,shade=T,rug=F,seWithMean=T,select=i); par(mfrow=c(1,1))
 
-#Check for multicollinearity
-concurvity(mod3)
+#Check for concurvity between smoothers
+concurvity(mod3) #High concurvity
 checkMC <- concurvity(mod3,full=F)$worst
-termNames <- gsub('s\\(distMat(,endDayMat)?\\)','s',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
-termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
-termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
-termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
-#High concurvity b/w some terms. Water and TreeShrub are very spatially dependent
+termNames <- rownames(checkMC)
+# termNames <- gsub('s\\(distMat(,endDayMat)?\\)','s',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
+# termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
+# termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
+# termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
 matrixplot(checkMC,mar=c(1, 10, 10, 1),termNames)
+matrixplot(checkMC[4:nrow(checkMC),4:nrow(checkMC)],mar=c(1, 10, 10, 1),termNames[4:nrow(checkMC)]) #Only landscape terms
+abline(h=seq(0-1/length(4:nrow(checkMC))/2,1+1/length(4:nrow(checkMC))/2,length.out=1+length(4:nrow(checkMC))/3)) #Lines to separate terms
+abline(v=seq(0-1/length(4:nrow(checkMC))/2,1+1/length(4:nrow(checkMC))/2,length.out=1+length(4:nrow(checkMC))/3))
+
+#High concurvity seems to be coming from similar terms (e.g. s(dist):Canola & s(day):Canola), but not really between terms
+
+#Problem terms:
+#Cereal ~ Canola (bad), 
+#Wetland ~ Grassland (bad)
+#Urban ~ Grassland,Wetland,Canola (not as bad)
 
 #Check for correlation in smoothers
 matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,10,10,1))
 
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
+
+varcomp %>% data.frame() %>% rownames_to_column('term') %>%
+  mutate(term=factor(term,levels=term)) %>% 
+  ggplot(aes(x=term,y=std.dev))+geom_col()+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 
 #Problem: need partial effects plots for function regression of space, time, or both.
 # First two are doable, but interactions are tricky
@@ -224,6 +240,10 @@ matrixplot(checkMC,termNames,mar=c(1,6,6,1))
 #Smoothing term estimates
 matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
 
+matrixplot(checkMC,mar=c(1, 10, 10, 1),termNames)
+matrixplot(checkMC[4:nrow(checkMC),4:nrow(checkMC)],mar=c(1, 10, 10, 1),termNames[4:nrow(checkMC)]) #Only landscape terms
+
+#High concurvity seems to be coming from similar terms (e.g. s(dist):Canola & s(day):Canola), but not really between terms
 plot(mod3$sp)
 round(diag(sp.vcov(mod3)))
 

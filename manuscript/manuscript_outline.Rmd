@@ -11,6 +11,7 @@ csl: ecology-letters.csl
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(tidyverse)
+library(mgcv)
 
 #Helper functions
 
@@ -78,6 +79,12 @@ opilSmTerms <- opilRes$s.table %>% as.data.frame() %>%
   rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
   mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
   mutate(p=ifelse(sig,boldRMD(p),p)) %>% select(-sig) #Make text bold
+
+#Get variance components
+varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterostichus melanarius'),'term') %>% 
+  bind_rows(rownames_to_column(data.frame(gam.vcomp(ParDisMod$mod3),spp='Pardosa distincta'),'term')) %>% 
+  bind_rows(rownames_to_column(data.frame(gam.vcomp(OpilioMod$mod3),spp='Phalangium opilio'),'term')) %>%
+  mutate(term=factor(term,levels=names(PteMelMod$mod3$sp)))
 
 ```
 
@@ -212,8 +219,9 @@ kable(pdisSmTerms[c(1,2,4,5)],caption='\\label{tab:ParDisCoefs-smoothTerms} Smoo
 
 * _Phalangium opilio_ activity density was strongly influenced by trap location, with pivot corners and wetlands having the highest activity density (p = `r with(opilLinTerms, unboldRMD(p[loc=='Pivot']))`, `r with(opilLinTerms, unboldRMD(p[loc=='Wetland']))`)  
   + However, unlike _P. melanarius_ or _P. pardosa_, _P. opilio_ was not strongly influenced by any land cover type, except for Pasture (p = `r with(opilSmTerms,unboldRMD(p[Smoother=='ti(distMat,endDayMat):Pasture']))`)
-  + This specific effect of pasture was not large, as the model using non-crop cover performed similarly ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod3)-AIC(mod4)))`)
-  + In fact, both models that used landscape composition performed worse than the model with only trap location ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod3)))`,`r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod4)))`)
+  + This effect of this specific land cover type was not very large, as the model using non-crop cover performed similarly ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod3)-AIC(mod4)))`)
+  + In fact, the models that used landscape composition performed worse than the model with only trap location ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod3)))`,`r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod4)))`), indicating a weak effect of landscape composition
+  + The temporal and spatial components, as in the other two species, were very strong (both p = `r with(opilSmTerms,unboldRMD(p[grepl('E,N',Smoother)]))`, and Easting 
 
 ```{r OpilioCoefs-linTerms, echo=FALSE, warning=FALSE}
 kable(opilLinTerms,caption='\\label{tab:OpilioCoefs-linTerms} Linear terms for _Phalangium opilio_. Line',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
@@ -233,6 +241,13 @@ kable(opilSmTerms[c(1,2,4,5)],caption='\\label{tab:OpilioCoefs-smoothTerms} Smoo
 ```{r OpilioCoefs-raneff, echo=FALSE, fig.cap='\\label{fig:OpilioCoefs-raneff} Temporal and spatial components of _Phalangium opilio_ activity density'}
   include_graphics('../figures/Opiliones_raneff.png')
 ```
+
+
+```{r varComp, echo=FALSE, fig.cap='\\label{fig:varComp} Variance components of all models'}
+ggplot(varComp,aes(x=term,y=std.dev))+geom_col()+theme_classic()+facet_wrap(~spp,ncol=1,scales='free_y')+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+```
+
 
 # Discussion
 

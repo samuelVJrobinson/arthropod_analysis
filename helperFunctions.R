@@ -14,7 +14,8 @@ matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
   if(is.null(mar)) mar <- c(1,5,5,1)
   par(mfrow=c(1,1),mar=mar)
   #Dark colours indicate high multicollinearity
-  image(m[1:n,n:1],axes=F,col=gray.colors(12,start=0.2,end=1,rev=T))
+  image(t(apply(m,2,rev)),axes=F,col=gray.colors(12,start=0.2,end=1,rev=T))
+  
   mtext(text=nam[n:1], side=2, line=0.3, at=seq(0,1,length.out=nrow(m)), las=1, cex=0.8)
   mtext(text=nam, side=3, line=0.3, at=seq(0,1,length.out=nrow(m)), las=2, cex=0.8)
   
