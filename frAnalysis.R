@@ -29,8 +29,8 @@ oRingMat2Prop$NonCrop <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonC
 
 #Combine classes that are collinear/represent similar things
 
-#Trees + Shrubs
-oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
+##Trees + Shrubs - try without this for now
+# oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
 # oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 # #Water + Wetland
 # oRingMat2Prop$WetlandWater <- oRingMat2Prop$Wetland + oRingMat2Prop$Water
@@ -43,6 +43,8 @@ modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
 # mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
 mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','Forest','Shrubland','Pulses','Urban') #Variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
+
+#Assemble formulas:
 for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
   #Main effects + interaction (s + ti)
   modFormulas[3] <- paste0(modFormulas[3],"+ s(distMat,by=",mod3Vars[i],",bs=basisFun)")
@@ -98,10 +100,13 @@ termNames <- rownames(checkMC)
 # termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 # termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
 # termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
-matrixplot(checkMC,mar=c(1, 10, 10, 1),termNames)
-matrixplot(checkMC[4:nrow(checkMC),4:nrow(checkMC)],mar=c(1, 10, 10, 1),termNames[4:nrow(checkMC)]) #Only landscape terms
-abline(h=seq(0-1/length(4:nrow(checkMC))/2,1+1/length(4:nrow(checkMC))/2,length.out=1+length(4:nrow(checkMC))/3)) #Lines to separate terms
-abline(v=seq(0-1/length(4:nrow(checkMC))/2,1+1/length(4:nrow(checkMC))/2,length.out=1+length(4:nrow(checkMC))/3))
+
+N <- 1:nrow(checkMC) #Plot all smooth terms
+# N <- 4:nrow(checkMC) #Plot with only landscape smoothers
+lN <- length(N)
+matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
+abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
+abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
 
 #High concurvity seems to be coming from similar terms (e.g. s(dist):Canola & s(day):Canola), but not really between terms
 
