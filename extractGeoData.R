@@ -222,6 +222,8 @@ sapply(oRingMat2,sum)/sum(sapply(oRingMat2,sum))
 # Convert to proportions
 oRingMat2Prop <- lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 
+#Make figure of land cover distributions
+png('./figures/oRingPlot2_AAFC.png',800,1200,pointsize=20)
 par(mfrow=c(5,2))
 for(i in 1:10){
   covClass <- sapply(oRingMat2,sum)[order(sapply(oRingMat2,sum),decreasing=T)][i]
@@ -234,6 +236,7 @@ for(i in 1:10){
   }
 }
 par(mfrow=c(1,1))
+dev.off()
 
 #Save list of matrices
 save(oRingMat2,file='./data/geoDataAAFC.Rdata')

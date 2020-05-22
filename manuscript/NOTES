@@ -69,7 +69,7 @@ Phalangium opilo:
 
 Concurvity: originally defined by Buja et al. 1989 (https://www.jstor.org/stable/2241560)
 Very few examples of how to deal with concurvity properly
-  - Some suggest threshold of 0.5 as a cutoff (https://www.jstor.org/stable/3703274, https://doi.org/10.3832/ifor2620-012)
+  - Some suggest threshold of 0.5 as a cutoff (https://www.jstor.org/stable/3703274, https://doi.org/10.3832/ifor2620-012 )
   - Others seem to think it's not much of a problem, as long as convergence is achieved, eg:
     - https://stats.stackexchange.com/questions/299368/gams-with-many-slightly-correlated-predictors
     - https://m-clark.github.io/generalized-additive-models/issues.html#Concurvity

@@ -27,21 +27,21 @@ oRingMat2Prop <-  lapply(oRingMat2,function(x) x/Reduce('+',oRingMat2))
 nonCropClasses <- c('Grassland','Pasture','Wetland','Urban','Shrubland','Forest','Water','Barren','Fallow')
 oRingMat2Prop$NonCrop <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonCropClasses])
 
-#Combine classes that are collinear/represent similar things
+#Combine classes that are concurved/represent similar things
+#Trees + Shrubs
+oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
+oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 
-##Trees + Shrubs - try without this for now
-# oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
-# oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
-# #Water + Wetland
-# oRingMat2Prop$WetlandWater <- oRingMat2Prop$Wetland + oRingMat2Prop$Water
-# oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Water <- NULL
+#Grassland + Wetland
+oRingMat2Prop$GrassWetland <- oRingMat2Prop$Wetland + oRingMat2Prop$Grassland
+oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
 
 #Create model formulas
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
 modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
-# mod3Vars <- c('Grassland','Canola','Pasture','Wetland','TreeShrub','Pulses','Urban') #Variables for mod3
-mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Wetland','Forest','Shrubland','Pulses','Urban') #Variables for mod3
+mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3
+# mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest','Water') #Expanded variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
 
 #Assemble formulas:
@@ -80,7 +80,6 @@ AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTempo
 
 #Model 3 - landscape effects matter quite a bit
 summary(mod3); AIC(mod3)
-anova(mod3)
 
 #Variogram of residuals - no pattern
 tempTrap %>% mutate(resid=resid(mod3)) %>% 
@@ -94,8 +93,9 @@ par(mfrow=c(3,1)); for(i in 12:14) plot(mod3,scheme=2,shade=T,rug=F,seWithMean=T
 
 #Check for concurvity between smoothers
 concurvity(mod3) #High concurvity
-checkMC <- concurvity(mod3,full=F)$worst
+checkMC <- concurvity(mod3,full=F)$estimate
 termNames <- rownames(checkMC)
+termNames[1] <- 'Linear terms'
 # termNames <- gsub('s\\(distMat(,endDayMat)?\\)','s',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
 # termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 # termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
@@ -104,10 +104,11 @@ termNames <- rownames(checkMC)
 N <- 1:nrow(checkMC) #Plot all smooth terms
 # N <- 4:nrow(checkMC) #Plot with only landscape smoothers
 lN <- length(N)
+png('./figures/coverCorPlots/concurvityEstimate_reduced.png',1200,1000,pointsize=15)
 matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
 abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
 abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
-
+dev.off(); rm(N,lN)
 #High concurvity seems to be coming from similar terms (e.g. s(dist):Canola & s(day):Canola), but not really between terms
 
 #Problem terms:
@@ -115,8 +116,11 @@ abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
 #Wetland ~ Grassland (bad)
 #Urban ~ Grassland,Wetland,Canola (not as bad)
 
-#Check for correlation in smoothers
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),mar=c(1,10,10,1))
+#Check for correlation in smoothers - seems to be OK for reduced set, but starts acting strangely if Water included
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),mar=c(1,10,10,1))
+
+#Hessian
+matrixplot(mod3$outer.info$hess,c('scale',names(mod3$sp)),mar=c(1,10,10,1))
 
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
 
@@ -169,25 +173,33 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
-p2 <- data.frame(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% #Pasture distance: p=0.018
+p2 <- data.frame(endDayMat=149:241,GrassWetland=1,y=NA) %>% #Grass/Wetland time: p=0.003
+  smoothPred(mod3,whichSmooth=4) %>% rename(x=endDayMat) %>% 
+  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
+  effectPlot(leg=F)+labs(x='Time of year',y='Grassland/Wetland effect')
+
+p3 <- data.frame(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% #Pasture distance: p=0.018
   smoothPred(mod3,whichSmooth=9) %>% rename(x=distMat) %>% 
   effectPlot(leg=F)+labs(x='Distance (m)',y='Pasture effect')
 
-p3 <- data.frame(endDayMat=149:241,Wetland=1,y=NA) %>% #Wetland time: p=0.00160
-  smoothPred(mod3,whichSmooth=13) %>% rename(x=endDayMat) %>% 
-  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
-  effectPlot(leg=F)+labs(x='Time of year',y='Wetland effect')
-
 #Tree/shrub effect
 p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
-  smoothPred(mod3,whichSmooth=15:17) %>% rename(x=distMat,y=endDayMat) %>% 
+  smoothPred(mod3,whichSmooth=12:14) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Tree/Shrub effect')
 
 #Pulses: p=0.026
 p5 <- data.frame(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=18) %>% rename(x=distMat) %>% 
+  smoothPred(mod3,whichSmooth=15) %>% rename(x=distMat) %>% 
   effectPlot(leg=F)+labs(x='Distance (m)',y='Pulse effect')
+
+# #Flax effect
+# expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Flax=1) %>% 
+#   smoothPred(mod3,whichSmooth=18:20) %>% 
+#   mutate(endDayMat=factor(endDayMat)) %>% 
+#   rename(x=distMat,y=endDayMat) %>% 
+#   mutate(y=factor(y,labels=dispDays$date)) %>% 
+#   effectPlot()+labs(x='Distance (m)',y='Flax effect')
 
 #Urban effect
 p6 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>% 
@@ -196,6 +208,14 @@ p6 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Urban effect')
+
+# #Water effect
+# p7 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Water=1) %>% 
+#   smoothPred(mod3,whichSmooth=24:26) %>% 
+#   mutate(endDayMat=factor(endDayMat)) %>% 
+#   rename(x=distMat,y=endDayMat) %>% 
+#   mutate(y=factor(y,labels=dispDays$date)) %>% 
+#   effectPlot()+labs(x='Distance (m)',y='Water effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,p6,

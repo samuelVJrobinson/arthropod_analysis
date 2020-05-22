@@ -41,10 +41,9 @@ siteSf <- st_as_sf(site,coords=c('lon','lat'),crs=4326) %>%
 
 #Add coordinate system to trap df
 trapSf <- trap %>% left_join(select(site,BLID:lon),by='BLID') %>% 
-  rename('latSite'='lat','lonSite'='lon') %>% 
   #Replace trap lat/lon with site lat/lon if not recorded
   mutate(latTrap=ifelse(latTrap==0,latSite,latTrap),lonTrap=ifelse(lonTrap==0,lonSite,lonTrap)) %>% 
-  st_as_sf(coords=c('lonTrap','latTrap'),crs=4326) %>% 
+  st_as_sf(coords=c('lon','lat'),crs=4326) %>% 
   st_transform(3403)
 
 #Bounding box for 2016:2018 sites (excludes Grande Prairie)
@@ -105,5 +104,36 @@ yearNumbers <- arthNumbers %>%
   theme(axis.text=element_text(size=5),axis.text.x=element_text(angle=90,vjust=0.3,hjust=1)))
   # ggsave('./figures/maps/arthDistMap.png',p1,scale=1.5)
 
-rm(p1)
+#Pterostichus sampling (2017-2018)
+arth %>% select(BTID:BLID,year,genus,species) %>% filter(genus=='Pterostichus',species=='melanarius') %>% 
+  group_by(BTID) %>% summarize(count=n()) %>%
+  right_join(filter(trapSf,startYear==2017|startYear==2018),by='BTID') %>% 
+  mutate(count=ifelse(is.na(count),0,count),deployedWeeks=deployedhours/(24*7)) %>%
+  filter(!is.na(deployedWeeks)) %>% 
+  # ggplot()+geom_histogram(aes(x=deployedWeeks))
+  ggplot()+geom_sf(aes(geometry=geometry,size=count/deployedWeeks),alpha=0.1)+
+  facet_grid(trapType~startYear)
+
+#Opiliones sampling
+arth %>% select(BTID:BLID,year,genus,species) %>% filter(genus=='Phalangium',species=='opilio') %>% 
+  group_by(BTID) %>% summarize(count=n()) %>%
+  right_join(filter(trapSf,startYear==2017|startYear==2018),by='BTID') %>% 
+  mutate(count=ifelse(is.na(count),0,count),deployedWeeks=deployedhours/(24*7)) %>%
+  filter(!is.na(deployedWeeks)) %>% 
+  # ggplot()+geom_histogram(aes(x=deployedWeeks))
+  ggplot()+geom_sf(aes(geometry=geometry,size=count/deployedWeeks))+
+  facet_grid(trapType~startYear)
+
+#Pardosa sampling (2017 only)
+arth %>% select(BTID:BLID,year,genus,species) %>% filter(genus=='Pardosa',species=='distincta') %>% 
+  group_by(BTID) %>% summarize(count=n()) %>%
+  right_join(filter(trapSf,startYear==2017),by='BTID') %>% 
+  mutate(count=ifelse(is.na(count),0,count),deployedWeeks=deployedhours/(24*7)) %>%
+  filter(!is.na(deployedWeeks)) %>% 
+  # ggplot()+geom_histogram(aes(x=deployedWeeks))
+  ggplot()+geom_sf(aes(geometry=geometry,size=count/deployedWeeks,col=count/deployedWeeks))+
+  facet_grid(trapType~startYear)
+
+  
+  
 

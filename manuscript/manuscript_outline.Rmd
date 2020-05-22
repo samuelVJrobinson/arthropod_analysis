@@ -3,7 +3,7 @@ title: "Landscape composition and beneficial insects"
 author: "Sam Robinson, Paul Galpern, et al."
 date: "Spring 2020"
 output: bookdown::html_document2 
-bibliography: "/home/samuel/Documents/bibtexRefs/references.bib"
+bibliography: refs.bib
 csl: ecology-letters.csl
 ---
 
@@ -130,20 +130,32 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + However, the radius of the circle depends on the grain of the landscape that is relevant to the abundance of a given organism (@addicott1987)
   + Instead, we divided the landscape into annuli (rings) surrounding each trap location.
   + Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
-  + Using functional regression (see below), we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition 
+  + Using functional regression [@ramsay2004], we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition 
   
 ## Statistics
 
-* Scalar-on-function (SoF) regression is a special type of linear model ($\hat{y}=X\beta$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$ (e.g. biomass as a function of monthly average temperatures), and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the continuous predictors
-  + In our case, each column represents the landscape composition within each annulus, with increasing radii away from the location of the trap, and the coefficients are a smooth function of distance ($\beta_i = f(distance_i)$), meaning that the coefficients represent the (additive) effect of a given type of landscape cover and  from the trap 
-  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages (@addicott1987, @lima1996)
-  + This technique has been used by other authors (``onion-skin regression" in @galpern2020)
+* We used functional regression to model the effect of landscape composition on activity density 
+  +  Scalar-on-function (SoF) regression is a special type of functional linear regression model ($\hat{y}=X\beta$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$ (e.g. biomass in a plot (scalar) as a function of monthly average temperatures (vector)), and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the predictors
+  + In our case, each column represents the proportion of a given landscape cover class within each annulus, with increasing radii away from the location of the trap, and the coefficients are a smooth function of distance ($\beta_i = f(distance_i)$), meaning that the coefficients represent the (additive) effect of a given type of landscape cover and  from the trap 
+  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987, @lima1996]
+  + This technique has been used by other authors [@yen2014, @galpern2020]
   + We fit our functional regression models using _mgcv_ version 1.8-31.
+  
+* Some of the landscape terms in our model were strongly concurved, so we removed them from the model, or combined them into a single term
+  + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989, @ramsay2003]
+  + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002, @ramsay2003] 
+  + We found that some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely shrubland and forest (max: 0.71), canola and cereal (max: 0.74), and wetland and grassland (max: 0.63)
+  + 
+  
+```{r concurvity, echo=FALSE, fig.cap='\\label{fig:concurvity} Concurvity estimates for top land cover classes'}  
+  include_graphics('../figures/coverCorPlots/concurvityEstimate.png')
+```
+  
   
 <!-- This part could be pared down. Probably not necessary to discuss several models if the full one is the only important one. -->
 * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density
   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data 
-  <!-- Smoothers can be thought of as random effects, where the coefficients follow a probability distribution defined by a fixed smoothing coefficient $\lambda$ - see @wood2017 for the Bayesian/Frequentist details of this -->
+  + Smoothers can be thought of as random effects, where the coefficients follow a probability distribution defined by a fixed smoothing coefficient $\lambda$ [@wood2017] 
   + Model 2 added a local cover term, to account for the specific effect of local cover on activity density
   + Model 3 added a smoother term for the landscape rings, modeling the effect of non-crop cover at varying distances on activity density
   + Model 4, similar to model 3, modeled the effect of all underlying cover classes (crop and non-crop) at varying distances
