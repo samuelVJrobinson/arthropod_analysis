@@ -55,16 +55,8 @@ for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
 }
 modFormulas[4] <- paste0(modFormulas[2],'+s(distMat,by=NonCrop,bs=basisFun)+s(endDayMat,by=NonCrop,bs=basisFun)+ti(distMat,endDayMat,by=NonCrop,bs=basisFun)')
 
+
 # Pterostichus melanarius ----------------------------------
-
-#What spp of beetles are present?
-arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
-  mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
-  summarize(n=n()) %>% arrange(genus,desc(n)) %>% data.frame()
-
-arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
-  group_by(genus) %>% summarize(n=n()) %>% data.frame() %>% 
-  arrange(desc(n))
 
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
@@ -230,19 +222,13 @@ detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
-#What spp of spiders are present?
-arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
-  mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
-  summarize(n=n()) %>% arrange(family,genus,desc(n)) %>% data.frame()
-#Lots of Pardosa distincta and P. moesta. Could try all lycosids at once, but this might be a stretch
-
 # #Select only wolf spiders
 # tempArth <- arth %>% filter(family=='Lycosidae') %>% group_by(BTID) %>% summarize(n=n())
 
 #Select only Pardosa distincta
 tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
 
-# #Takes way longer to run. 5-10 mins +
+#Takes way longer to run. 5-10 mins +
 # ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
 load('./data/ParDisMod.Rdata')
@@ -256,22 +242,10 @@ AIC(mod1,mod2,mod3,mod4)
 summary(mod3); AIC(mod3)
 plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 
-#Check for multicollinearity
-checkMC <- concurvity(mod3,full=F)$worst
-#Looks OK. Some correlation between grassland and wetland
-termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
-matrixplot(checkMC,termNames,mar=c(1,6,6,1))
+#Check for multicollinearity (same as above)
 
 #Smoothing term estimates
 matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
-
-matrixplot(checkMC,mar=c(1, 10, 10, 1),termNames)
-matrixplot(checkMC[4:nrow(checkMC),4:nrow(checkMC)],mar=c(1, 10, 10, 1),termNames[4:nrow(checkMC)]) #Only landscape terms
-
-#High concurvity seems to be coming from similar terms (e.g. s(dist):Canola & s(day):Canola), but not really between terms
-plot(mod3$sp)
-round(diag(sp.vcov(mod3)))
-
 
 #Variance component
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
@@ -300,6 +274,9 @@ ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=8,height=4,scal
 
 #Plot important landscape effects
 
+#Get order of terms to plot
+cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
+
 #Days to display on plots (early,mid,late)
 dispDays <- data.frame(doy=c(173,203,232)) %>% 
   mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
@@ -313,10 +290,10 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Grassland
-p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Grassland=1) %>% 
+p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
   smoothPred(mod3,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Grassland effect')
+  effectPlot()+labs(x='Distance (m)',y='GrassWetland effect')
 
 #Canola
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
@@ -326,7 +303,7 @@ p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>%
 
 #Pulses
 p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Pulses=1) %>% 
-  smoothPred(mod3,whichSmooth=18:20) %>% rename(x=distMat,y=endDayMat) %>% 
+  smoothPred(mod3,whichSmooth=15:17) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Pulse effect')
 
@@ -344,22 +321,21 @@ ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=8,height=4,scal
 rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
 detach(ParDisMod)
 
-
 # Harvestmen -------------------------------------------------------------
 
 #Select only harvestmen
 tempArth <- arth %>% filter(arthOrder=='Opiliones') %>% group_by(BTID) %>% summarize(n=n())
 
 #Takes way longer to run. 5-10 mins +
-# OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-# save(OpilioMod,file='./data/OpilioMod.Rdata')
-load('./data/OpilioMod.Rdata')
+OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+save(OpilioMod,file='./data/OpilioMod.Rdata')
+# load('./data/OpilioMod.Rdata')
 
 #Check models
 attach(OpilioMod)
 # detach(OpilioMod)
 
-AIC(mod1,mod2,mod3,mod4)  #Very little info beyond geography here
+AIC(mod1,mod2,mod3,mod4)  #Very little info beyond geography/trap location
 
 #Model 3 - none of the fixed terms are super important
 #Model 4 - noncrop land
@@ -368,17 +344,10 @@ anova(mod3)
 
 plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 
-#Check for multicollinearity
-checkMC <- concurvity(mod3,full=F)$worst
-#Looks OK. Some correlation between grassland and wetland
-termNames <- gsub('(te|s)\\(distMat(,endDayMat)?\\)','f',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
-matrixplot(checkMC,termNames,mar=c(1,6,6,1))
+#Check for multicollinearity - same as above
 
 #Smoothing term estimates
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
-
-plot(mod3$sp)
-round(diag(sp.vcov(mod2)))
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
 
 #Variance component
 varcomp <- gam.vcomp(mod3) 
@@ -411,6 +380,9 @@ ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=8,height=4,scale=2)
 dispDays <- data.frame(doy=c(173,203,232)) %>% 
   mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
 
+#Get order of terms to plot
+cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
+
 #Trap location - less in canola, more in wetland/pivot
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
@@ -425,9 +397,15 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Pasture=1) %>
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Pasture effect')
 
+#Tree/Shrub
+p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
+  smoothPred(mod3,whichSmooth=12:14) %>% rename(x=distMat,y=endDayMat) %>% 
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
+  effectPlot()+labs(x='Distance (m)',y='Pulse effect')
+
 #Plot landscape effects
-fixeffPlot <- ggarrange(p1,p2,
-                        labels=letters[1:6],nrow=1,ncol=2,
+fixeffPlot <- ggarrange(p1,p2,p3,
+                        labels=letters[1:6],nrow=1,ncol=3,
                         legend='bottom',common.legend=T) 
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
 rm(p1,p2,raneffPlot,fixeffPlot) #Cleanup

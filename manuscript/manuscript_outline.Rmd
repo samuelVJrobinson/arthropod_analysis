@@ -120,17 +120,35 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 ## Data collection
 
-* We used a system of pitfall traps installed in ditches, field margins, wetlands, and in-field sites across southern Alberta in 2017 (_need a map here_)
-  + Traps at in-field sites were installed 20, 100, 200m (?) along a transect from the nearest non-crop feature (wetland, grassland, pivot)
-  + Specimens were collected from the traps every 14 days, on average (SD: 2.9), and were identified to species
+* We used a system of pitfall traps installed at roadsides, field margins, wetlands, and in-field sites across southern Alberta in 2017 (_need a map here_)
+  + Pitfall traps consisted of 582 mL Solo® cups buried up to the rim, partially filled with ethylene glycol
+  + All traps had 2cm (?) chicken wire mounted over the rim to prevent small vertebrates from falling into the traps
+  + Traps at roadsides were located 5m (?) from the roads, while traps at in-field sites were installed 20, 100, 200m (?) along a transect from the nearest non-crop feature (wetland, grassland, pivot)
+  + Specimens were collected from the traps every 14 days (SD: 2.9), and were identified to species
   
-* To characterize landscape composition surrounding the traps, we used classified landscape data from AAFC
-  + Classifications are very accurate for fields (~90%), but less accurate for non-crop areas (~70%, [@AAFC_data])
-  + Landscape studies often use the landscape composition within a circle of a fixed radius surrounding each point
-  + However, the radius of the circle depends on the grain of the landscape that is relevant to the abundance of a given organism (@addicott1987)
-  + Instead, we divided the landscape into annuli (rings) surrounding each trap location.
+* We used three species of predatory arthropods that were present at very high abundances in the traps
+  + _Pterostichus melanarius_ is predatory introduced ground beetle that is a wide-ranging generalist [@carcamo1994, @larsen2003, @busch_Msc]
+  + It is commonly found in untilled grasslands [@purtauf2005] and grassy field margins may act as larval habitat [@desender1988]
+  + _Pardosa distincta_ is a species of wolf spider that is common across the Canadian prairies, and is commonly found in ungrazed pastures [@carcamo2014]
+  + Finally, _Phallangium opilio_ is a widely-distributed harvestment from the order Opilio
+  + 
+  
+  
+* We modeled arthropod activity density as a function of landscape composition using generalized additive models @wood2017
+    + To account for different lengths of trap exposure, log-days since trap placement was used as a fixed effect with its slope held at 1 (``offset" variable)
+    + All models were fit using a negative binomial distribution
+    + We fit our functional regression models using _mgcv_ version 1.8-31
+  
+* To characterize landscape composition surrounding the traps, we used classified landscape data from @AAFC_data
+  + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%)
+  + We extracted the landscape composition within a circle of a fixed radius surrounding each trap location 
+  + However, the radius of the circle necessary to characterize the landscape depends on the ``grain" of the landscape that is relevant to the abundance of a given organism (@addicott1987)
+  + Therefore, we divided the landscape into annuli (rings) surrounding each trap location.
   + Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
+  
+  
   + Using functional regression [@ramsay2004], we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition 
+
   
 ## Statistics
 
@@ -139,35 +157,32 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + In our case, each column represents the proportion of a given landscape cover class within each annulus, with increasing radii away from the location of the trap, and the coefficients are a smooth function of distance ($\beta_i = f(distance_i)$), meaning that the coefficients represent the (additive) effect of a given type of landscape cover and  from the trap 
   + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987, @lima1996]
   + This technique has been used by other authors [@yen2014, @galpern2020]
-  + We fit our functional regression models using _mgcv_ version 1.8-31.
   
 * Some of the landscape terms in our model were strongly concurved, so we removed them from the model, or combined them into a single term
   + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989, @ramsay2003]
   + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002, @ramsay2003] 
   + We found that some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely shrubland and forest (max: 0.71), canola and cereal (max: 0.74), and wetland and grassland (max: 0.63)
-  + 
+  
   
 ```{r concurvity, echo=FALSE, fig.cap='\\label{fig:concurvity} Concurvity estimates for top land cover classes'}  
   include_graphics('../figures/coverCorPlots/concurvityEstimate.png')
 ```
   
   
-<!-- This part could be pared down. Probably not necessary to discuss several models if the full one is the only important one. -->
-* We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density
-  + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data 
-  + Smoothers can be thought of as random effects, where the coefficients follow a probability distribution defined by a fixed smoothing coefficient $\lambda$ [@wood2017] 
-  + Model 2 added a local cover term, to account for the specific effect of local cover on activity density
-  + Model 3 added a smoother term for the landscape rings, modeling the effect of non-crop cover at varying distances on activity density
-  + Model 4, similar to model 3, modeled the effect of all underlying cover classes (crop and non-crop) at varying distances
-  + To account for different lengths of trap exposure, log-days since trap placement was used as a fixed effect with its slope held at 1 (``offset" variable)
-  + All models were fit using a negative binomial distribution, and model fits were compared using conditional Akaike's Information Criteria @wood2017
 
-Model    | Independent variables                                     | $r$ Formula
--------- | --------------------------------------------------------- | -----------------------------------------------
-1        | Phenology + Geography                                     | Activity Density ~ s(Day) + s(E,N)
-2        | Phenology + Geography + Local cover                       | Activity Density ~ s(Day) + s(E,N) + Trap Location
-3        | Phenology + Geography + Local cover + Landscape (general) | Activity Density ~ s(Day) + s(E,N) + Trap Location + s(Non-crop Cover)                         
-4        | Phenology + Geography + Local cover + Landscape (specific)| Activity Density ~ s(Day) + s(E,N) + Trap Location + s(Cover 1) + s(Cover 2) + ... + s(Cover n)
+<!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density -->
+<!--   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data  -->
+<!--   + Smoothers can be thought of as random effects, where the coefficients follow a probability distribution defined by a fixed smoothing coefficient $\lambda$ [@wood2017]  -->
+<!--   + Model 2 added a local cover term, to account for the specific effect of local cover on activity density -->
+<!--   + Model 3 added a smoother term for the landscape rings, modeling the effect of non-crop cover at varying distances on activity density -->
+<!--   + Model 4, similar to model 3, modeled the effect of all underlying cover classes (crop and non-crop) at varying distances -->
+
+<!-- Model    | Independent variables                                     | $r$ Formula -->
+<!-- -------- | --------------------------------------------------------- | ----------------------------------------------- -->
+<!-- 1        | Phenology + Geography                                     | Activity Density ~ s(Day) + s(E,N) -->
+<!-- 2        | Phenology + Geography + Local cover                       | Activity Density ~ s(Day) + s(E,N) + Trap Location -->
+<!-- 3        | Phenology + Geography + Local cover + Landscape (general) | Activity Density ~ s(Day) + s(E,N) + Trap Location + s(Non-crop Cover)                          -->
+<!-- 4        | Phenology + Geography + Local cover + Landscape (specific)| Activity Density ~ s(Day) + s(E,N) + Trap Location + s(Cover 1) + s(Cover 2) + ... + s(Cover n) -->
 
 # Results
 

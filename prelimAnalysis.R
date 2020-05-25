@@ -9,6 +9,35 @@ theme_set(theme_classic())
 theme_update(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(sf)
 
+# Abundance tables --------------------------------------------------------
+
+#What spp of beetles are present in pitfall traps?
+arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
+  mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
+  summarize(count=n()) %>% arrange(desc(count)) %>% 
+  unite(genSpp,genus,species,sep=' ') %>% 
+  mutate(genSpp=factor(genSpp,levels=genSpp)) %>% 
+  ggplot(aes(x=genSpp,y=count))+geom_col()+scale_y_sqrt()+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
+#Tons of Pterostichus melanarius
+
+#Genera
+arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
+  group_by(genus) %>% summarize(count=n()) %>% data.frame() %>% 
+  arrange(desc(count)) %>% mutate(genus=factor(genus,levels=genus)) %>% 
+  ggplot(aes(x=genus,y=count))+geom_col()+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
+
+
+#What spp of spiders are present in pitfall traps?
+arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
+  mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
+  summarize(n=n()) %>% arrange(family,genus,desc(n)) %>% data.frame()
+#Lots of Pardosa distincta and P. moesta. Could try all lycosids at once, but this might be a stretch
+
+
 # Basic maps of sites/trap distribution -----------------------------------
 
 #Calgary-centred projection from Paul - seems to be problems when using this
