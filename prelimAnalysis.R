@@ -17,19 +17,17 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
   summarize(count=n()) %>% arrange(desc(count)) %>% 
   unite(genSpp,genus,species,sep=' ') %>% 
   mutate(genSpp=factor(genSpp,levels=genSpp)) %>% 
+  filter(genSpp!='Pterostichus melanarius') %>% #Strip out P. melanarius
   ggplot(aes(x=genSpp,y=count))+geom_col()+scale_y_sqrt()+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-
 #Tons of Pterostichus melanarius
 
 #Genera
-arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
+arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>% filter(species!='melanarius') %>% 
   group_by(genus) %>% summarize(count=n()) %>% data.frame() %>% 
   arrange(desc(count)) %>% mutate(genus=factor(genus,levels=genus)) %>% 
   ggplot(aes(x=genus,y=count))+geom_col()+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-
-
 
 #What spp of spiders are present in pitfall traps?
 arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%

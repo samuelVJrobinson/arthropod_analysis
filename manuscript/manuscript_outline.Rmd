@@ -2,9 +2,11 @@
 title: "Landscape composition and beneficial insects"
 author: "Sam Robinson, Paul Galpern, et al."
 date: "Spring 2020"
-output: bookdown::html_document2 
 bibliography: refs.bib
 csl: ecology-letters.csl
+output:
+  bookdown::html_document2:
+    pandoc_args: ["--include-after-body=manuscript_appendix.md"]
 ---
 
 ```{r setup, include=FALSE}
@@ -269,17 +271,8 @@ kable(opilSmTerms[c(1,2,4,5)],caption='\\label{tab:OpilioCoefs-smoothTerms} Smoo
   include_graphics('../figures/Opiliones_raneff.png')
 ```
 
-
-```{r varComp, echo=FALSE, fig.cap='\\label{fig:varComp} Variance components of all models'}
-ggplot(varComp,aes(x=term,y=std.dev))+geom_col()+theme_classic()+facet_wrap(~spp,ncol=1,scales='free_y')+
-  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-```
-
-
 # Discussion
 
-* Lemme tell ya 
-  + We found all kinds of stuff
-  + Boy oh boy is it cool
+* Pterostichus responded to landscape composition
 
 # References
