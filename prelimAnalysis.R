@@ -18,9 +18,10 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>%
   unite(genSpp,genus,species,sep=' ') %>% 
   mutate(genSpp=factor(genSpp,levels=genSpp)) %>% 
   filter(genSpp!='Pterostichus melanarius') %>% #Strip out P. melanarius
-  ggplot(aes(x=genSpp,y=count))+geom_col()+scale_y_sqrt()+
+  ggplot(aes(x=genSpp,y=count))+geom_col()+
+  # scale_y_sqrt()+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-#Tons of Pterostichus melanarius
+#Tons of Pterostichus melanarius. 
 
 #Genera
 arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>% filter(species!='melanarius') %>% 
@@ -32,9 +33,13 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Coleoptera') %>% filter(species!='m
 #What spp of spiders are present in pitfall traps?
 arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
   mutate(genSpp=paste(genus,species,sep=' ')) %>% group_by(family,genus,species) %>% 
-  summarize(n=n()) %>% arrange(family,genus,desc(n)) %>% data.frame()
-#Lots of Pardosa distincta and P. moesta. Could try all lycosids at once, but this might be a stretch
-
+  summarize(count=n()) %>% ungroup() %>% arrange(desc(count)) %>%
+  unite(genSpp,genus,species,sep=' ') %>% 
+  mutate(genSpp=factor(genSpp,levels=genSpp)) %>% 
+  ggplot(aes(x=genSpp,y=count))+geom_col()+ 
+  # scale_y_sqrt()+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+#Lots of Pardosa distincta and moesta. Could try all lycosids or Pardosa at once, but this might be a stretch
 
 # Basic maps of sites/trap distribution -----------------------------------
 

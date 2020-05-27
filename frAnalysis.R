@@ -225,13 +225,13 @@ detach(PteMelMod)
 # #Select only wolf spiders
 # tempArth <- arth %>% filter(family=='Lycosidae') %>% group_by(BTID) %>% summarize(n=n())
 
-#Select only Pardosa distincta
-tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
+# #Select only Pardosa distincta
+# tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
 
-#Takes way longer to run. 5-10 mins +
+# # Takes way longer to run. 5-10 mins +
 # ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
-load('./data/ParDisMod.Rdata')
+# load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
@@ -245,7 +245,7 @@ plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 #Check for multicollinearity (same as above)
 
 #Smoothing term estimates
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c(names(mod3$sp),'scale'),numSize=1,mar=c(1,8,8,1))
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
 
 #Variance component
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
@@ -320,6 +320,105 @@ fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
 ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
 rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
 detach(ParDisMod)
+
+
+# Pardosa moesta (wolf spider) --------------------------------------------
+
+#Select only Pardosa moesta
+tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta') %>% group_by(BTID) %>% summarize(n=n())
+
+# Takes way longer to run. 5-10 mins +
+ParMoeMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+save(ParMoeMod,file='./data/ParMoeMod.Rdata')
+# load('./data/ParMoeMod.Rdata')
+
+#Check models
+attach(ParMoeMod)
+
+AIC(mod1,mod2,mod3,mod4) 
+
+#Model 3 
+summary(mod3); AIC(mod3)
+plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
+
+#Check for multicollinearity (same as above)
+
+#Smoothing term estimates
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
+
+#Variance component
+varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
+round(varcomp,3)
+
+#Temporal smoother
+p1 <- data.frame(day=min(datList$day):max(datList$day)) %>% 
+  smoothPred(mod3,whichSmooth=1) %>% 
+  ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+  geom_line()+
+  labs(x='Day of Year',y='Activity')
+
+#Spatial smoother
+p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
+  smoothPred(mod3,whichSmooth=2) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
+  ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
+  geom_point(data=tempTrap,aes(x=easting,y=northing))+
+  scale_fill_gradient(low='blue',high='red')+
+  labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
+  theme(legend.position = c(0.85, 0.2),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
+  maptheme
+
+raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
+ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=8,height=4,scale=2)
+
+#Plot important landscape effects
+
+#Get order of terms to plot
+cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
+
+#Days to display on plots (early,mid,late)
+dispDays <- data.frame(doy=c(173,203,232)) %>% 
+  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+
+#Trap location - far less in canola
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  labs(x='Trap location',y='Activity')
+
+#Canola - strong negative effect - canola acting as a source?
+p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+  smoothPred(mod3,whichSmooth=6:8) %>% rename(x=distMat,y=endDayMat) %>% 
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
+  effectPlot()+labs(x='Distance (m)',y='Canola effect')
+
+#Tree/shrub effect: act as a sink
+p3 <- expand.grid(distMat=seq(30,1500,30),TreeShrub=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=12) %>% 
+  rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Tree/shrub effect')
+
+#Pulses: sink 
+p4 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=15) %>% 
+  rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Pulse effect')
+
+#Urban effect: (weak) sink later in season
+p5 <- data.frame(endDayMat=149:241,Urban=1,y=NA) %>% #Grass/Wetland time: p=0.003
+  smoothPred(mod3,whichSmooth=22) %>% rename(x=endDayMat) %>% 
+  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
+  effectPlot(leg=F)+labs(x='Time of year',y='Urban effect')
+
+#Plot landscape effects
+fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
+                        labels=letters[1:6],nrow=2,ncol=3,
+                        legend='bottom',common.legend=T) 
+ggsave('./figures/Pardosa_moesta_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
+detach(ParMoeMod)
 
 # Harvestmen -------------------------------------------------------------
 

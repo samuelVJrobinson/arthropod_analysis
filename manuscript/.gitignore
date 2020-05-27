@@ -1,5 +1,8 @@
 *.html
-manuscript_outline.html
-refs.bak
-refs.bib.bak
-refs.bib.sav
+*.bak
+*.bib.bak
+*.bib.sav
+*.log
+*.pdf
+*.spl
+*.tex
