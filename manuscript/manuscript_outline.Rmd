@@ -1,6 +1,6 @@
 ---
 title: Landscape composition and beneficial insects
-subtitle: I like carabids
+# subtitle: 
 author:
   - name: Samuel Robinson
     email: samuel.robinson@ucalgary.ca
@@ -19,7 +19,7 @@ date: "Spring 2020"
 abstract: Ground-dwelling arthropods are important generalist predators in prairie agro-ecosystems. However, we don't know what types of landscape features they live in. Some may act as sources of arthropods during some parts of the year, and sinks during others. We examined 3 widely-distributed species of arthropods, and used functional regression to examine their habitat preferences. We found that trees/shrubs, and roadside grasses acted as sources of arthropods. Other features did not function as significant sources or sinks. Farmers should keep these landscape intact in order to preserve populations of generalist predators to defend their crops.
 
 bibliography: refs.bib
-csl: ecology-letters.csl
+# csl: ecology-letters.csl
 output: 
   bookdown::pdf_book:
     base_format: rticles::elsevier_article
@@ -154,10 +154,10 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + Specimens were collected from the traps every 14 days (SD: 2.9), and were identified to species
   
 * We used three species of predatory arthropods that were present at very high abundances in the traps
-  + _Pterostichus melanarius_ is predatory introduced ground beetle that is a wide-ranging generalist [@carcamo1994, @larsen2003, @busch_Msc]
+  + _Pterostichus melanarius_ is predatory introduced ground beetle that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc]
   + It is commonly found in untilled grasslands [@purtauf2005] and grassy field margins may act as larval habitat [@desender1988]
   + _Pardosa distincta_ is a species of wolf spider that is common across the Canadian prairies, and is commonly found in ungrazed pastures [@carcamo2014]
-  + Finally, _Phallangium opilio_ is a widely-distributed harvestmen from the order Opilio
+  + Finally, _Phallangium opilio_ is a widely-distributed harvestman that lives in 
   
 * We modeled arthropod activity density as a function of landscape composition using generalized additive models @wood2017
     + To account for different lengths of trap exposure, log-days since trap placement was used as a fixed effect with its slope held at 1 (``offset" variable)
@@ -178,12 +178,12 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 * We used functional regression to model the effect of landscape composition on activity density 
   +  Scalar-on-function (SoF) regression is a special type of functional linear regression model ($\hat{y}=X\beta$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$ (e.g. biomass in a plot (scalar) as a function of monthly average temperatures (vector)), and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the predictors
   + In our case, each column represents the proportion of a given landscape cover class within each annulus, with increasing radii away from the location of the trap, and the coefficients are a smooth function of distance ($\beta_i = f(distance_i)$), meaning that the coefficients represent the (additive) effect of a given type of landscape cover and  from the trap 
-  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987 @lima1996]
-  + This technique has been used by other authors [@yen2014, @galpern2020]
+  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996]
+  + This technique has been used by other authors [@yen2014; @galpern2020]
   
 * Some of the landscape terms in our model were strongly concurved, so we removed them from the model, or combined them into a single term
-  + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989, @ramsay2003]
-  + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002, @ramsay2003] 
+  + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989; @ramsay2003]
+  + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002; @ramsay2003] 
   + We found that some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely shrubland and forest (max: 0.71), canola and cereal (max: 0.74), and wetland and grassland (max: 0.63)
   
 
