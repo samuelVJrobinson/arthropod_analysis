@@ -3,8 +3,6 @@
 
 library(tidyverse)
 library(ggpubr)
-theme_set(theme_classic())
-maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better for maps
 library(mgcv)
 library(sf)
 library(gstat)
@@ -55,13 +53,20 @@ for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
 }
 modFormulas[4] <- paste0(modFormulas[2],'+s(distMat,by=NonCrop,bs=basisFun)+s(endDayMat,by=NonCrop,bs=basisFun)+ti(distMat,endDayMat,by=NonCrop,bs=basisFun)')
 
+#Parameters for multiplot figures
+landscapeFigX <- 8 #width
+landscapeFigY <- 6 #height
+landscapeLabel <- 20 #label size (letters a-f) 
+theme_set(theme_classic()) #Classic theme
+maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
+
 
 # Pterostichus melanarius ----------------------------------
 
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -148,8 +153,8 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E)-5,to=max(E)+5,length.out=100),N
   theme(legend.position = c(0.85, 0.2),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
   maptheme
 
-raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
-ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=8,height=4,scale=2)
+raneffPlot <- ggarrange(p1,p2,labels=letters[1:2],font.label=list(size=landscapeLabel)) #Plot spatial/temporal effects
+ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=8,height=4,scale=1.2)
 
 #Plot significant landscape effects
 
@@ -170,8 +175,10 @@ p2 <- data.frame(endDayMat=149:241,GrassWetland=1,y=NA) %>% #Grass/Wetland time:
   mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
   effectPlot(leg=F)+labs(x='Time of year',y='Grassland/Wetland effect')
 
-p3 <- data.frame(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% #Pasture distance: p=0.018
-  smoothPred(mod3,whichSmooth=9) %>% rename(x=distMat) %>% 
+#Pasture effect
+p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Pasture=1) %>% 
+  smoothPred(mod3,whichSmooth=9:11) %>% rename(x=distMat,y=endDayMat) %>% 
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot(leg=F)+labs(x='Distance (m)',y='Pasture effect')
 
 #Tree/shrub effect
@@ -212,8 +219,8 @@ p6 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>%
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,p6,
                         labels=letters[1:6],nrow=2,ncol=3,
-                        legend='bottom',common.legend=T) 
-ggsave('./figures/Pterostichus_melanarius_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+                        legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
+ggsave('./figures/Pterostichus_melanarius_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,p5,p6,raneffPlot,fixeffPlot) #Cleanup
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
@@ -222,16 +229,13 @@ detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
-# #Select only wolf spiders
-# tempArth <- arth %>% filter(family=='Lycosidae') %>% group_by(BTID) %>% summarize(n=n())
-
-# #Select only Pardosa distincta
-# tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
+#Select only Pardosa distincta
+tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
 
 # # Takes way longer to run. 5-10 mins +
 # ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
-# load('./data/ParDisMod.Rdata')
+load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
@@ -270,7 +274,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   maptheme
 
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
-ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=8,height=4,scale=2)
+ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=8,height=4,scale=1.2)
 
 #Plot important landscape effects
 
@@ -293,13 +297,12 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
 p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
   smoothPred(mod3,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='GrassWetland effect')
+  effectPlot()+labs(x='Distance (m)',y='Grass/Wetland effect')
 
 #Canola
-p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
-  smoothPred(mod3,whichSmooth=6:8) %>% rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Canola effect')
+p3 <- expand.grid(distMat=seq(30,1500,30),Canola=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=6) %>% rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Canola effect')
 
 #Pulses
 p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Pulses=1) %>% 
@@ -315,22 +318,21 @@ p5 <- expand.grid(distMat=seq(30,1500,30),Urban=1,y=NA) %>%
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
-                        labels=letters[1:6],nrow=2,ncol=3,
-                        legend='bottom',common.legend=T) 
-ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+                        labels=letters[1:5],nrow=2,ncol=3,
+                        legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
+ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
 detach(ParDisMod)
-
 
 # Pardosa moesta (wolf spider) --------------------------------------------
 
 #Select only Pardosa moesta
 tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta') %>% group_by(BTID) %>% summarize(n=n())
 
-# Takes way longer to run. 5-10 mins +
-ParMoeMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-save(ParMoeMod,file='./data/ParMoeMod.Rdata')
-# load('./data/ParMoeMod.Rdata')
+# # Takes way longer to run. 5-10 mins +
+# ParMoeMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# save(ParMoeMod,file='./data/ParMoeMod.Rdata')
+load('./data/ParMoeMod.Rdata')
 
 #Check models
 attach(ParMoeMod)
@@ -369,7 +371,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   maptheme
 
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
-ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=8,height=4,scale=2)
+ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=8,height=4,scale=1.2)
 
 #Plot important landscape effects
 
@@ -415,8 +417,8 @@ p5 <- data.frame(endDayMat=149:241,Urban=1,y=NA) %>% #Grass/Wetland time: p=0.00
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
                         labels=letters[1:6],nrow=2,ncol=3,
-                        legend='bottom',common.legend=T) 
-ggsave('./figures/Pardosa_moesta_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+                        legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
+ggsave('./figures/Pardosa_moesta_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
 detach(ParMoeMod)
 
@@ -426,9 +428,9 @@ detach(ParMoeMod)
 tempArth <- arth %>% filter(arthOrder=='Opiliones') %>% group_by(BTID) %>% summarize(n=n())
 
 #Takes way longer to run. 5-10 mins +
-OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-save(OpilioMod,file='./data/OpilioMod.Rdata')
-# load('./data/OpilioMod.Rdata')
+# OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# save(OpilioMod,file='./data/OpilioMod.Rdata')
+load('./data/OpilioMod.Rdata')
 
 #Check models
 attach(OpilioMod)
@@ -471,7 +473,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   maptheme
 
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
-ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=8,height=4,scale=2)
+ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=8,height=4,scale=1.2)
 
 #Plot important landscape effects
 
@@ -504,9 +506,9 @@ p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) 
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
-                        labels=letters[1:6],nrow=1,ncol=3,
+                        labels=letters[1:3],nrow=1,ncol=3,
                         legend='bottom',common.legend=T) 
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
 rm(p1,p2,raneffPlot,fixeffPlot) #Cleanup
 
-detach(ParDisMod)
+detach(OpilioMod)
