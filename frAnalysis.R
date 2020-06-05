@@ -66,9 +66,11 @@ maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_bl
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
+
+#Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
 
 #Check models
 attach(PteMelMod)
@@ -114,10 +116,10 @@ dev.off(); rm(N,lN)
 #Urban ~ Grassland,Wetland,Canola (not as bad)
 
 #Check for correlation in smoothers - seems to be OK for reduced set, but starts acting strangely if Water included
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),mar=c(1,10,10,1))
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75)
 
 #Hessian
-matrixplot(mod3$outer.info$hess,c('scale',names(mod3$sp)),mar=c(1,10,10,1))
+matrixplot(mod3$outer.info$hess,c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75)
 
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
 
@@ -300,8 +302,9 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=
   effectPlot()+labs(x='Distance (m)',y='Grass/Wetland effect')
 
 #Canola
-p3 <- expand.grid(distMat=seq(30,1500,30),Canola=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=6) %>% rename(x=distMat) %>% 
+p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+  smoothPred(mod3,whichSmooth=6:8) %>% rename(x=distMat,y=endDayMat) %>% 
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot(leg=F)+labs(x='Distance (m)',y='Canola effect')
 
 #Pulses
@@ -502,13 +505,13 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Pasture=1) %>
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
   smoothPred(mod3,whichSmooth=12:14) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Pulse effect')
+  effectPlot()+labs(x='Distance (m)',y='Tree/shrub effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
                         labels=letters[1:3],nrow=1,ncol=3,
                         legend='bottom',common.legend=T) 
-ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=8,height=4,scale=2)
+ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=8,height=4,scale=1)
 rm(p1,p2,raneffPlot,fixeffPlot) #Cleanup
 
 detach(OpilioMod)
