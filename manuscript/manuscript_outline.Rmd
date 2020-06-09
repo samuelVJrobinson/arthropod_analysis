@@ -327,32 +327,43 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + _P. distincta_ was influenced by grassland/wetland, canola, pulses, and urban land cover
   + _P. moesta_ was influenced by the same landscape components: grassland/wetland, canola, pulses, and urban land cover
   + Finally, _P. opilio_ was weakly influenced by pasture, and trees/shrubs
-  + These results highlight the important of non-crop marginal lands for predatory arthropod abundance 
+  + These results highlight the seasonal importance of non-crop marginal lands for predatory arthropod abundance (Table \@ref(tab:sumTab))
   
-Cover class     | _Pterostichus_          | _Pardosa_               | _Phalangium_
---------------- | ----------------------- | ----------------------- | ------------
-Grass/Wetland   | Late sink               | Early source (weak)     |
-Canola          |                         | Early, mid source       |
-Pasture         | Early source            |                         | Early sink, late source
-Trees/Shrubland | Early sink, Late source | Variable                | Early sink, mid source (weak)
-Pulses          | Source                  | Variable                |
-Flax            |                         |                         |
-Urban           | Early sink, Mid source  | Variable                |
+Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance.
+  
+Cover class      | _Pterostichus melanarius_| _Pardosa distincta_      | _Pardosa moesta_     | _Phalangium opilio_
+---------------- | -----------------------  | ------------------------ | -------------------  | ------------
+Grass/ Wetland   | Late sink                | Late sink (weak)         |                      |
+Canola           |                          | Source                   | Source               |
+Pasture          | Early source             |                          |                      | Early sink, Late source
+Trees/ Shrubland | Early sink, Late source  |                          | Source               | Early sink, Mid source (weak)
+Pulses           | Source                   | Early source, Late sink  | Sink                 |
+Urban            | Early sink, Mid source   | Sink                     | Mid sink (weak)      |
 
-
-* The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, and responded most strongly to urban and tree/shrub land cover
-
-* The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition
+* The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, and responded most strongly to urban and tree/shrub cover
+  + _P. melanarius_ is found in a wide variety of habitats, but tends to prefer agricultural fields [@larsen2003]
+  + Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988, @fournier2002, but see @hatten2007]
+ + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
+ + We also identified several other candidate land cover types as early- and mid-season sources of _P. melanarius_, namely urban, pasture, and pulse crops (primarily lentils in Alberta)
+ + The roles that carabids play in pulse crops is not well-studied, but carabids are known predators of pea-leaf weevils (_Sitona lineatus_) on other Fabacea [@hamon1990], so it is possible that pulses represent a source of spill-over
+ + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_ (_Bembidion quadrimaculatum_, @vankosky2011)
+ <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
+ 
+* The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition, in particular, pulses, canola, urban, and trees/shrubs 
+  + Surprisingly, canola acted as a source for both species, indicating that _Pardosa_ may use canola as foraging grounds
+  + Similar to our findings, @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in Canadian and European contexts
+  
 
 * The harvestman _Phalangium opilio_ did not respond to landscape composition
 
 * The influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale land cover may have a stronger effect on arthropod abundance than small-scale land cover
 
-* There was a strong temporal component to the landscape effects, meaning that it is important to consider how sinks and sources may change over the year
+* There was a strong temporal component to the landscape effects, meaning that it is important to consider how sinks and sources may change over the season
+  + We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc, @bertrand2015]
 
 * These patterns indicate movement between landscape features, but since we did not directly observe arthropod movement between features, future studies should examine this
-  + Mark-recapture studies or two-sided traps would be a good start
-  + Should also be linked to ecosystem services (e.g. predation on bait insects - imagine the scene from Jurassic Park where the T-rex eats the goat)
+  + Mark-recapture studies, monitoring movement patterns (e.g. radio tags), or two-sided traps could be useful
+  + Should also be linked to ecosystem services (e.g. predation on bait insects or weed seeds)
 
 
 \newpage 
@@ -394,13 +405,13 @@ pdisSmTerms %>% select(-Ref.df,-p) %>%
 ```
 
 ```{r ParMoeLinear, echo=FALSE, warning=FALSE}
-pdisLinTerms %>% select(-p) %>% 
+pmoeLinTerms %>% select(-p) %>% 
   kable(.,caption='Linear terms for \\emph{Pardosa moesta}. Line',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
         digits=c(1,2,2,2,2),align='rrrrl',escape=FALSE)
 ```
 
 ```{r ParMoeSmooth, echo=FALSE, warning=FALSE}
-pdisSmTerms %>% select(-Ref.df,-p) %>% 
+pmoeSmTerms %>% select(-Ref.df,-p) %>% 
   kable(.,caption='Smooth terms for \\emph{Pardosa moesta}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
         col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
         digits=c(1,2,2,2),align='rrll',escape=FALSE)
