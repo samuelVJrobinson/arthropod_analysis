@@ -310,7 +310,7 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + In fact, the models that used landscape composition performed worse than the model with only trap location ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod3)))`, `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod4)))`), indicating a weak effect of landscape composition
   + The temporal and spatial components, as in the other two species, were both very strong (both p = `r with(opilSmTerms,p[grepl('E,N',Smoother)])`)
   + Together, these results indicate that _P. opilio_ activity density is influenced by large-scale geographic patterns rather than landscape composition
-  + The landscape composition and the spatio-temporal component explained `r round(with(OpilioMod,summary(mod3)$dev.expl),3)*100`% of deviance
+  + The landscape composition and the spatio-temporal component explained `r round(with(OpilioMod,summary(mod3)$dev.expl),3)*100`% of model deviance
 
 ```{r OpilioLandscape, echo=FALSE, fig.cap='Landscape influence on _Phalangium opilio_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
   include_graphics('../figures/Opiliones_fixeff.png')
