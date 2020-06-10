@@ -93,6 +93,10 @@ Pardosa:
 
 
 Phalangium opilo:
+
+  Food preferences:
+  - Newton and Yeargan 2001: can eat corn moth (Helicoverpa zea) larvae and eggs; only 5th,6th instars successful hunters for eggs in an arena trial
+  https://www.jstor.org/stable/25086022 
   - Newton and Yeargan 2002: very abundant in soybeans/alfalfa
   https://academic.oup.com/ee/article-abstract/31/1/92/377653
   - Edgar and Yuan 1968: likely nocturnal foragers - very active compared to other harvestmen
@@ -111,8 +115,21 @@ Phalangium opilo:
   https://doi.org/10.1093/jee/83.3.772
   - Ashby 1974: P. opilio is a major predator of Pieris rapae caterpillars in New Zealand (along with Lycosid spiders and ground beetles)
   https://www.jstor.org/stable/2402195 
-  - Stasiov et al 2006: vegetation influences harvestmen species diversity
+  
+  Habitat preferences:
+  - Stasiov et al 2006: vegetation influences harvestmen species diversity - not very well written
   https://link.springer.com/content/pdf/10.2478/s11756-006-0027-7.pdf
+  - Sajna et al 2011: seems like P. opilio chooses habitats mainly based on humidity, less so on temperature; avoid grazed turf during high temperatures
+    - dominant in understory? - not written very well, so hard to tell
+    https://www.researchgate.net/publication/236667709_Benefits_of_low-intensive_grazing_Co-occurrence_of_umbelliferous_plant_Hladikia_Pastinacifolia_RCHB_and_opilionid_species_Phalangium_opilio_L_in_dry_calcareous_Grassland
+  - Van de Poel 2015 MSc: P. opilio found in "intensively used" landscapes
+    - sample direction (direction of trapping) doesn't matter for most Opiliones, but it does for P. opilio (more found in traps facing the forest); migration between habitats?
+    - found a lot at forest edges, rather than in centre of forests
+    - sampling is unclear; looks like only 1 sample per location (4 pitfall traps)
+    https://www.researchgate.net/profile/Sam_Van_De_Poel/publication/306322819_Harvestman_communities_in_small_forest_patches_in_European_agricultural_landscapes/links/57b804b508aec9984ff2c0c0/Harvestman-communities-in-small-forest-patches-in-European-agricultural-landscapes.pdf
+  - Muster and Meyer 2014: (naturalist catalogue from Luxembourg) P. opilio prefers open and light-exposed habitats, usually farmlands and grasslands
+  https://ps.mnhn.lu/ferrantia/publications/Ferrantia70.pdf
+    
 
 Concurvity: originally defined by Buja et al. 1989 (https://www.jstor.org/stable/2241560)
 Very few examples of how to deal with concurvity properly

@@ -305,7 +305,7 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 ## *Harvestman:* Phalangium opilio 
 
 * _Phalangium opilio_ activity density was strongly influenced by trap location, with pivot corners and wetlands having the highest activity density (p = `r with(opilLinTerms, p[loc=='Pivot'])`, `r with(opilLinTerms, p[loc=='Wetland'])`)  
-  + However, unlike _P. melanarius_ or _P. pardosa_, _P. opilio_ was not strongly influenced by any land cover type, except for Pasture (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`)
+  + However, unlike _P. melanarius_ or _P. pardosa_, _P. opilio_ was not strongly influenced by any land cover type, except for Pasture (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and trees/shrubs (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`)
   + This effect of this specific land cover type was not very large, as the model using non-crop cover performed similarly ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod3)-AIC(mod4)))`)
   + In fact, the models that used landscape composition performed worse than the model with only trap location ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod3)))`, `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod4)))`), indicating a weak effect of landscape composition
   + The temporal and spatial components, as in the other two species, were both very strong (both p = `r with(opilSmTerms,p[grepl('E,N',Smoother)])`)
@@ -342,24 +342,28 @@ Urban            | Early sink, Mid source   | Sink                     | Mid sin
 
 * The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, and responded most strongly to urban and tree/shrub cover
   + _P. melanarius_ is found in a wide variety of habitats, but tends to prefer agricultural fields [@larsen2003]
-  + Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988, @fournier2002, but see @hatten2007]
+  + Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988; @fournier2002; but see @hatten2007]
  + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
  + We also identified several other candidate land cover types as early- and mid-season sources of _P. melanarius_, namely urban, pasture, and pulse crops (primarily lentils in Alberta)
  + The roles that carabids play in pulse crops is not well-studied, but carabids are known predators of pea-leaf weevils (_Sitona lineatus_) on other Fabacea [@hamon1990], so it is possible that pulses represent a source of spill-over
- + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_ (_Bembidion quadrimaculatum_, @vankosky2011)
+ + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
  <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
  
 * The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition, in particular, pulses, canola, urban, and trees/shrubs 
   + Surprisingly, canola acted as a source for both species, indicating that _Pardosa_ may use canola as foraging grounds
   + Similar to our findings, @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in Canadian and European contexts
   
-
-* The harvestman _Phalangium opilio_ did not respond to landscape composition
-
+* _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
+  + _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011]
+  + In particular, it is largely found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc]
+  + Our results show that _P. opilio_ migrated into pastures
+  + It is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc]
+  + We found the opposite pattern (albeit weakly): _P. opilio_ appears to migrate into forests
+  
 * The influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale land cover may have a stronger effect on arthropod abundance than small-scale land cover
 
 * There was a strong temporal component to the landscape effects, meaning that it is important to consider how sinks and sources may change over the season
-  + We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc, @bertrand2015]
+  + We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc; @bertrand2016]
 
 * These patterns indicate movement between landscape features, but since we did not directly observe arthropod movement between features, future studies should examine this
   + Mark-recapture studies, monitoring movement patterns (e.g. radio tags), or two-sided traps could be useful
