@@ -360,8 +360,9 @@ Urban            | Early sink, Mid source   | Sink                     | Mid sin
   + It is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc]
   + We found the opposite pattern (albeit weakly): _P. opilio_ appears to migrate into forests
   
-* The influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale land cover may have a stronger effect on arthropod abundance than small-scale land cover
-
+* Overall, we found that trees/shrubs, 
+  + The influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale land cover may have a stronger effect on arthropod abundance than small-scale land cover
+  
 * There was a strong temporal component to the landscape effects, meaning that it is important to consider how sinks and sources may change over the season
   + We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc; @bertrand2016]
 

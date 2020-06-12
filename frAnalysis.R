@@ -66,7 +66,11 @@ maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_bl
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+# PteMelMod <-
+
+#Something is going wrong here. Check allignment b/w landscape comp matrix and ID column within runMods
+debugonce(runMods)
+runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -227,7 +231,26 @@ rm(p1,p2,p3,p4,p5,p6,raneffPlot,fixeffPlot) #Cleanup
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
 # Urban (spatial + temporal), Pasture, Pulses (weak), Tree/Shrubs (weak)
+
+#Trying out some distance plots.
+#Need to identify sites at differing distances into fields
+
+#Figure out which sites have the higest amount of pasture
+PteMelMod$datList$Pasture %>% apply(.,1,sum) %>%
+  data.frame(pasture=.,ID=PteMelMod$tempTrap$ID)
+
+#Choose only 26133 at pass 4
+chooseMe <- which(with(PteMelMod$tempTrap,BLID=='26133'&pass==4))
+
+dat <- lapply(PteMelMod$datList,function(x) if(is.matrix(x)) x[chooseMe,] else x[chooseMe])
+
+PteMelMod$tempTrap$BTID
+
 detach(PteMelMod)
+
+
+
+
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
