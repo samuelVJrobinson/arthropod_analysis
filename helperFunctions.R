@@ -73,7 +73,7 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
   #Arrange matrices from oRingMat2 to correspond with rows of tempTrap
   oRingMat2 <- lapply(oRingMat2,function(x){
     x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
-      left_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
+      right_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
       select(-ID) %>% as.matrix() })
   
   #Distance matrix to use in functional regression
