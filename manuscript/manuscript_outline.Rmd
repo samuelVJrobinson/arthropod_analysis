@@ -253,12 +253,12 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 ## *Ground beetle:* Pterostichus melanarius
 
 * _P. melanarius_ activity density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:PteMelLinear), \@ref(tab:PteMelSmooth))
-  + Canola crops had a marginally higher activity density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a), possibly indicating that (comparitively) low-density stands of canola may allow faster movement of ground beetles.
+  + Canola crops had a marginally higher activity density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a), possibly indicating that canola may allow faster movement of ground beetles
   + In landscape composition, nearby grassland/wetland cover had a neutral effect early in the summer, but a negative effect later in the summer (Figure \@ref(fig:PteMelLandscape)b), indicating that _P. melanarius_ may move into grasslands later in the year
   + Nearby canola had a positive effect in the early summer, but conversely, far-away canola (>800 m) had a negative effect, indicating that areas with widespread amounts of canola coverage had lower _P. melanarius_ activity density than those with simply local canola cover
   + Two other crop types had unexpected effects on _P. melanarius_ activity density: pulses and flax
   + Pulses acted as a late-season source, possibly indicating that _P. melanarius_ migrate out of the crop after (or during) harvest
-  + Flax acted as both a local and far-away sink, suggesting that the crop is not suitable for _P. melanarius_ foraging
+  + Flax had both a local and landscape-level negative effect, suggesting that the crop is not suitable for _P. melanarius_ foraging
   + Finally, _P. melanarius_ activity density had a very strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were strong drivers of ground beetle activity density (Figure \@ref(fig:PteMelSpatiotemporal))
   + Together, the landscape composition and the spatio-temporal component explained `r round(with(PteMelMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(PteMelMod,summary(mod3)$r.sq),3)`)
   <!-- + This could be related to climatic drivers (rainfall, growing degree days), or could simply represent a single yearly realization of a spatio-temporal random field  -->
@@ -270,31 +270,21 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 ## *Wolf spiders:* Pardosa distincta *and* Pardosa moesta
 
-* _Pardosa distincta_ activity density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth))
-  + Unlike _P. melanarius_, _P. distincta_ had far lower activity density in canola than any other cover type (Figure \@ref(fig:ParDisLandscape)a)
-  + 
-  
-  
-  + Interestingly, nearby canola appeared to act as a source of _P. distincta_ for surrounding landscape features, as activity density was positively related to the nearby proportion of canola (p = `r with(pdisSmTerms,p[Smoother=='s(distMat):Canola'])`), and that this effect was slightly stronger early in the season (p = `r with(pdisSmTerms,p[Smoother=='s(endDayMat):Canola'])`)
-  + Pulse crops had a similar effect, acting as a source of _P. distincta_ early in the season, and acting as a mild sink later in the season (p = `r with(pdisSmTerms,p[Smoother=='ti(distMat,endDayMat):Pulses'])`, Figure \@ref(fig:ParDisLandscape)d)
-  + Grassland acted as a weak sink in the middle of the season (p = `r with(pdisSmTerms,p[Smoother=='s(endDayMat):Grassland'])`), and urban cover acted as a weak sink at intermediate distances (~600m) 
-  <!-- How should this be interpreted? -->
-  + Similar to _P. melanarius_, _P. distincta_ activity density had a very strong temporal and spatial component (both p = `r with(pdisSmTerms,p[grepl('E,N',Smoother)])`, Figure \@ref(fig:ParDisCoefs-raneff)) 
-  + The landscape composition and the spatio-temporal component explained `r round(with(ParDisMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParDisMod,summary(mod3)$r.sq),3)`)
+* Activity density of _Pardosa_ was strongly influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth))
+  + Unlike _P. melanarius_, both _Pardosa_ species had far lower activity density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a)
+  + Interestingly, nearby canola appeared to act as a source of both _Pardosa_, as activity density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p = `r with(pdisSmTerms,p[Smoother=='s(distMat):Canola'])`, `r with(pmoeSmTerms,p[Smoother=='s(distMat):Canola'])`)
+  <!-- + This may indicate?? -->
+  + Urban land cover had a similar effect on _P. moesta_, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)f)
+  + Trees and shrubs acted as a sink for _P. distincta_ later in the season, and as a weak source early on in the season for _P. moesta_ (Figures \@ref(fig:ParDisLandscape)d, \@ref(fig:ParMoeLandscape)d)
+  + Grass and wetlands had strong local negative effect on _P. moesta_, but a positive landscape-level effect, indicating that while these cover types act as a sink, the general amount of grasslands and wetlands in the area have a positive effect on _P. moesta_ abundance
+  + Pulses had a similar effect on _P. distincta_ activity density, where landscape-level abundance of pulses increased _P. distincta_ density, but local abundance had a neutral effect
+  + Finally, activity density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_ (Figure \@ref(fig:ParDisSpatiotemporal)a, p = `r with(pdisSmTerms,p[Smoother=='s(Day)'])`) whereas the spatial component was dominant for _P. moesta_ (Figure \@ref(fig:ParMoeSpatiotemporal)b, p = `r with(pdisSmTerms,p[Smoother=='s(E,N)'])`) 
+  + The landscape composition and the spatio-temporal component explained `r round(with(ParDisMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParDisMod,summary(mod3)$r.sq),3)`) and `r round(with(ParMoeMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParMoeMod,summary(mod3)$r.sq),3)`) for _P. distincta_ and _P. moesta_, respectively
 
 
 ```{r ParDisLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa distincta_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
   include_graphics('../figures/Pardosa_distincta_fixeff.png')
 ```
-
-* _P. moesta_ was also heavily influenced by trap location and landscape composition (Tables \@ref(tab:ParMoeLinear), \@ref(tab:ParMoeSmooth))
-  + Like its sister species _P. distincta_, _P. moesta_ had much lower activity density in canola than any other trap location (Figure \@ref(fig:ParMoeLandscape)a)
-  + Nearby canola also acted as a source of _P. moesta_ (Figure \@ref(fig:ParMoeLandscape)b, p = `r with(pmoeSmTerms,p[Smoother=='s(distMat):Canola'])`), although the effect was only strong at the end of the season (p = `r with(pmoeSmTerms,p[Smoother=='ti(distMat,endDayMat):Canola'])`)
-  + This indicates that both _P. distincta_ and _P. moesta_ may migrate out of canola into adjacent habitat in order to overwinter or oviposit
-  + _P. moesta_ also had similar responses to pulses (Figures \@ref(fig:ParMoeLandscape)d)
-  + _P. moesta_ responded negatively to nearby tree and shrub cover, indicating that they are possible sinks of 
-  + Urban land cover acted as a sink, but only at certain times of the year
-  + The landscape composition and the spatio-temporal component explained `r round(with(ParMoeMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParMoeMod,summary(mod3)$r.sq),3)`)
 
 ```{r ParMoeLandscape, echo=FALSE, fig.cap='Landscape influence on \\emph{Pardosa moesta} activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
   include_graphics('../figures/Pardosa_moesta_fixeff.png')
@@ -380,7 +370,7 @@ Urban            |                          |                          | Early s
   include_graphics('../figures/Pterostichus_melanarius_raneff.png')
 ```
 
-```{r ParDisCoefs-raneff, echo=FALSE, fig.cap='Temporal and spatial components of _Pardosa distincta_ activity density'}
+```{r ParDisSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pardosa distincta_ activity density'}
   include_graphics('../figures/Pardosa_distincta_raneff.png')
 ```
 
