@@ -272,13 +272,12 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 * Activity density of _Pardosa_ was strongly influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth))
   + Unlike _P. melanarius_, both _Pardosa_ species had far lower activity density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a)
-  + Interestingly, nearby canola appeared to act as a source of both _Pardosa_, as activity density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p = `r with(pdisSmTerms,p[Smoother=='s(distMat):Canola'])`, `r with(pmoeSmTerms,p[Smoother=='s(distMat):Canola'])`)
-  <!-- + This may indicate?? -->
+  + Interestingly, nearby canola appeared to act as a source of both _Pardosa_, as activity density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p=`r with(pdisSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`, `r with(pmoeSmTerms,p[Smoother==ti(Distance,Day):Canola'])`)
   + Urban land cover had a similar effect on _P. moesta_, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)f)
   + Trees and shrubs acted as a sink for _P. distincta_ later in the season, and as a weak source early on in the season for _P. moesta_ (Figures \@ref(fig:ParDisLandscape)d, \@ref(fig:ParMoeLandscape)d)
   + Grass and wetlands had strong local negative effect on _P. moesta_, but a positive landscape-level effect, indicating that while these cover types act as a sink, the general amount of grasslands and wetlands in the area have a positive effect on _P. moesta_ abundance
   + Pulses had a similar effect on _P. distincta_ activity density, where landscape-level abundance of pulses increased _P. distincta_ density, but local abundance had a neutral effect
-  + Finally, activity density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_ (Figure \@ref(fig:ParDisSpatiotemporal)a, p = `r with(pdisSmTerms,p[Smoother=='s(Day)'])`) whereas the spatial component was dominant for _P. moesta_ (Figure \@ref(fig:ParMoeSpatiotemporal)b, p = `r with(pdisSmTerms,p[Smoother=='s(E,N)'])`) 
+  + Finally, activity density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_ (Figure \@ref(fig:ParDisSpatiotemporal)a, p=`r with(pdisSmTerms,p[Smoother=='s(Day)'])`) whereas the spatial component was dominant for _P. moesta_ (Figure \@ref(fig:ParMoeSpatiotemporal)b, p=`r with(pdisSmTerms,p[Smoother=='s(E,N)'])`) 
   + The landscape composition and the spatio-temporal component explained `r round(with(ParDisMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParDisMod,summary(mod3)$r.sq),3)`) and `r round(with(ParMoeMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParMoeMod,summary(mod3)$r.sq),3)`) for _P. distincta_ and _P. moesta_, respectively
 
 
@@ -292,12 +291,13 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 ## *Harvestman:* Phalangium opilio 
 
-* _Phalangium opilio_ activity density was strongly influenced by trap location, with pivot corners and wetlands having the highest activity density (p = `r with(opilLinTerms, p[loc=='Pivot'])`, `r with(opilLinTerms, p[loc=='Wetland'])`)  
-  + However, unlike _P. melanarius_ or _P. pardosa_, _P. opilio_ was not strongly influenced by any land cover type, except for Pasture (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and trees/shrubs (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`)
-  + This effect of this specific land cover type was not very large, as the model using non-crop cover performed similarly ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod3)-AIC(mod4)))`)
-  + In fact, the models that used landscape composition performed worse than the model with only trap location ($\Delta AIC$= `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod3)))`, `r with(OpilioMod, sprintf("%.2f",AIC(mod2)-AIC(mod4)))`), indicating a weak effect of landscape composition
-  + The temporal and spatial components, as in the other two species, were both very strong (both p = `r with(opilSmTerms,p[grepl('E,N',Smoother)])`)
-  + Together, these results indicate that _P. opilio_ activity density is influenced by large-scale geographic patterns rather than landscape composition
+* _Phalangium opilio_ activity density was strongly influenced by trap location, with pivot corners and wetlands having the highest activity density (Figure \@ref(fig:OpilioLandscape)a)
+  + _P. opilio_ was affected by grassland/wetlands (p=`r with(opilSmTerms,p[Smoother=='ti(Distance,Day):GrassWetland'])`), trees/shrubs (p`r with(opilSmTerms,p[Smoother=='s(Distance):TreeShrub'])`), and flax (p <`r with(opilSmTerms,p[Smoother=='s(Day):Flax'])`)
+  + Nearby grassland/wetland and trees/shrubs both had a negative effect on _P. opilio_ activity density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c)
+  + Flax had a negative influence, but this effect was only strong during the middle of the season (Figure \@ref(fig:OpilioLandscape)d)
+  + However, the specific effect of these land cover types was not very large, as a competing model using only non-crop cover performed slightly better (Full model AIC = `r with(OpilioMod, sprintf("%.1f",AIC(mod3)))`, Non-crop model AIC = `r with(OpilioMod, sprintf("%.1f",AIC(mod4)))`)
+  + The temporal and spatial components, as in the other two species, were both very strong (both p`r with(opilSmTerms,p[grepl('E,N',Smoother)])`)
+  + Together, these results indicate that _P. opilio_ activity density is more strongly influenced by large-scale geographic patterns, and less so by landscape composition
   + The landscape composition and the spatio-temporal component explained `r round(with(OpilioMod,summary(mod3)$dev.expl),3)*100`% of model deviance ($R^2_{adj}$ = `r round(with(OpilioMod,summary(mod3)$r.sq),3)`)
 
 ```{r OpilioLandscape, echo=FALSE, fig.cap='Landscape influence on _Phalangium opilio_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
@@ -315,15 +315,15 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   
 Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance.
   
-Cover class      | _Pterostichus melanarius_| _Pardosa distincta_      | _Pardosa moesta_               | _Phalangium opilio_
----------------- | -----------------------  | ------------------------ | -----------------------------  | -----------------------
-Grass/ Wetland   | Late sink                | Late sink (weak)         | Sink                           | Early sink, late source
-Canola           | Early source             | Early source             | Early source, late sink        | 
-Pasture          |                          | Landscape-level sink     |                                | 
-Trees/ Shrubland |                          | Late sink                | Early source, late sink (weak) | Early sink
-Pulses           | Late source              |                          | Landscape-level source         |
-Flax             | Sink                     |                          |                                | Mid & late sink
-Urban            |                          |                          | Early source, late sink        |
+Cover class      | _P. melanarius_                        | _P. distincta_      | _P. moesta_        | _P. opilio_
+---------------- | -------------------------------        | ------------------  | -----------------  | ------------------
+Grass/ Wetland   | Late sink                              |                     | *                  | *                   
+Canola           | Local source, landscape sink (early)   | Local source (weak) | *                  | 
+Pasture          |                                        | Landscape sink      |                    | 
+Trees/ Shrubland |                                        | Sink (late)         |                    | *         
+Pulses           | Late source                            |                     | *                  |
+Flax             | Local and landscape sink               |                     |                    | *              
+Urban            |                                        |                     | *                  |
 
 * The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, and responded most strongly to urban and tree/shrub cover
   + _P. melanarius_ is found in a wide variety of habitats, but tends to prefer agricultural fields [@larsen2003]
@@ -338,7 +338,7 @@ Urban            |                          |                          | Early s
   + Surprisingly, canola acted as a source for both species, indicating that _Pardosa_ may use canola as foraging grounds
   + Similar to our findings, @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in Canadian and European contexts
   
-* _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p = `r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
+* _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
   + _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011]
   + In particular, it is largely found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc]
   + Our results show that _P. opilio_ migrated into pastures

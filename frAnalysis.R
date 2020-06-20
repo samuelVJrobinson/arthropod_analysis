@@ -524,4 +524,41 @@ fixeffPlot <- ggarrange(p1,p2,p3,p4,
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,raneffPlot,fixeffPlot) #Cleanup
 
+
+#Make plots for mod4 (non-crop only)
+
+#Temporal smoother
+p1 <- data.frame(day=min(datList$day):max(datList$day)) %>% 
+  smoothPred(mod4,whichSmooth=1) %>% 
+  ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
+  geom_line()+
+  labs(x='Day of Year',y='Activity')
+
+#Spatial smoother
+p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
+  smoothPred(mod4,whichSmooth=2) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
+  ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
+  geom_point(data=tempTrap,aes(x=easting,y=northing))+
+  scale_fill_gradient(low='blue',high='red')+
+  labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
+  theme(legend.position = c(stLegPosX, stLegPosY), legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
+  maptheme
+
+#Trap location - less in canola, more in wetland/pivot
+p3 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod4,type='terms',terms='trapLoc',se.fit=T)) %>% 
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  labs(x='Trap location',y='Activity')
+
+#Noncrop
+p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),NonCrop=1) %>% 
+  smoothPred(mod4,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
+  mutate(y=factor(y,labels=dispDays$date)) %>% 
+  effectPlot()+labs(x='Distance (m)',y='Noncrop effect')
+
+ggarrange(p1,p2,p3,p4,labels=letters[1:4],nrow=2,ncol=2,legend='right',common.legend=F) 
+
 detach(OpilioMod)
