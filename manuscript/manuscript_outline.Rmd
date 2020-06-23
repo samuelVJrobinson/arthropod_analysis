@@ -355,9 +355,11 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
  + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
  + However, _P. melanarius_ is also found in a wide variety of habitats, and tends to prefer agricultural fields [@larsen2003], which our models also demonstrated
  + We found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_ 
- + The roles that carabids play in pulse crops is not well-studied, but carabids are known predators of pea-leaf weevils (_Sitona lineatus_) on other Fabacea [@hamon1990]
+ + The roles that carabids play in pulse crops is not well-studied, but carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990]
  + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
  + Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season
+ + Surprisingly, flax acted as a local and landscape level sink, suggesting that it may 
+ 
  
  <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
  
@@ -375,10 +377,12 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 * Overall, we found that trees/shrubs, 
   + The influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale land cover may have a stronger effect on arthropod abundance than small-scale land cover
   
+  
 * There was a strong temporal component to the landscape effects, meaning that it is important to consider how sinks and sources may change over the season
   + We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc; @bertrand2016]
 
 * These patterns indicate movement between landscape features, but since we did not directly observe arthropod movement between features, future studies should examine this
+  + Some land cover classes were strongly concurved (canola and cereal, wetland and grassland) with each other, we removed or combined them, meaning that we could not consider the influence of the categories independently 
   + Mark-recapture studies, monitoring movement patterns (e.g. radio tags), or two-sided traps could be useful
   + Should also be linked to ecosystem services (e.g. predation on bait insects or weed seeds)
 

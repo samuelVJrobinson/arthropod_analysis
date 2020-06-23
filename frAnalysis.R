@@ -71,7 +71,7 @@ maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_bl
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
