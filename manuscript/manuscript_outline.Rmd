@@ -16,7 +16,7 @@ footnote:
   - code: 1
     text: "Corresponding Author"
 date: "Spring 2020"
-abstract: Ground-dwelling arthropods are important generalist predators in prairie agro-ecosystems. However, we don't know what types of landscape features they live in. Some may act as sources of arthropods during some parts of the year, and sinks during others. We examined four widely-distributed species of arthropods, and used functional regression to examine their habitat preferences. We found that trees/shrubs, and roadside grasses acted as sources of arthropods. Other features did not function as significant sources or sinks. Farmers should keep these landscape intact in order to preserve populations of generalist predators to defend their crops.
+abstract: Ground-dwelling arthropods are important generalist predators in prairie agro-ecosystems. However, we don't know what types of landscape features they live in. Some may act as sources of arthropods during some parts of the year, and sinks during others. We examined four widely-distributed species of arthropods, using functional regression to examine their habitat preferences. We found that trees/shrubs, and roadside grasses acted as sources of arthropods. Other features did not function as significant sources or sinks. Farmers should keep these landscape intact in order to preserve populations of generalist predators to defend their crops.
 
 bibliography: refs.bib
 # csl: ecology-letters.csl
@@ -187,7 +187,8 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + Finally, _Phallangium opilio_ is a widely-distributed generalist harvestman, whose habitat preferences are poorly understood 
   
 * To characterize landscape composition surrounding the traps, we used classified landscape data from @AAFC_data
-  + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%)
+  <!-- + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%) -->
+  + We combined functionally similar landscape categories (cereals: _Triticum aestivum_ and _Hordeum vulgare_, pulses: _Pisum sativum_ and _Lens culinaris_, forest: coniferous and broadleaf) 
   + We extracted the landscape composition within a circle of a fixed radius surrounding each trap location 
   + However, the radius of the circle necessary to characterize the landscape depends on the ``grain" of the landscape that is relevant to the abundance of a given organism [@addicott1987]
   + Therefore, we divided the landscape into annuli (rings) surrounding each trap location.
@@ -227,12 +228,12 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a sink but never as a source
   + Alternatively, a cover class could act as a sink by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as a source at other times (e.g. during emergence)
   
-* Some of the landscape terms in our model were strongly concurved, so we removed them from the model or combined them into a single term
+* Some of the landscape terms in our model were strongly concurved, so we removed them from the model or combined them
   + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989]
   + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002; @ramsay2003] 
   + Some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63)
-  + Forest and shrubland were combined into the ``TreeShrub" category, grassland and wetland were combined into the "GrassWetland" category, as they were strongly positively correlated at all distances, indicating similar feature classes
-  + Cereal was removed from the model, as it was negatively correlated with canola at distances less than 200m and positively correlated at distances over 500m, likely reflecting the most common crop rotations and landscape structure present across our study region
+  + Forest and shrubland were combined into the ``Tree\Shrub" category, grassland and wetland were combined into the "Grass\Wetland" category, as they were strongly positively correlated at all distances, indicating similar feature classes
+  + Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola -> wheat -> barley) and the landscape structure present across our study region
   
 <!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density -->
 <!--   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data  -->
@@ -249,6 +250,13 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 <!-- 4        | Phenology + Geography + Local cover + Landscape (specific)| Activity Density ~ s(Day) + s(E,N) + Trap Location + s(Cover 1) + s(Cover 2) + ... + s(Cover n) -->
 
 # Results
+
+## Landscape composition 
+
+* Grassland, cereal, and canola were the three most-abundant landcover classes surrounding our traps, accounting for `r 27.44+25.76+22.65`% of land cover
+  + Several landscape ``fingerprints" were evident in the landscape annuli, with cereal cover increasing with distance away, along with a corresponding decrease in canola cover (leading to the strong concurvity)
+  + Grassland cover was largely constant with distance, although a cluster of sites had uniformly high or low cover of grassland with distance
+  + Figure \@ref(fig:landscapeComp) displays the proportions of the 10 most-dominant land cover over distance
 
 ## *Ground beetle:* Pterostichus melanarius
 
@@ -272,7 +280,7 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 * Activity density of _Pardosa_ was strongly influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth))
   + Unlike _P. melanarius_, both _Pardosa_ species had far lower activity density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a)
-  + Interestingly, nearby canola appeared to act as a source of both _Pardosa_, as activity density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p=`r with(pdisSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`, `r with(pmoeSmTerms,p[Smoother==ti(Distance,Day):Canola'])`)
+  + Interestingly, nearby canola appeared to act as a source of both _Pardosa_, as activity density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p=`r with(pdisSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`, `r with(pmoeSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`)
   + Urban land cover had a similar effect on _P. moesta_, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)f)
   + Trees and shrubs acted as a sink for _P. distincta_ later in the season, and as a weak source early on in the season for _P. moesta_ (Figures \@ref(fig:ParDisLandscape)d, \@ref(fig:ParMoeLandscape)d)
   + Grass and wetlands had strong local negative effect on _P. moesta_, but a positive landscape-level effect, indicating that while these cover types act as a sink, the general amount of grasslands and wetlands in the area have a positive effect on _P. moesta_ abundance
@@ -313,25 +321,44 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + Finally, _P. opilio_ was weakly influenced by pasture, and trees/shrubs
   + These results highlight the seasonal importance of non-crop marginal lands for predatory arthropod abundance (Table \@ref(tab:sumTab))
   
-Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance.
+Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance. Italics indicates that effects were weak (95% intervals overlapped zero)
   
-Cover class      | _P. melanarius_                        | _P. distincta_      | _P. moesta_        | _P. opilio_
----------------- | -------------------------------        | ------------------  | -----------------  | ------------------
-Grass/ Wetland   | Late sink                              |                     | *                  | *                   
-Canola           | Local source, landscape sink (early)   | Local source (weak) | *                  | 
-Pasture          |                                        | Landscape sink      |                    | 
-Trees/ Shrubland |                                        | Sink (late)         |                    | *         
-Pulses           | Late source                            |                     | *                  |
-Flax             | Local and landscape sink               |                     |                    | *              
-Urban            |                                        |                     | *                  |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Cover class     | _P. melanarius_            | _P. distincta_             | _P. moesta_                 | _P. opilio_           |
++=================+============================+============================+=============================+=======================+
+| Grass/ Wetland  | - Local sink (late)        |                            | - Local sink                | - Local sink (early)  |
+|                 |                            |                            | - Landscape source          |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Canola          | - Local source (early)     | - _Local source (early)_   | - Local source (early)      |                       |
+|                 | - Landscape sink (early)   | - _Local sink (late)_      | - Local sink (late)         |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Pasture         |                            | - Landscape sink           |                             |                       | 
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Trees/Shrubland |                            | - Overall sink (late)      | - _Overall source (early)_  | - Local sink (early)  |
+|                 |                            |                            | - _Overall sink (late)_     |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Pulses          | - Overall source (late)    |                            | - Landscape source          |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Flax            | - Local sink               |                            |                             | - Overall sink        |
+|                 | - Landscape sink           |                            |                             |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
+| Urban           |                            |                            | - Local source (early)      |                       |
+|                 |                            |                            | - Local sink (early)        |                       |
+|                 |                            |                            | - Landscape sink (late)     |                       |
+|                 |                            |                            | - Landscape source (late)   |                       |
++-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 
-* The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, and responded most strongly to urban and tree/shrub cover
-  + _P. melanarius_ is found in a wide variety of habitats, but tends to prefer agricultural fields [@larsen2003]
+
+* The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, primarily to different crop types (Table \@ref(tab:sumTab),\@ref(tab:PteMelSmooth))
+  + Of the non-crop land categories, grassland and wetland cover acted as a late-season sink, suggesting that _P. melanarius_ may migrate into it at the end of the summer
   + Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988; @fournier2002; but see @hatten2007]
  + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
- + We also identified several other candidate land cover types as early- and mid-season sources of _P. melanarius_, namely urban, pasture, and pulse crops (primarily lentils in Alberta)
- + The roles that carabids play in pulse crops is not well-studied, but carabids are known predators of pea-leaf weevils (_Sitona lineatus_) on other Fabacea [@hamon1990], so it is possible that pulses represent a source of spill-over
+ + However, _P. melanarius_ is also found in a wide variety of habitats, and tends to prefer agricultural fields [@larsen2003], which our models also demonstrated
+ + We found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_ 
+ + The roles that carabids play in pulse crops is not well-studied, but carabids are known predators of pea-leaf weevils (_Sitona lineatus_) on other Fabacea [@hamon1990]
  + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
+ + Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season
+ 
  <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
  
 * The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition, in particular, pulses, canola, urban, and trees/shrubs 
@@ -364,6 +391,10 @@ Urban            |                                        |                     
 
 ```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for top land cover classes'}  
   include_graphics('../figures/coverCorPlots/concurvityEstimate.png')
+```
+
+```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location'}  
+  include_graphics('../figures/oRingPlot2_AAFC.png')
 ```
 
 ```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pterostichus melanarius_ activity density'}
