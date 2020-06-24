@@ -11,11 +11,14 @@ Preditions:
 - Predatory arthropod abundance will be high in non-crop areas and low in crop areas
   - Specifically, abundance will be higher in areas with abundance (nearby) non-crop area
 
-Other notes:
+General notes:
 - Lang 2000: Seems like pitfall traps are not a good measure of density, by themselves. Sampling radius depends on time, ground cover, etc.
 https://link.springer.com/article/10.1007/BF02956438
   - Zhao et al 2013: However, there are methods to address this, namely 2-trap method:
     https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12083
+- Ganser et al 2019: wildflower strips increased abundance of ground beetles and spiders
+  - if strips were tilled after harvest, this reduced beetle and spider abundance
+https://doi.org/10.1016/j.agee.2019.02.010
 
 Pterostichus melanarius:
   - Desender and Alderweireldt 1988:  P. melanarius adults found in fields, larvae found in margins: possibly reproduction in margins and feeding in fields?
@@ -48,6 +51,12 @@ https://doi.org/10.1016/j.agee.2005.01.005
   https://doi.org/10.1016/j.agee.2005.02.004
   - Bertrand et al 2016: temporal heterogeneity (high crop rotation) increases carabid abundance, but this is largely highly-mobile carabids
   https://link.springer.com/article/10.1007/s10980-015-0259-4
+  - Mullins 2014 MSc: more carabids captured in areas with planted grass (but no relationship with aphid abundance)
+   http://hdl.handle.net/10222/54067
+   
+  
+  - Deal with these refs:
+  Clark et al 1993, Clark et al 1994
 
   
   Carabids as canola/oilseed rape pest control:
@@ -61,6 +70,10 @@ https://doi.org/10.1016/j.agee.2005.01.005
   https://link.springer.com/article/10.1007/s10980-013-9848-2
   - Kulkarni et al 2015: review of weed seed predation by ground beetles
   https://doi.org/10.1614/WS-D-14-00067.1
+  - Trichard et al. 2014: carabid abundance and weed seed predation higher in no-till, related to activity density (but only for 1 spp of weed seed)
+    - sharp decrease after harvest in no-till, but an increase in tilled; cover crop after harvest not suitable for granivores?
+    - large amount of spatiotemporal variability; looks like seed predators just moved to tilled areas after no-tilled was harvested
+  https://doi.org/10.1016/j.agee.2014.01.031
   - Menalled et al 1999: Ground beetles are effective generalist predators
   https://link.springer.com/article/10.1023/A:1009946004251
   - Lang et al 1999: Carabids AND Lycosids suppressed thrips/leafhoppers(?)
@@ -68,8 +81,7 @@ https://doi.org/10.1016/j.agee.2005.01.005
   - Edwards et al 1979: effective aphid predators
   https://www.jstor.org/stable/2402855 
   
-  - Deal with these refs:
-  Clark et al 1993, Clark et al 1994, Carmona and Landis 1999
+  
   
   
   

@@ -358,7 +358,8 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
  + The roles that carabids play in pulse crops is not well-studied, but carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990]
  + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
  + Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season
- + Surprisingly, flax acted as a local and landscape level sink, suggesting that it may 
+ + Surprisingly, flax acted as a local and landscape level sink, suggesting that it may be inappropriate feeding or nesting cover for _P. melanarius_.
+ + To our knowledge, there is no published research demonstrating this
  
  
  <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
