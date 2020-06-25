@@ -69,9 +69,9 @@ maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_bl
 # Pterostichus melanarius ----------------------------------
 
 #Select only P. melanarius
-tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius') %>% group_by(BTID) %>% summarize(n=n())
+tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -79,6 +79,7 @@ load('./data/PteMelMod.Rdata')
 
 #Check models
 attach(PteMelMod)
+
 # detach(PteMelMod)
 AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
 
@@ -233,7 +234,7 @@ detach(PteMelMod)
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
 #Select only Pardosa distincta
-tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta') %>% group_by(BTID) %>% summarize(n=n())
+tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
 # Takes way longer to run. 5-10 mins +
 # ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
@@ -242,6 +243,8 @@ load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
+
+#Check 10212-4-DPF-2017 and 10212-5-DPF-2017, looks like both have 127 count?
 
 AIC(mod1,mod2,mod3,mod4) 
 
@@ -325,7 +328,7 @@ detach(ParDisMod)
 # Pardosa moesta (wolf spider) --------------------------------------------
 
 #Select only Pardosa moesta
-tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta') %>% group_by(BTID) %>% summarize(n=n())
+tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
 # Takes way longer to run. 5-10 mins +
 # ParMoeMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
@@ -429,7 +432,7 @@ detach(ParMoeMod)
 # Harvestmen -------------------------------------------------------------
 
 #Select only harvestmen
-tempArth <- arth %>% filter(arthOrder=='Opiliones') %>% group_by(BTID) %>% summarize(n=n())
+tempArth <- arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
 #Takes way longer to run. 5-10 mins +
 # OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)

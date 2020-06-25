@@ -232,7 +232,7 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + Concurvity is an non-linear analogue of multicollinearity that can bias estimates of standard errors [@buja1989]
   + There is no agreed-upon threshold of unacceptable concurvity, but 0.5 is commonly used [@dominici2002; @ramsay2003] 
   + Some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63)
-  + Forest and shrubland were combined into the ``Tree\Shrub" category, grassland and wetland were combined into the "Grass\Wetland" category, as they were strongly positively correlated at all distances, indicating similar feature classes
+  + Forest and shrubland were combined into the ``Tree/Shrub" category, grassland and wetland were combined into the "Grass/Wetland" category, as they were strongly positively correlated at all distances, indicating similar feature classes
   + Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola -> wheat -> barley) and the landscape structure present across our study region
   
 <!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density -->
@@ -321,7 +321,7 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   + Finally, _P. opilio_ was weakly influenced by pasture, and trees/shrubs
   + These results highlight the seasonal importance of non-crop marginal lands for predatory arthropod abundance (Table \@ref(tab:sumTab))
   
-Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance. Italics indicates that effects were weak (95% intervals overlapped zero)
+Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance. Italics indicates that effects were weak (p>=0.05)
   
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Cover class     | _P. melanarius_            | _P. distincta_             | _P. moesta_                 | _P. opilio_           |
@@ -352,21 +352,27 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 * The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, primarily to different crop types (Table \@ref(tab:sumTab),\@ref(tab:PteMelSmooth))
   + Of the non-crop land categories, grassland and wetland cover acted as a late-season sink, suggesting that _P. melanarius_ may migrate into it at the end of the summer
   + Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988; @fournier2002; but see @hatten2007]
- + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
- + However, _P. melanarius_ is also found in a wide variety of habitats, and tends to prefer agricultural fields [@larsen2003], which our models also demonstrated
- + We found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_ 
- + The roles that carabids play in pulse crops is not well-studied, but carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990]
- + Alternatively, _P. melanarius_ is known to predate upon other carabid predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
- + Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season
- + Surprisingly, flax acted as a local and landscape level sink, suggesting that it may be inappropriate feeding or nesting cover for _P. melanarius_.
- + To our knowledge, there is no published research demonstrating this
+  + In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season
+  + However, _P. melanarius_ is also found in a wide variety of habitats, and tends to prefer agricultural fields [@larsen2003], which our models also demonstrated
+  + We also found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_ 
+  + The roles that carabids play in pulse crops is not well-studied, but carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990]
+  + _P. melanarius_ is also known to prey upon other carabids that are predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011]
+  + Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season
+  <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
  
- 
- <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
+* Surprisingly, flax acted as a local and landscape level sink for _P. melanarius_, and as an overall sink for _P. opilio_, suggesting that it may be inappropriate feeding or nesting cover for these beneficial arthropods
+  + Flax is more sensitive to weed competition than other small grains [@friesen1986; @kandel2020], so weed control tends to be more intense
+  + Lower weed abundance may cause flax fields to have lower levels of weed seeds to feed on, causing seed-feeding carabids to move to other locations [@trichard2014] 
+  + Alternatively, it could be that plant structural diversity due to extensive weed control, meaning that carabids have lower amounts of attractive ground cover [@butts2003; @clark1993]
+  + Why this occurs in flax fields but not canola or pulse crops is unclear, but may have to do with decreased shading or ground cover being less attractive to carabids [@butts2003]
+  + To our knowledge, there is no published research investigating effects of flax cropping on beneficial arthropods, so the causes of this pattern are speculative
  
 * The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition, in particular, pulses, canola, urban, and trees/shrubs 
   + Surprisingly, canola acted as a source for both species, indicating that _Pardosa_ may use canola as foraging grounds
-  + Similar to our findings, @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in Canadian and European contexts
+  + @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in both Canadian and European contexts
+  + 
+  
+
   
 * _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
   + _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011]
