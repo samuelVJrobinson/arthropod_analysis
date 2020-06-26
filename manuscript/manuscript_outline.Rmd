@@ -315,8 +315,8 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 # Discussion
 
 * We found that while _Pterostichus melanarius_, _Pardosa distincta_, and _Pardosa moesta_ responded to landscape composition, _Phalangium opilio_ did not
-  + _P. melanarius_ was influenced by grassland/wetland, pasture, trees/shrubs, pulses, and urban land cover
-  + _P. distincta_ was influenced by grassland/wetland, canola, pulses, and urban land cover
+  + _P. melanarius_ was influenced by grass/wetland, pasture, trees/shrubs, pulses, and urban land cover
+  + _P. distincta_ was influenced by grass/wetland, canola, pulses, and urban land cover
   + _P. moesta_ was influenced by the same landscape components: grassland/wetland, canola, pulses, and urban land cover
   + Finally, _P. opilio_ was weakly influenced by pasture, and trees/shrubs
   + These results highlight the seasonal importance of non-crop marginal lands for predatory arthropod abundance (Table \@ref(tab:sumTab))
@@ -326,7 +326,7 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Cover class     | _P. melanarius_            | _P. distincta_             | _P. moesta_                 | _P. opilio_           |
 +=================+============================+============================+=============================+=======================+
-| Grass/ Wetland  | - Local sink (late)        |                            | - Local sink                | - Local sink (early)  |
+| Grass & Wetland | - Local sink (late)        |                            | - Local sink                | - Local sink (early)  |
 |                 |                            |                            | - Landscape source          |                       |
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Canola          | - Local source (early)     | - _Local source (early)_   | - Local source (early)      |                       |
@@ -334,7 +334,7 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Pasture         |                            | - Landscape sink           |                             |                       | 
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
-| Trees/Shrubland |                            | - Overall sink (late)      | - _Overall source (early)_  | - Local sink (early)  |
+| Forest & Shrubs |                            | - Overall sink (late)      | - _Overall source (early)_  | - Local sink (early)  |
 |                 |                            |                            | - _Overall sink (late)_     |                       |
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Pulses          | - Overall source (late)    |                            | - Landscape source          |                       |
@@ -367,12 +367,12 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
   + Why this occurs in flax fields but not canola or pulse crops is unclear, but may have to do with decreased shading or ground cover being less attractive to carabids [@butts2003]
   + To our knowledge, there is no published research investigating effects of flax cropping on beneficial arthropods, so the causes of this pattern are speculative
  
-* The Lycosid spiders _Pardosa distincta_ and _Pardosa moesta_ responded to landscape composition, in particular, pulses, canola, urban, and trees/shrubs 
-  + Surprisingly, canola acted as a source for both species, indicating that _Pardosa_ may use canola as foraging grounds
-  + @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in both Canadian and European contexts
+* The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but in slightly different ways
+  + Canola acted as an early-season source for both species, indicating that _Pardosa_ may use canola as foraging grounds
   + 
   
-
+  + @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in both Canadian and European contexts
+  
   
 * _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
   + _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011]

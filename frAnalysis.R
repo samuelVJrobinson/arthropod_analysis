@@ -243,9 +243,6 @@ load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
-
-#Check 10212-4-DPF-2017 and 10212-5-DPF-2017, looks like both have 127 count?
-
 AIC(mod1,mod2,mod3,mod4) 
 
 #Model 3 
@@ -254,11 +251,22 @@ plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 
 #Check for multicollinearity (same as above)
 
+#Check residuals
+sumres <- with(datList,data.frame(trapLoc,day,E,N)) %>% 
+  mutate(EN=factor(paste(E,N,sep='_'))) %>% 
+  mutate(res=residuals(mod3)) %>% group_by(EN) %>% 
+  summarize(E=first(E),N=first(N),res=sum(res))
+
+ggplot(sumres,aes(x=E,y=N,size=res,col=res))+geom_point(alpha=0.5)+
+  scale_colour_gradient(low='red',high='blue')
+
+gam(res~s(E,N),data=sumres) %>% plot(.,scheme=2,rug=F)
+
 #Smoothing term estimates - problem here with distance term for TreeShrub
 matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
 
 #Variance component
-varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting
+varcomp <- gam.vcomp(mod3) 
 round(varcomp,3)
 
 #Temporal smoother
