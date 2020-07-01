@@ -39,6 +39,7 @@ modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,b
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
 modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
 mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3
+mod3Vars <- c('GrassWetland','Cereal','Canola','TreeShrub','Pulses','Flax','Urban') #Includes cereal, excludes pasture
 # mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest','Water') #Expanded variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
 
@@ -66,16 +67,18 @@ stLegPosY <- 0.3 #Legend position Y
 theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
 
+
 # Pterostichus melanarius ----------------------------------
 
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
-load('./data/PteMelMod.Rdata')
+# load('./data/PteMelMod.Rdata')
 
 #Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
+#Also tried running this with Cereal included, despite concurvity. Fits, but causes a bunch of weird instability in other results.
 
 #Check models
 attach(PteMelMod)
@@ -237,9 +240,10 @@ detach(PteMelMod)
 tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
 # Takes way longer to run. 5-10 mins +
-# ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
-load('./data/ParDisMod.Rdata')
+# load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
@@ -262,7 +266,7 @@ ggplot(sumres,aes(x=E,y=N,size=res,col=res))+geom_point(alpha=0.5)+
 
 gam(res~s(E,N),data=sumres) %>% plot(.,scheme=2,rug=F)
 
-#Smoothing term estimates - problem here with distance term for TreeShrub
+#Smoothing term estimates - problem here with distance term for TreeShrub, but this appears to be caused by the large number of terms. When "Urban" is dropped (weak effects), smoothing estimate for TreeShrub is fine, and no other effects change.
 matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
 
 #Variance component
@@ -355,7 +359,7 @@ plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 #Check for multicollinearity (same as above)
 
 #Smoothing term estimates
-matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,8,8,1))
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),numSize=1,mar=c(1,9,9,1))
 
 #Variance component
 varcomp <- gam.vcomp(mod3) #Large amount of variation explained by easting

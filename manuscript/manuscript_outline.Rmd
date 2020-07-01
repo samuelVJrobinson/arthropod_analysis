@@ -188,26 +188,25 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   
 * To characterize landscape composition surrounding the traps, we used classified landscape data from @AAFC_data
   <!-- + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%) -->
-  + We combined functionally similar landscape categories (cereals: _Triticum aestivum_ and _Hordeum vulgare_, pulses: _Pisum sativum_ and _Lens culinaris_, forest: coniferous and broadleaf) 
-  + We extracted the landscape composition within a circle of a fixed radius surrounding each trap location 
+  + We combined functionally similar landscape categories (cereals: _Triticum aestivum_ and _Hordeum vulgare_, pulses: _Pisum sativum_ and _Lens culinaris_, forest: coniferous and broadleaf), then extracted the landscape composition within a circle of a fixed radius surrounding each trap location 
   + However, the radius of the circle necessary to characterize the landscape depends on the ``grain" of the landscape that is relevant to the abundance of a given organism [@addicott1987]
   + Therefore, we divided the landscape into annuli (rings) surrounding each trap location.
   + Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
   + Using functional regression [@ramsay2004], we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition 
-
   
 ## Statistics
 
 * We used functional regression to model the effect of landscape composition on activity density 
   +  Scalar-on-function (SoF) regression is a special type of functional regression model ($\hat{y}=X\beta$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$ (e.g. biomass in a plot (scalar) as a function of monthly average temperatures (vector)), and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the predictors
   + In our case, each column represents the proportion of a given landscape cover class within each annulus, with increasing radii away from the location of the trap, and the coefficients are a smooth function of distance ($\beta_i = f(distance_i)$), meaning that the coefficients represent the (additive) effect of a given type of landscape cover and  from the trap 
-  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996]
+  + This avoids the fundamental problem of choosing an optimal radius of landscape composition, and allows the possibility that the size of the landscape ``grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010]
+  + It also allows for the possibility that certain land cover types may be locally beneficial, but detremental at wider scales, indicating that the cover type may not constitute a completely useable habitat
   + This technique has been used by other authors [@yen2014; @galpern2020]
   
-* Activity density of each arthropod was  fit as generalized additive models @wood2017, using _mgcv_ version `r packageVersion('mgcv')` 
-    + Count data of arthropods were fit using a negative binomial distribution
+* Activity density of each arthropod was fit as generalized additive models @wood2017, using _mgcv_ version `r packageVersion('mgcv')` 
+    + Count data of arthropods were fit using a negative binomial distribution with a log-link
     + To account for different lengths of trap exposure, log-days since trap placement was used as a fixed effect with its slope held at 1 (``offset" variable)
-    + To account for overall spatial and temporal autocorrelation in the data, we included day of year as a 1-dimensional smooth and easting and northing as a 2-dimensional smooth
+    + We included day of year as a 1-dimensional smooth and easting and northing as a 2-dimensional smooth, in order to account for underlying spatial and temporal autocorrelation in the data
     + For each landscape term, we used three SoF regression terms:
     + First, we used the proportion cover of all landscape cover classes in the annuli surrounding each trap location (spatial effect of cover class)
     + Second, we used day of the year multiplied by the proportion of cover classes in each annuli (temporal effect of cover class) 
@@ -369,9 +368,15 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
  
 * The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but in slightly different ways
   + Canola acted as an early-season source for both species, indicating that _Pardosa_ may use canola as foraging grounds
-  + 
+  + Trees and shrubs acted as a late season sink in both species, suggesting that they migrate to off-field areas with woody shrubs and trees 
+  + @drapela2011 also found that _Pardosa agrestis_ had higher activity density in areas with woody trees and shrubs
+  + While _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2011; @kowal2011], _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010]
+  + We found that roads clearly acted as an early source and a late sink of _P. moesta_
+  + Grassland and wetland, as well as pulses, also acted as a local sink, but a landscape-level source for _P. moesta_
+  + @oberg2007
   
-  + @drapela2011 also found that _Pardosa agresti_ had higher activity density in areas with more woody trees and shrubs, as well as in areas close to roadside strips, suggesting similar habitat preferences in both Canadian and European contexts
+  a wandering-active predation strategy [@young1990], 
+
   
   
 * _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
