@@ -367,17 +367,14 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
   + To our knowledge, there is no published research investigating effects of flax cropping on beneficial arthropods, so the causes of this pattern are speculative
  
 * The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but in slightly different ways
+  + Lycosids employ a wandering-active predation strategy [@young1990], meaning that nearby landscape composition may be more influential than large-scale composition [@oberg2007; @oberg2008]
   + Canola acted as an early-season source for both species, indicating that _Pardosa_ may use canola as foraging grounds
-  + Trees and shrubs acted as a late season sink in both species, suggesting that they migrate to off-field areas with woody shrubs and trees 
+  + Trees and shrubs acted as a late season sink in both species, suggesting that they migrate to off-field areas with woody shrubs and trees for overwintering [but _P. distincta_ are known to be active during the winter; @aitchison1984]
   + @drapela2011 also found that _Pardosa agrestis_ had higher activity density in areas with woody trees and shrubs
-  + While _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2011; @kowal2011], _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010]
+  + @moring1994 showed that _P. distincta_ were more active in grassy substrates
+  + While _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2008; @drapela2011; @kowal2011], _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010]
   + We found that roads clearly acted as an early source and a late sink of _P. moesta_
   + Grassland and wetland, as well as pulses, also acted as a local sink, but a landscape-level source for _P. moesta_
-  + @oberg2007
-  
-  a wandering-active predation strategy [@young1990], 
-
-  
   
 * _Phalangium opilio_ activity density did not respond to landscape composition, aside from pasture (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):Pasture'])`) and a weaker response to trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`) 
   + _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011]

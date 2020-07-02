@@ -21,8 +21,14 @@ https://link.springer.com/article/10.1007/BF02956438
 https://doi.org/10.1006/bcon.1997.0543
 - Gardiner et al 2010: pitfall trap catches in soybean fields, but studied spiders, carabids, and harvestmen
   - spiders increased in response to forest and grasslands; carabids strongly influenced by single species
-  - spatial scale varies between taxa
+  - for carabids, relationships with landscape variables are taxon-specific (agricultural vs perennial specializations)
+    - can depend on overwintering as larvae vs adults
+  - Lycosid abundance higher near grasslands, Lyniphiid abundance higher near forests
 https://doi.org/10.1016/j.biocontrol.2010.06.008
+- Thies et al 2003: local landscape scale (0.5 km) is related to herbivory, but wider scale (1.5 km) related to parasitism of herbivores
+https://doi.org/10.1034/j.1600-0706.2003.12567.x
+- Marc et al 1999: review of spiders as bioindicators of heavy metals and pest control
+https://doi.org/10.1016/S0167-8809(99)00038-9
 
 Pterostichus melanarius:
   - Desender and Alderweireldt 1988:  P. melanarius adults found in fields, larvae found in margins: possibly reproduction in margins and feeding in fields?
@@ -106,11 +112,19 @@ Pardosa:
   	https://www.jstor.org/stable/3706207 
   - Young and Edwards 1990: Lycosidae have a wandering-active predation strategy; wanderers tend to be generalists
   https://www.jstor.org/stable/3705574 
+  - Drapela et al 2008: spider species richness in winter canola fields related to woody areas at small scales (500m), but activity density related to road-side strips (1750m radius) and non-crop area (750m)
+  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.0906-7590.2008.5250.x
   - Drapela et al 2011: activity density of Pardosa agrestis positively related to road-side strips and distance to woody areas
   https://www.researchgate.net/profile/Johann_Zaller/publication/225082098_Landscape_structure_affects_activity_density_body_size_and_fecundity_of_Pardosa_wolf_spiders_Araneae_Lycosidae_in_winter_oilseed_rape/links/0046351541173e3f5e000000.pdf
-  - Oberg et al 2007: Lycosid spiders activity density higher in field margins than edge or in-field (in cereal crops)
+  - Oberg and Ekbom 2006: Carabids uniformly distributed from field edge, most Pardosa uniformly distributed (except P. palustris) as well
+    - Sowing didn't affect Lycosids, and affected only a few Carabids
+  https://doi.org/10.1111/j.1744-7348.2006.00088.x
+  
+  
+  - Oberg et al 2007: Lycosid spiders activity density higher in cereal field margins than edge or in-field (in cereal crops)
   https://doi.org/10.1016/j.agee.2006.12.034
-  - Oberg et al 2008: Lycosids increased over time in fields, indicating re-colonization (Linyphiids did not - had already recolonized?)
+  - Oberg et al 2008: Lycosids increased over time in fields, indicating re-colonization (but not all spp related to surrounding landscape)
+    - Linyphiids were constant over time (ballooning dispersal is quick), but were more strongly related to surrounding landscape 
   https://doi.org/10.1016/j.agee.2007.06.005
   - Schmid and Tscharntke 2005: Lyniphiid spider abundance enhanced by large-scale habitat (1-3km) due to ballooning behaviour
     - Varied between years due to heavy rains (?)
@@ -120,6 +134,9 @@ Pardosa:
   https://www.researchgate.net/profile/Martin_Entling/publication/255575419_SPIDERS_IN_SPACE_HOW_LANDSCAPE-WIDE_MOVEMENT_OF_GENERALIST_PREDATORS_INFLUENCES_LOCAL_DENSITY_SPECIES_RICHNESS_AND_BIOCONTROL/links/0046353add0edbf072000000/SPIDERS-IN-SPACE-HOW-LANDSCAPE-WIDE-MOVEMENT-OF-GENERALIST-PREDATORS-INFLUENCES-LOCAL-DENSITY-SPECIES-RICHNESS-AND-BIOCONTROL.pdf
   - Pluess et al 2010: Lycosids not influenced by landscape composition in an arid environment
   https://doi.org/10.1016/j.agee.2009.12.020
+  - Moring and Stewart 1994: Pardosa distincta dominant in grass-willow areas (grass substrate, rather than rock, sand, or leaf litter)
+  http://www.jstor.org/stable/3705424
+  
   
 
 Phalangium opilo:
