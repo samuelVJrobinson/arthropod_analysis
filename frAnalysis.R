@@ -38,8 +38,10 @@ oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
 modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
-mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3
-mod3Vars <- c('GrassWetland','Cereal','Canola','TreeShrub','Pulses','Flax','Urban') #Includes cereal, excludes pasture
+mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3 (drops cereal)
+# mod3Vars <- c('GrassWetland','Cereal','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Includes cereal
+# mod3Vars <- c('GrassWetland','Cereal','Canola','TreeShrub','Pulses','Flax','Urban') #Includes cereal, excludes pasture
+
 # mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest','Water') #Expanded variables for mod3
 #Cereal may be causing problems in estimation - collinear with canola
 
@@ -66,7 +68,6 @@ stLegPosX <- 0.85 #Legend position X
 stLegPosY <- 0.3 #Legend position Y
 theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
-
 
 # Pterostichus melanarius ----------------------------------
 
@@ -239,8 +240,14 @@ detach(PteMelMod)
 #Select only Pardosa distincta
 tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
+tempArthF <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017,sex=='F') %>% group_by(BTID) %>% summarize(n=n())
+tempArthM <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017,sex=='M') %>% group_by(BTID) %>% summarize(n=n())
+
 # Takes way longer to run. 5-10 mins +
 ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+
+ParDisModF <- runMods(tempArthF,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+ParDisModM <- runMods(tempArthM,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
 
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
 # load('./data/ParDisMod.Rdata')
