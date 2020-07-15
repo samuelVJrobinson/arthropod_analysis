@@ -28,21 +28,21 @@ oRingMat2Prop$NonCrop <- Reduce('+',oRingMat2Prop[names(oRingMat2Prop) %in% nonC
 #Combine classes that are concurved/represent similar things
 #Trees + Shrubs
 oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
-oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
+# oRingMat2Prop$Shrubland <- NULL; oRingMat2Prop$Forest <- NULL
 
 #Grassland + Wetland
 oRingMat2Prop$GrassWetland <- oRingMat2Prop$Wetland + oRingMat2Prop$Grassland
-oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
+# oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
 
 #Create model formulas
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
 modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
-mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3 (drops cereal)
-# mod3Vars <- c('GrassWetland','Cereal','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Includes cereal
+# mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Variables for mod3 (drops cereal)
+mod3Vars <- c('GrassWetland','Cereal','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #Includes cereal
 # mod3Vars <- c('GrassWetland','Cereal','Canola','TreeShrub','Pulses','Flax','Urban') #Includes cereal, excludes pasture
 
-# mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest','Water') #Expanded variables for mod3
+# mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest') #Expanded variables for mod3 - adding Water causes problems
 #Cereal may be causing problems in estimation - collinear with canola
 
 #Assemble formulas:
@@ -185,15 +185,17 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
-#Grassland effect
-p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
-  smoothPred(mod3,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
+#Cereal effect
+p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Cereal=1) %>% 
+  smoothPred(mod3,whichSmooth=which(grepl('Cereal',sapply(mod3$smooth,function(x) x$label)))) %>% 
+  rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Grassland/Wetland effect')
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Cereal effect')
 
 #Canola effect
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
-  smoothPred(mod3,whichSmooth=6:8) %>% rename(x=distMat,y=endDayMat) %>% 
+  smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
+  rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot(leg=T)+labs(x='Distance (m)',y='Canola effect')
 
@@ -454,15 +456,15 @@ detach(ParMoeMod)
 tempArth <- arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
 #Takes way longer to run. 5-10 mins +
-# OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-# save(OpilioMod,file='./data/OpilioMod.Rdata')
+OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+save(OpilioMod,file='./data/OpilioMod.Rdata')
 load('./data/OpilioMod.Rdata')
 
 #Check models
 attach(OpilioMod)
 # detach(OpilioMod)
 
-AIC(mod1,mod2,mod3,mod4)  #Very little info beyond geography/trap location
+AIC(mod1,mod2,mod3,mod4) #Much less info from landscape level
 
 #Model 3 - none of the fixed terms are super important
 #Model 4 - noncrop land
@@ -520,21 +522,39 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
-#Grassland/wetland
+#Grassland/wetland (distance, time, interaction)
 p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
   smoothPred(mod3,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Grass/Wetland effect')
 
-#Tree/Shrub
-p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
-  smoothPred(mod3,whichSmooth=12:14) %>% rename(x=distMat,y=endDayMat) %>% 
+#Cereal (distance)
+expand.grid(distMat=seq(30,1500,30),Cereal=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=6) %>% 
+  rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Cereal effect')
+
+#Canola (distance)
+expand.grid(distMat=seq(30,1500,30),Canola=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=9) %>% 
+  rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Canola effect')
+
+#Tree/Shrub (weak distance, time interaction)
+expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
+  smoothPred(mod3,whichSmooth=15:17) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot()+labs(x='Distance (m)',y='Tree/shrub effect')
 
-#Flax
-p4 <- data.frame(endDayMat=149:241,Flax=1,y=NA) %>% 
+#Pulses (time only)
+data.frame(endDayMat=149:241,Pulses=1,y=NA) %>% 
   smoothPred(mod3,whichSmooth=19) %>% rename(x=endDayMat) %>% 
+  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
+  effectPlot(leg=F)+labs(x='Time of year',y='Flax effect')
+
+#Flax (time only)
+data.frame(endDayMat=149:241,Flax=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=22) %>% rename(x=endDayMat) %>% 
   mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
   effectPlot(leg=F)+labs(x='Time of year',y='Flax effect')
 

@@ -79,40 +79,19 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
 par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
-detach(ParDisModM)
+#Check concurvity
+concurvity(mod3) #High concurvity
+checkMC <- with(ParMoeModM2,concurvity(mod3,full=F)$estimate)
+termNames <- rownames(checkMC)
+termNames[1] <- 'Linear terms'
+N <- 1:nrow(checkMC) #Plot all smooth terms
+# N <- 4:nrow(checkMC) #Plot with only landscape smoothers
+lN <- length(N)
+matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
+abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
+abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
 
-#Compare parameters
-compareFM <- function(female,male,topTitle=''){
-  #F/M intercepts
-  fInt <- summary(female)[c('p.coeff','p.t','p.pv')] %>% do.call('cbind',.) %>% 
-    cbind(.,p.se=unname(summary(female)[[2]][c(1:5)]),f=1)
-  mInt <- summary(male)[c('p.coeff','p.t','p.pv')] %>% do.call('cbind',.) %>% 
-    cbind(.,p.se=unname(summary(female)[[2]][c(1:5)]),f=0)
-  
-  #Intercepts
-  p1 <- rbind(fInt,mInt) %>% data.frame(.) %>% rownames_to_column('loc') %>% 
-    mutate(loc=gsub('.1','',loc)) %>% mutate(loc=gsub('trapLoc','',loc)) %>% 
-    mutate(upr=p.coeff+p.se,lwr=p.coeff-p.se) %>% mutate(f=factor(f,labels=c('F','M'))) %>% 
-    ggplot(aes(x=loc))+geom_pointrange(aes(y=p.coeff,ymax=upr,ymin=lwr,col=f))+
-    labs(x='Location',y='Intercept',col='Sex')+ scale_colour_manual(values=c('blue','red'))
-  
-  #F/M smoothing terms
-  fS <- summary(female)[c('chi.sq','s.pv','edf')] %>% do.call('cbind',.) %>% cbind(f=1)
-  mS <- summary(male)[c('chi.sq','s.pv','edf')] %>% do.call('cbind',.) %>% cbind(f=0)
-  
-  #Smoothers
-  p2 <- rbind(fS,mS) %>% data.frame %>% rownames_to_column('s') %>% 
-    mutate(s=gsub('.1','',s),s=gsub('s.','',s),s=gsub('ti.','',s)) %>%
-    mutate(s=factor(s,levels=s[f==1],labels=rownames(fS))) %>% 
-    mutate(f=factor(f,labels=c('M','F'))) %>% 
-    ggplot(aes(x=s,y=chi.sq))+geom_col(aes(fill=f),position=position_dodge())+
-    #facet_wrap(~f,ncol=1)+
-    theme(axis.text.x=element_text(angle=90))+
-    labs(x='Smoother',y='Chi square value',fill='Sex')+
-    scale_fill_manual(values=c('blue','red'))
-  
-  ggarrange(p1,p2,ncol=1,common.legend=TRUE,legend='right') 
-}
+detach(ParDisModM)
 
 compareFM(ParDisModF$mod3,ParDisModM$mod3)
 
@@ -207,10 +186,85 @@ ggarrange(p1,p2,p3,p4,p5,p6,p7,
 
 arth %>% filter(genus=='Pardosa',species=='moesta',year==2017) %>% group_by(sex) %>% summarize(n=n())
 
+#Do males and females have different responses to landscape?
+tempArthF <- arth %>% filter(genus=='Pardosa',species=='moesta',year==2017,sex=='F') %>% group_by(BTID) %>% summarize(n=n())
+tempArthM <- arth %>% filter(genus=='Pardosa',species=='moesta',year==2017,sex=='M') %>% group_by(BTID) %>% summarize(n=n())
+
+#Trying with cereal for now. Males have stronger response, but may be effect of concurvity. 
+#Does concurvity impact results from other critters? If so, it may be better to leave cereal in and let shrinkage take care of it. 
+ParMoeModF <- runMods(tempArthF,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+ParMoeModM <- runMods(tempArthM,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+save(ParMoeModF, file='./data/ParMoeModF.Rdata')
+save(ParMoeModM, file='./data/ParMoeModM.Rdata')
+load('./data/ParMoeModF.Rdata')
+load('./data/ParMoeModM.Rdata')
+
+#Females
+attach(ParMoeModF)
+
+AIC(mod1,mod2,mod3,mod4) #Landscape model performs better
+#Model 3 
+summary(mod3) 
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75) #ti(TreeShrub) has NA entries
+matrixplot(sp.vcov(mod3),c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75) #ti(TreeShrub) has NA entries
+
+#Variogram of residuals - no pattern
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  # group_by(ID) %>% summarize(resid=sum(abs(resid))) %>% ungroup() %>% 
+  as_Spatial() %>% variogram(resid~1,.) %>% plot()
+
+#Check k values
+par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
+
+#Check concurvity
+concurvity(mod3) #High concurvity
+checkMC <- with(ParMoeModM2,concurvity(mod3,full=F)$estimate)
+termNames <- rownames(checkMC)
+termNames[1] <- 'Linear terms'
+N <- 1:nrow(checkMC) #Plot all smooth terms
+# N <- 4:nrow(checkMC) #Plot with only landscape smoothers
+lN <- length(N)
+matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
+abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
+abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
+
+detach(ParMoeModF)
+
+#Males
+attach(ParMoeModM)
+
+AIC(mod1,mod2,mod3,mod4) #Landscape model performs better
+#Model 3 
+summary(mod3) 
+matrixplot(abs(cov2cor(sp.vcov(mod3))),c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75) 
+matrixplot(sp.vcov(mod3),c('scale',names(mod3$sp)),mar=c(1,10,10,1),numSize=0.75) 
+
+#Variogram of residuals - no pattern
+tempTrap %>% mutate(resid=resid(mod3)) %>% 
+  # group_by(ID) %>% summarize(resid=sum(abs(resid))) %>% ungroup() %>% 
+  as_Spatial() %>% variogram(resid~1,.) %>% plot()
+
+#Check k values
+par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
+
+detach(ParMoeModM)
+
+compareFM(ParMoeModF$mod3,ParMoeModM$mod3,vlines=2.5+rep(0:7)*3)
+
 # Phalangium opilio -----------------------
 
 #Many unsexed P. opilio
-arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(sex) %>% summarize(n=n()) 
+arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(sex) %>% summarize(n=n())
+
+#Are they all from the same locations? Looks like it. Would likely have to drop time aspect of models.
+arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(BLID,pass,sex,.drop=FALSE) %>% summarize(n=n()) %>% ungroup() %>% 
+  mutate(sex=ifelse(sex=='','na',tolower(sex))) %>% 
+  pivot_wider(names_from=sex,values_from=n,values_fill=list(n=0)) %>% mutate(propNA=na/(na+f+i+m)) %>%
+  inner_join(select(site,BLID,lat,lon),by='BLID') %>% 
+  st_as_sf(coords=c('lon','lat'),crs=4326) %>% 
+  ggplot()+geom_sf(aes(col=propNA))+facet_wrap(~pass)
 
 tempArthF <- arth %>% filter(arthOrder=='Opiliones',year==2017,sex=='F') %>% group_by(BTID) %>% summarize(n=n())
 tempArthM <- arth %>% filter(arthOrder=='Opiliones',year==2017,sex=='M') %>% group_by(BTID) %>% summarize(n=n())

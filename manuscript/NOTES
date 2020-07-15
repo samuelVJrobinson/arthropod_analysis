@@ -186,6 +186,8 @@ Very few examples of how to deal with concurvity properly
     - https://jroy042.github.io/nonlinear/week3.html
   - Wood's approach isn't very helpful; I suspect he doesn't have a solution to the problem. Not mentioned in GAM 2nd ed, but briefly mentioned in some lectures
     - https://people.maths.bris.ac.uk/~sw15190/mgcv/tampere/mgcv-advanced.pdf
+  - Amodio et al 2014:
+  https://rivista-statistica.unibo.it/article/view/4599/4084
     
     
 Notes from Kevin Floate:
