@@ -1,5 +1,7 @@
 ---
-title: Landscape composition and beneficial insects
+title: Landscape composition and beneficial insects - time is important
+# PG: time is important in this paper - conservation efforts should consider temporal availability of resources
+# Find the angle and write for this
 # subtitle: 
 author:
   - name: Samuel Robinson
