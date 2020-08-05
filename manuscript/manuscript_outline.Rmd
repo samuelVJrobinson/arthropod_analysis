@@ -68,6 +68,16 @@ load('../data/ParDisMod.Rdata')
 load('../data/ParMoeMod.Rdata')
 load('../data/OpilioMod.Rdata')
 
+#Get landscape % cover for each cover class
+coverList <- PteMelMod$datList[9:25]
+siteID <- as.numeric(rownames(unique(cbind(PteMelMod$datList$E,PteMelMod$datList$N))))
+coverList <- lapply(coverList,function(x){
+  data.frame(site=as.character(siteID),x[siteID,]) %>%  #Get unique sites only, convert to DF
+  pivot_longer(cols=d30:d1500,names_to='dist',values_to='prop') %>% 
+  mutate(dist=as.numeric(gsub('d','',dist)))
+})
+coverList <- data.frame(cover=rep(names(coverList),each=nrow(coverList[[1]])),do.call('rbind',coverList))
+
 #Extract Pterostichus melanarius results
 pmelRes <- summary(PteMelMod$mod3)
 pmelLinTerms <- pmelRes$p.table %>% as.data.frame() %>% 
@@ -194,11 +204,12 @@ Finally, _Phallangium opilio_ is a widely-distributed generalist harvestman, who
 To characterize landscape composition surrounding the traps, we used classified landscape data from @AAFC_data.
 <!-- + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%) -->
 We combined functionally similar landscape categories (cereals: _Triticum aestivum_ and _Hordeum vulgare_, pulses: _Pisum sativum_ and _Lens culinaris_, forest: coniferous and broadleaf), then extracted the landscape composition within a circle of a fixed radius surrounding each trap location. 
-However, the radius of the circle necessary to characterize the landscape depends on the ``grain" of the landscape that is relevant to the abundance of a given organism [@addicott1987].
+The ten most-common cover classes represented 98% of the total land cover in our study region: grassland, cereal, canola, pasture, pulses, wetland, urban, shrubland, flax, and forest (Figure \@ref(fig:landscapeComp)); flax was removed, as only a single site had nearby flax cover.
+The radius of the circle necessary to characterize the landscape depends on the scale of the landscape that matters to a given organism [@addicott1987].
 Therefore, we divided the landscape into annuli (rings) surrounding each trap location.
 Each annulus was 30 m thick, and had inner radii ranging from 30 to 1470m, in increments of 30m.
 Using functional regression [@ramsay2004], we were able to incorporate landscape information at different distance, allowing us to assess the impact of both local and regional landscape composition.
-  
+
 ## Statistics
 
 We used functional regression to model the effect of landscape composition on activity density.
@@ -212,6 +223,8 @@ Activity density of each arthropod was fit as generalized additive models @wood2
 Count data of arthropods were fit using a negative binomial distribution with a log-link.
 To account for different lengths of trap exposure, log-days since trap placement was used as a fixed effect with its slope held at 1 ("offset" variable).
 We included day of year as a 1-dimensional smooth and easting and northing as a 2-dimensional smooth, in order to account for underlying spatial and temporal autocorrelation in the data.
+The deviance residuals from each model were visually inspected for normality and equal variance.
+
 For each landscape term, we used three SoF regression terms:
 First, we used the proportion cover of all landscape cover classes in the annuli surrounding each trap location (spatial effect of cover class).
 Second, we used day of the year multiplied by the proportion of cover classes in each annuli (temporal effect of cover class). 
@@ -219,7 +232,7 @@ Finally, we used a tensor-product interaction of landscape cover and day of year
 We used 10 basis dimensions for the spatial and temporal landscape smoothers, and 16 basis dimensions for the spatio-temporal interaction.
 This was deemed adequate, as the effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
 To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage ("bs=`ts'" in _mgcv_).
-This is a continuous analog to stepwise model selection, whereby weaker terms can be completely removed from the model, rather than just reduced to a line [@marra2011].
+This is a continuous analog to stepwise model selection, whereby weaker terms can be completely removed from the model rather than reduced to a line [@marra2011].
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
   
 Functional regression plots of landscape composition reveal which cover classes are acting as sources or sinks of organisms.
@@ -234,9 +247,10 @@ Alternatively, a cover class could act as a sink by providing high-quality habit
 Some of the landscape terms in our model were strongly concurved, so we removed them from the model or combined them.
 Concurvity is a nonlinear analogue of multicollinearity, and can bias estimates of standard errors [@buja1989].
 There is no agreed-upon threshold of "unacceptable" concurvity, but 0.5 is commonly used [@dominici2002; @ramsay2003]. 
-Some landscape terms were strongly concurved (Figure \@ref(fig:concurvity)), namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63).
+Some landscape terms were strongly concurved (Figure \@ref(fig:concurvityFull)), namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63).
 Forest and shrubland were combined into the ``Tree/Shrub" category, grassland and wetland were combined into the "Grass/Wetland" category, as they were strongly positively correlated at all distances, indicating similar feature classes.
 Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola -> wheat -> barley) and the landscape structure present across our study region.
+This resulted in a much-reduced set of landscape terms, none of which were strongly concurved with each other (Figure \@ref(fig:concurvity)) 
   
 <!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity density -->
 <!--   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data  -->
@@ -341,9 +355,6 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Pulses          | - Overall source (late)    |                            | - Landscape source          |                       |
 +-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
-| Flax            | - Local sink               |                            |                             | - Overall sink        |
-|                 | - Landscape sink           |                            |                             |                       |
-+-----------------+----------------------------+----------------------------+-----------------------------+-----------------------+
 | Urban           |                            |                            | - Local source (early)      |                       |
 |                 |                            |                            | - Local sink (early)        |                       |
 |                 |                            |                            | - Landscape sink (late)     |                       |
@@ -403,12 +414,21 @@ Should also be linked to ecosystem services (e.g. predation on bait insects or w
 
 \beginsupplement
 
-```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for top land cover classes'}  
-  include_graphics('../figures/coverCorPlots/concurvityEstimate.png')
+```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Overall percent cover for each cover class is listed in each sub-figure heading.'}  
+coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p=100*round(p/sum(unique(p)),4)) %>% 
+  mutate(cover=paste0(as.character(cover),' (',p,'%)'),prop=prop*100) %>% 
+  mutate(cover=factor(cover,levels=unique(cover))) %>% 
+  ggplot(aes(dist,prop,group=site))+geom_line(alpha=0.2)+
+  facet_wrap(~cover)+theme_classic()+labs(y='Percent cover',x='Distance (m)')
+
 ```
 
-```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location'}  
-  include_graphics('../figures/oRingPlot2_AAFC.png')
+```{r concurvityFull, echo=FALSE, fig.cap='Concurvity estimates for ten most-abundant land cover classes'}  
+  include_graphics('../figures/coverCorPlots/concurvityEstimate_full.png')
+```
+
+```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for reduced cover classes used in models'}  
+  include_graphics('../figures/coverCorPlots/concurvityEstimate_reduced.png')
 ```
 
 ```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pterostichus melanarius_ activity density'}
