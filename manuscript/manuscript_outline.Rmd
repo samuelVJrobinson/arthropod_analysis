@@ -146,7 +146,7 @@ Important for global biodiversity - insects may be declining globally
 Agriculture is ~36% of land worldwide
 Potential for win-win scenarios
   
-Understanding of how landscape structure drives beneficial arthropod abundance is incomplete
+Landscape structure drives beneficial arthropod abundance, and is key for understanding how to manage benefical insects
 Bees are generally driven by flower/nest substrate availability [@roulston2011]
 Limited understanding of other arthropods (but see ``beetle hedges" from UK?)
 Beetles are limited by water, food, and oviposition sites [@lovei1996]
@@ -156,14 +156,15 @@ Arachnids are similarly limited by food, shelter
 Landscape structure can influence abundance of beneficial arthropods in agricultural areas [@albrecht2010]
 Spillover occurs when organisms migrate from suitable habitat patches
 Can occur with pests or beneficial organisms [@woodcock2016]
+Contrast between landscape and local SNL is important [@boetzl2020; @vanSchalkwyk2020]; small patches can have a large effect if overall landscape lacks SNL
 Management goal: be able to design landscapes that benefit both farmers and insect diversity/abundance
   
-Point estimates of abundance are influenced by spatio-temporal processes 
+Abundance is also influenced by spatio-temporal processes, such as phenology and migration
 Arthropods move between landscape components depending on their life history
 e.g. Carabid beetles are thought to reproduce in field margins, but adults feed in fields [@desender1988]
 This means that spillover depends not only on habitat type, but on time of the year
 Certain habitat types may be sources of arthropods during some times of the year, but sinks during other times
-Counts in pitfall traps are a proxy of activity density (not actual density), but this is probably an OK measure, at least within fields [@lang2000]
+<!-- Counts in pitfall traps are a proxy of activity density (not actual density), but this is probably an OK measure, at least within fields [@lang2000] -->
   
 In this study, we used pitfall trap counts of three species of beneficial arthropod to determine how landscape composition affects activity density of arthropods.
 We hypothesized that:
