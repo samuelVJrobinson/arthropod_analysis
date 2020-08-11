@@ -157,19 +157,19 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 # Introduction - needs flushing out
 
 <!-- "Throwaway paragraph" -->
-Arthropod diversity is important to understand in agricultural systems
-Pests can cause large amounts of damage
-Beneficial insects can offset this
-Important for global biodiversity - insects may be declining globally
-Agriculture constitutes ~36% of land worldwide [@ramankutty2018], meaning large conservation potential
-Potential for win-win scenarios
-  
-Landscape structure drives beneficial arthropod abundance [@albrecht2010], and is key for understanding how to manage benefical arthropods in agroecosystems [@martin2020]
+Arthropods are one of the most influential groups of animals in agricultural systems.
+Pest arthropods can cause huge amounts of damage to crops, resulting in yield losses for farmers and negative downstream economic effects.
+On the other hand, beneficial arthropods can deliver increased crop yields from extra pollination or free pest control.
+The seasonal "pulses" of food resources from agricultural land act as a bottom-up driver of arthropod communities, which include both native and introduced species.
+Agricultural land also constitutes 15 million km^2 (~36%) of land worldwide [@ramankutty2018], meaning that conservation of insect biodiversity should consider agricultural practices, as small changes in agricultural practices can have large effects globally.
+In particular, land managers and conservationists are interested in finding "win-win" practices; that is, practices that result in better conservation outcomes while achieving the same (or higher) crop yields.
+
+One method of passively manipulating agricultural arthropods is through landscape management [@albrecht2010; @landis2000; @martin2020].
 Non-cultivated areas, such as natural or semi-natural land (SNL) can act as important habitat for some arthropods [@duelli2003].
-Ground-nesting bees are generally driven by flower/nest substrate availability [@roulston2011], and beetles can be limited by water, food, and oviposition sites [@lovei1996; @gardiner2010].
+Ground-nesting bees are generally driven by flower and nest availability [@roulston2011], and beetles can be limited by water, food, and egg-laying sites [@lovei1996; @gardiner2010].
 However, while the effect of SNL on bees is generally positive, its effect on beetles and parasitoids less consistent [@macfadyen2013; @shackelford2013] 
 Other organisms may use SNL as travel corridors or overwintering sites, but may not be directly dependent on them for reproduction.
-Spillover from SNL occurs when organisms migrate from SNL into adjacent cropland [@woodcock2016; @scheiner2020]. 
+Spillover from SNL occurs when organisms migrate from SNL into adjacent cropland, or from cropland into SNL [@tscharntke2005b]. 
 The degree to which spillover occurs depends on the life history of the organism in question, as well as their reliance on the specific type of SNL.
 Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers [@oberg2008].
 
@@ -193,8 +193,9 @@ Finally, different SNL patches may act as sources or sinks of arthropods at diff
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal activity density of arthropods across a prairie agroecosystem.
 We hypothesized that:
-1. Untilled semi-natural land (SNL) provides oviposition and feeding areas for predatory arthropods, meaning that nearby SNL should act as a source of arthropods during the early part of the season, and a sink during the later part of the season. 
-2. Crops in agricultural land act as sources of pest insects during the growing season, while crop senescence at the end of the season causes a crash in the number of pests. This should result in agricultural land becoming a sink for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
+1. Untilled semi-natural land (SNL) provides egg-laying and feeding areas for predatory arthropods, meaning that nearby SNL should act as a source of arthropods during the early part of the season, and a sink during the later part of the season. 
+2. Crops in agricultural land act as sources of food for predatory arthropods during the growing season, while crop senescence at the end of the season causes a crash as pest popuations decrease. This should result in agricultural land becoming a sink for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
+3. Crops may act as a temporary feeding site for predators, but do not act as permanent habitat. Therefore, crops may act as a local sink for arthropods, but will also be negatively associated at larger (landscape-level) scales.
 Using a novel statistical technique, we were able to isolate seasonal signals of changes in arthropod abundance at multiple landscape scales.
 
 # Methods
