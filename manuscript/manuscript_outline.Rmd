@@ -5,6 +5,7 @@ title: Non-crop features influence the abundance and timing of beneficial arthro
 #Potential titles:
 # Non-crop features influence the abundance and timing of beneficial arthropod abundance
 # Seasonal sinks and sources of beneficial arthropods in Canadian prairie agroecosystems
+# Non-crop features create seasonal sinks and sources of beneficial arthropods
 # 
 # subtitle: 
 author:
@@ -156,12 +157,12 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 # Introduction - needs flushing out
 
-<!-- "Throwaway paragraph" -->
+<!-- Ralph's "throwaway paragraph" -->
 Arthropods are one of the most influential groups of animals in agricultural systems.
 Pest arthropods can cause huge amounts of damage to crops, resulting in yield losses for farmers and negative downstream economic effects.
 On the other hand, beneficial arthropods can deliver increased crop yields from extra pollination or free pest control.
 The seasonal "pulses" of food resources from agricultural land act as a bottom-up driver of arthropod communities, which include both native and introduced species.
-Agricultural land also constitutes 15 million km^2 (~36%) of land worldwide [@ramankutty2018], meaning that conservation of insect biodiversity should consider agricultural practices, as small changes in agricultural practices can have large effects globally.
+Agricultural land also constitutes 15 million km$^2$ (~36%) of land worldwide [@ramankutty2018], meaning that conservation of insect biodiversity should consider agricultural practices, as small changes in agricultural practices can have large effects globally.
 In particular, land managers and conservationists are interested in finding "win-win" practices; that is, practices that result in better conservation outcomes while achieving the same (or higher) crop yields.
 
 One method of passively manipulating agricultural arthropods is through landscape management [@albrecht2010; @landis2000; @martin2020].
@@ -371,19 +372,19 @@ Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate th
 |                 |                            |                            | - Landscape source (late) |                         |
 +-----------------+----------------------------+----------------------------+---------------------------+-------------------------+
 
-<!-- This table looks like garbage, but I don't think pander will make it any better -->
+<!-- This table looks terrible, but I don't think pander will make it any better -->
 
-The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, primarily to different crop types (Table \@ref(tab:sumTab),\@ref(tab:PteMelSmooth)).
-Of the non-crop land categories, grassland and wetland cover acted as a late-season sink, suggesting that _P. melanarius_ may migrate into it at the end of the summer.
+The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, primarily to canola, pulses, and grass and wetland cover.
+Grassland and wetland cover acted as a late-season sink, suggesting that _P. melanarius_ may migrate into it at the end of the summer.
 Other studies have found similar results, suggesting that untilled land is important off-field habitat for carabids [@desender1988; @fournier2002; but see @hatten2007].
 In particular, @purtauf2005 found that carabid density increased with proportion of nearby grasslands; our finding of grassland/wetland as late-season sink may represent _P. melanarius_ moving to overwintering habitat at the end of the season.
 However, _P. melanarius_ is also found in a wide variety of habitats, and tends to prefer agricultural fields [@larsen2003], which our models also demonstrated.
-We also found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_. 
-The roles that carabids play in pulse crops is not well-studied, but carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990].
-_P. melanarius_ is also known to prey upon other carabids that are predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011].
-Either way this suggests that pulses may represent a potential food resource for _P. melanarius_, at least earlier in the season.
+We also found that canola and pulse crops acted as early- and mid-season sources of _P. melanarius_.
+Early in the season, canola crops acted as local source but a landscape-level sink, which may indicate that they provide only temporary feeding habitat.
+The effect of pulse crops on carabid abundance is not well-studied, but our results suggest that pulses may represent a potential food resource for _P. melanarius_.
+Carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990], and _P. melanarius_ can prey upon other carabids that are predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011], so this effect may be direct or indirect.
+
 <!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
- 
 <!-- Surprisingly, flax acted as a local and landscape level sink for _P. melanarius_, and as an overall sink for _P. opilio_, suggesting that it may be inappropriate feeding or nesting cover for these beneficial arthropods. -->
 <!-- Flax is more sensitive to weed competition than other small grains [@friesen1986; @kandel2020], so weed control tends to be more intense. -->
 <!-- Lower weed abundance may cause flax fields to have lower levels of weed seeds to feed on, causing seed-feeding carabids to move to other locations [@trichard2014]. -->
@@ -392,16 +393,18 @@ Either way this suggests that pulses may represent a potential food resource for
 <!-- To our knowledge, there is no published research investigating effects of flax cropping on beneficial arthropods, so the causes of this pattern are speculative. -->
  
 The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but in slightly different ways.
+Canola acted as an early-season source for both species, indicating that _Pardosa_ may use canola as foraging grounds, similar to _P. melanarius_.
+The response to other landscape cover classes, however, was different between each species.
+Aside from the (weak) effect of canola, we found that the only other landscape classes that influenced _P. distincta_ were pasture, and trees and shrubs.
+Pasture had a negative effect at the landscape scale, and trees and shrubs acted as a late season sink, suggesting that they use woody shrubs and trees for overwintering or winter foraging [@aitchison1984].
+_Pardosa_ are found in areas close to disturbed roadside strips [@drapela2008; @drapela2011; @kowal2011], but _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010].
+@moring1994 showed that _P. distincta_ were more active in grassy habitats, but we did not find evidence of this, aside from generally higher activity density in trap locations with higher grass cover (Figure \@ref(fig:ParDisLandscape)a).
+For _P. moesta_, we found that roads clearly acted as an early source and a late sink [similar to @drapela2008 and @drapela2011]. 
+Grassland and wetland, as well as pulses, also acted as a local sink, but a landscape-level source, suggesting that they draw _P. moesta_ away from trapping locations but enhance their landscape-level abundance.
 Lycosids employ a wandering-active predation strategy [@young1990], meaning that nearby landscape composition may be more influential than large-scale composition [@oberg2007; @oberg2008].
-Canola acted as an early-season source for both species, indicating that _Pardosa_ may use canola as foraging grounds.
-Trees and shrubs acted as a late season sink in both species, suggesting that they migrate to off-field areas with woody shrubs and trees for overwintering [but _P. distincta_ are known to be active during the winter; @aitchison1984].
-@drapela2011 also found that _Pardosa agrestis_ had higher activity density in areas with woody trees and shrubs.
-@moring1994 showed that _P. distincta_ were more active in grassy substrates.
-While _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2008; @drapela2011; @kowal2011], _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010].
-We found that roads clearly acted as an early source and a late sink of _P. moesta_.
-Grassland and wetland, as well as pulses, also acted as a local sink, but a landscape-level source for _P. moesta_.
+However, we showed that several landscape features were also important at large spatial scales, including grass and wetland, pasture, pulses, and urban, showing that their dispersal distance may be further than previously though.
   
-_Phalangium opilio_ activity density responded grasslands and wetlands (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):GrassWetland'])`) and trees/shrubland (p=`r with(opilSmTerms,p[Smoother=='ti(distMat,endDayMat):TreeShrub'])`).
+_Phalangium opilio_ activity density responded to grasslands and wetlands.
 _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011].
 In particular, it is largely found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc].
 Our results show that _P. opilio_ migrated into pastures.
