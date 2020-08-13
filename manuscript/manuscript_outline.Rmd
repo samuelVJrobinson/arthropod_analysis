@@ -153,6 +153,11 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   bind_rows(rownames_to_column(data.frame(gam.vcomp(OpilioMod$mod3),spp='Phalangium opilio'),'term')) %>%
   mutate(term=factor(term,levels=names(PteMelMod$mod3$sp)))
 
+#Calculate marginal and conditional R2 (Nakagawa and Schielzeth 2013)
+r2Nakagawa <- sapply(list(PteMelMod=PteMelMod,ParDisMod=ParDisMod,ParMoeMod=ParMoeMod,OpilioMod=OpilioMod), function(modList){
+  with(modList,getR2Terms(mod3,intVal=exp(mod1$coefficients[[1]]),thetaVal=mod1$family$getTheta(TRUE)))
+})
+
 ```
 
 # Introduction - needs flushing out
@@ -404,10 +409,11 @@ Grassland and wetland, as well as pulses, also acted as a local sink, but a land
 Lycosids employ a wandering-active predation strategy [@young1990], meaning that nearby landscape composition may be more influential than large-scale composition [@oberg2007; @oberg2008].
 However, we showed that several landscape features were also important at large spatial scales, including grass and wetland, pasture, pulses, and urban, showing that their dispersal distance may be further than previously though.
   
-_Phalangium opilio_ activity density responded to grasslands and wetlands.
+_Phalangium opilio_ activity density responded to grasslands and wetlands as well as trees and shrubs, but habitat
+Grasslands and wetlands acted 
+
 _P. opilio_ avoids heavily grazed areas, possibly due to low humidity, but is active in most other habitat types [@sajna2011].
 In particular, it is largely found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc].
-Our results show that _P. opilio_ migrated into pastures.
 It is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern (albeit weakly): _P. opilio_ appears to migrate into forests.
   

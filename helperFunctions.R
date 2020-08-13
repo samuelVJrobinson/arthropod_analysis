@@ -219,3 +219,51 @@ compareFM <- function(female,male,topTitle='',vlines=NA){
   
   ggarrange(p1,p2,ncol=1,common.legend=TRUE,legend='right') 
 }
+
+#Function to extract marginal variance from terms from a GAM (a la Nakagawa and Schielzeth 2013)
+getR2Terms <- function(mod,intVal,thetaVal){ #Model object, plus intercept value from null model.
+  #Note from Appendix: intVal (exp(beta0)) should be obtained either from a model with centred or scaled variables (sense Schielzeth 2010), or an intercept‐only model while including all random effects. Not clear whether this should be done with theta as well, but I assume so.
+  #Assumes models follow same structure as used in frAnalysis.R
+  
+  #Distribution-specific variance:
+  
+  #For a poisson distribution (see Appendix 1 in https://doi.org/10.1111/j.2041-210x.2012.00261.x):
+  # E(x) = lambda
+  # var(x) = lambda
+  # var(ln(x)) = ln(1 + var(x)/lambda^2)
+  #            = ln(1 + lambda/lambda^2)
+  #            = ln(1 + 1/lambda)
+  
+  #For a negative binomial distribution (see Appendix 1 in https://doi.org/10.1101/095851):
+  # E(x) = mu
+  # var(x) = mu(1+mu/theta)
+  # var(ln(x)) = ln(1 + var(x)/mu^2)
+  #            = ln(1 + mu(1+mu/theta)/mu^2)
+  #            = ln(1 + 1/mu + 1/theta)
+  #            = ln(1 + 1/exp(Intercept) + 1/theta)
+  
+  c1 <- mod$coefficients #Coefs
+  m1 <- model.matrix(mod) #Model matrix
+  
+  #Linear terms
+  lt <- attributes(mod$pterms)$term.labels
+  ltVar <- sapply(lt,function(x) var(m1[,grepl(x,colnames(m1))] %*% c1[grepl(x,names(c1))])) 
+  
+  #Smooth terms
+  st <- sapply(mod$smooth,function(x) x$label) #Get smoothing terms
+  st <- unique(gsub('(s|ti)\\((distMat|endDayMat|distMat,endDayMat)\\)\\:','',st)) #Reduce to unique terms
+  sVar <- sapply(st,function(x) var(m1[,grepl(x,colnames(m1),fixed=TRUE)] %*% c1[grepl(x,names(c1),fixed=TRUE)]))
+  
+  #Variance for each model component (sigma^2_f)
+  sigmaF <- data.frame(terms=c(lt,st),var=c(ltVar,sVar),row.names=NULL) #"Fixed" terms
+  
+  #Distribution-specific variance (sigma^2_d) - assumes intercept is 0
+  sigmaD <- log(1+(1/intVal)+(1/thetaVal))
+  
+  r2 <- c(sum(sigmaF$var[c(1,4:9)])/(sum(sigmaF$var)+sigmaD), #"Marginal" R2 (no spatial/temporal smoothers)
+          sum(sigmaF$var)/(sum(sigmaF$var)+sigmaD)) #Conditional R2
+  names(r2) <- c('Marginal','Conditional')
+  
+  return(r2)
+}
+
