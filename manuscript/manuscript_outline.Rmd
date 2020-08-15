@@ -46,33 +46,17 @@ header-includes:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
+# library(kableExtra)
 library(tidyverse)
 library(mgcv)
-library(pander)
-
-#Helper functions
-
-#Capitalize
-firstUpper <- function(x){
-  paste0(toupper(substring(x,1,1)),substring(x,2,nchar(x)))
-}
-
-#Rounds to dig digits, converts to character, anything less than digits becomes "<0.xx1"
-# Useful for tables
-roundLess <- function(x,dig){
-  x <- as.character(round(x,dig))
-  x[x=='0'] <- paste0('<0.',strrep('0',dig-1),'1',collapse='')
-  return(x)
-}
-
-boldRMD <- function(x) paste0('**',x,'**') #Makes text bold in rMarkdown
-boldLaTeX <- function(x) paste0('\\textbf{',x,'}') #Makes text bold in LaTeX
 
 #Load models
 load('../data/PteMelMod.Rdata')
 load('../data/ParDisMod.Rdata')
 load('../data/ParMoeMod.Rdata')
 load('../data/OpilioMod.Rdata')
+
+source('../helperFunctions.R') #Load helper functions
 
 #Get landscape % cover for each cover class
 coverList <- PteMelMod$datList[9:25]
@@ -83,6 +67,21 @@ coverList <- lapply(coverList,function(x){
   mutate(dist=as.numeric(gsub('d','',dist)))
 })
 coverList <- data.frame(cover=rep(names(coverList),each=nrow(coverList[[1]])),do.call('rbind',coverList))
+
+
+#Calculate marginal and conditional R2 (Nakagawa and Schielzeth 2013)
+
+#Overall R2 (conditional/marginal)
+r2Nakagawa <- sapply(list(PteMelMod=PteMelMod,ParDisMod=ParDisMod,ParMoeMod=ParMoeMod,OpilioMod=OpilioMod), function(modList){
+  with(modList,getR2Terms(mod3,intVal=exp(mod1$coefficients[[1]]),thetaVal=mod1$family$getTheta(TRUE)))
+}) %>% round(.,3) %>% as.data.frame()
+
+#Piecewise R2
+r2Nakagawa2 <- lapply(list(PteMelMod=PteMelMod,ParDisMod=ParDisMod,ParMoeMod=ParMoeMod,OpilioMod=OpilioMod), function(modList){
+  with(modList,getR2Terms(mod3,intVal=exp(mod1$coefficients[[1]]),thetaVal=mod1$family$getTheta(TRUE),individual=TRUE)) %>%
+    mutate(fixed=!grepl('(day|E,N|sigmaD)',terms),random=grepl('(day|E,N)',terms)) %>% 
+    mutate(r2comp=round(var/sum(var),4))
+}) %>% do.call('rbind',.) %>% rownames_to_column('model') %>% mutate(model=gsub('.[0-9]{1,2}','',model))
 
 #Extract Pterostichus melanarius results
 pmelRes <- summary(PteMelMod$mod3)
@@ -153,10 +152,6 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   bind_rows(rownames_to_column(data.frame(gam.vcomp(OpilioMod$mod3),spp='Phalangium opilio'),'term')) %>%
   mutate(term=factor(term,levels=names(PteMelMod$mod3$sp)))
 
-#Calculate marginal and conditional R2 (Nakagawa and Schielzeth 2013)
-r2Nakagawa <- sapply(list(PteMelMod=PteMelMod,ParDisMod=ParDisMod,ParMoeMod=ParMoeMod,OpilioMod=OpilioMod), function(modList){
-  with(modList,getR2Terms(mod3,intVal=exp(mod1$coefficients[[1]]),thetaVal=mod1$family$getTheta(TRUE)))
-})
 
 ```
 
@@ -251,6 +246,7 @@ We used 10 basis dimensions for the spatial and temporal landscape smoothers, an
 This was deemed adequate, as the effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
 To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage ("bs=`ts'" in _mgcv_).
 This is a continuous analog to stepwise model selection, whereby weaker terms can be completely removed from the model rather than reduced to a line [@marra2011].
+Finally, we calculated the R$^2$ for each group of terms in each model [@nakagawa2013; @nakagawa2017].
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
 
 Some of the landscape terms in our model were strongly concurved, so we removed them from the model or combined them.
@@ -302,11 +298,10 @@ Nearby grassland/wetland cover had a neutral effect early in the summer, but a n
 Nearby canola had a positive effect in the early summer, but conversely, far-away canola (>800 m) had a negative effect, indicating that areas with widespread amounts of canola coverage had lower _P. melanarius_ activity density than those with only local canola cover.
 Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest.
 Finally, _P. melanarius_ activity density had a very strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were strong drivers of ground beetle activity density (Figure \@ref(fig:PteMelSpatiotemporal)).
-Together, the landscape composition and the spatio-temporal component explained `r round(with(PteMelMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(PteMelMod,summary(mod3)$r.sq),3)`).
-<!-- + This could be related to climatic drivers (rainfall, growing degree days), or could simply represent a single yearly realization of a spatio-temporal random field  -->
+The landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`%  of variance in activity density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
-```{r PteMelLandscape, echo=FALSE, fig.cap='Landscape influence on _Pterostichus melanarius_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
-  include_graphics('../figures/Pterostichus_melanarius_fixeff.png')
+```{r PteMelLandscape, echo=FALSE, fig.cap='Landscape influence on _Pterostichus melanarius_ activity density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)
 ```
 
 
@@ -320,14 +315,14 @@ Trees and shrubs acted as a sink for _P. distincta_ later in the season, and as 
 Grass and wetlands had strong local negative effect on _P. moesta_, but a positive landscape-level effect, indicating that while these cover types act as a sink, the general amount of grasslands and wetlands in the area have a positive effect on _P. moesta_ abundance.
 _P. distincta_ was similarly affected by pulses: landscape-level abundance of pulses had a positive effect, but the local effect was neutral.
 Finally, activity density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_ (Figure \@ref(fig:ParDisSpatiotemporal)a, p=`r with(pdisSmTerms,p[Smoother=='s(Day)'])`) whereas the spatial component was dominant for _P. moesta_ (Figure \@ref(fig:ParMoeSpatiotemporal)b, p=`r with(pdisSmTerms,p[Smoother=='s(E,N)'])`).
-The landscape composition and the spatio-temporal component explained `r round(with(ParDisMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParDisMod,summary(mod3)$r.sq),3)`) and `r round(with(ParMoeMod,summary(mod3)$dev.expl),3)*100`% of deviance ($R^2_{adj}$ = `r round(with(ParMoeMod,summary(mod3)$r.sq),3)`) for _P. distincta_ and _P. moesta_, respectively.
+The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]*100`%  and `r r2Nakagawa$ParMoeMod[1]*100`% of variance in activity density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(ParDisMod[2]-ParDisMod[1])*100)`%  and `r with(r2Nakagawa,(ParMoeMod[2]-ParMoeMod[1])*100)`%, for _P. distincta_ and _P. moesta_ respectively.
 
-```{r ParDisLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa distincta_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
-  include_graphics('../figures/Pardosa_distincta_fixeff.png')
+```{r ParDisLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa distincta_ activity density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Pardosa_distincta_fixeff.png',dpi=NA)
 ```
 
-```{r ParMoeLandscape, echo=FALSE, fig.cap='Landscape influence on \\emph{Pardosa moesta} activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
-  include_graphics('../figures/Pardosa_moesta_fixeff.png')
+```{r ParMoeLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa moesta_ activity density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Pardosa_moesta_fixeff.png',dpi=NA)
 ```
 
 ## *Harvestman:* Phalangium opilio 
@@ -338,19 +333,32 @@ Nearby grassland/wetland and trees/shrubs both had a negative effect on _P. opil
 However, the specific effect of these land cover types was not very large, as a competing model using only non-crop cover performed slightly better (Full model AIC = `r with(OpilioMod, sprintf("%.1f",AIC(mod3)))`, Non-crop model AIC = `r with(OpilioMod, sprintf("%.1f",AIC(mod4)))`).
 The temporal and spatial components, as in the other two species, were both very strong (both p`r with(opilSmTerms,p[grepl('E,N',Smoother)])`).
 Together, these results indicate that _P. opilio_ activity density is more strongly influenced by large-scale geographic patterns, and less so by landscape composition.
-The landscape composition and the spatio-temporal component explained `r round(with(OpilioMod,summary(mod3)$dev.expl),3)*100`% of model deviance ($R^2_{adj}$ = `r round(with(OpilioMod,summary(mod3)$r.sq),3)`).
+The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]*100`%  of variance in activity density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(OpilioMod[2]-OpilioMod[1])*100)`%.
 
-```{r OpilioLandscape, echo=FALSE, fig.cap='Landscape influence on _Phalangium opilio_ activity density. Lines/dots represent means, and bars/shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
-  include_graphics('../figures/Opiliones_fixeff.png')
+```{r OpilioLandscape, echo=FALSE, fig.cap='Landscape influence on _Phalangium opilio_ activity density. Lines and dots represent means, and bars and shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+  include_graphics('../figures/Opiliones_fixeff.png',dpi=NA)
+```
+
+
+```{r rSquared, echo=FALSE}  
+  r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>% 
+  pivot_wider(names_from=model,values_from=r2comp) %>% 
+  mutate(terms=case_when(terms=='trapLoc' ~ 'Trap Location', terms=='s(day)' ~ 'Day of Year',
+                         terms=='s(E,N)' ~ 'Spatial Location', terms=='GrassWetland' ~ 'Grass/Wetland',
+                         terms=='TreeShrub' ~ 'Trees/Shrubs', terms=='sigmaD' ~ 'Residual',
+                         terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>% 
+  kable(.,caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
+        col.names=c('Term','$\\emph{Pterostichus melanarius}$','$\\emph{Pardosa distincta}$','$\\emph{Pardosa moesta}$','$\\emph{Phalangium opilio}$'),
+        digits=c(1,3,3,3,3),align='rllll',escape=FALSE) 
 ```
 
 # Discussion
 
-We found that while _Pterostichus melanarius_, _Pardosa distincta_, and _Pardosa moesta_ responded strongly to landscape composition, _Phalangium opilio_ did not.
+We found that _Pterostichus melanarius_, _Pardosa distincta_, _Pardosa moesta_, and _Phalangium opilio_ responded strongly to landscape composition.
 _P. melanarius_ was influenced by grass/wetland, pasture, trees/shrubs, pulses, and urban land cover.
 _P. distincta_ was influenced by grass/wetland, canola, pulses, and urban land cover.
 _P. moesta_ was influenced by the same landscape components: grassland/wetland, canola, pulses, and urban land cover.
-Finally, _P. opilio_ was influenced by pasture, and trees/shrubs.
+Finally, _P. opilio_ was influenced by grass/wetland, and trees/shrubs.
 These results highlight the seasonal importance of non-crop marginal lands for predatory arthropod abundance (Table \@ref(tab:sumTab)).
 
 Table: (\#tab:sumTab) Summary table of results. Early, mid, and late indicate the time of the season when cover classes had strong effects on abundance. Italics indicates that effects were weak (p>=0.05) 
@@ -444,27 +452,28 @@ coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p
 ```
 
 ```{r concurvityFull, echo=FALSE, fig.cap='Concurvity estimates for ten most-abundant land cover classes'}  
-  include_graphics('../figures/coverCorPlots/concurvityEstimate_full.png')
+  include_graphics('../figures/coverCorPlots/concurvityEstimate_full.png',dpi=NA)
 ```
 
 ```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for reduced cover classes used in models'}  
-  include_graphics('../figures/coverCorPlots/concurvityEstimate_reduced.png')
+  include_graphics('../figures/coverCorPlots/concurvityEstimate_reduced.png',dpi=NA)
 ```
 
+
 ```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pterostichus melanarius_ activity density'}
-  include_graphics('../figures/Pterostichus_melanarius_raneff.png')
+  include_graphics('../figures/Pterostichus_melanarius_raneff.png',dpi=NA)
 ```
 
 ```{r ParDisSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pardosa distincta_ activity density'}
-  include_graphics('../figures/Pardosa_distincta_raneff.png')
+  include_graphics('../figures/Pardosa_distincta_raneff.png',dpi=NA)
 ```
 
 ```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of \\emph{Pardosa moesta} activity density'}
-  include_graphics('../figures/Pardosa_moesta_raneff.png')
+  include_graphics('../figures/Pardosa_moesta_raneff.png',dpi=NA)
 ```
 
 ```{r OpilioSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Phalangium opilio_ activity density'}
-  include_graphics('../figures/Opiliones_raneff.png')
+  include_graphics('../figures/Opiliones_raneff.png',dpi=NA)
 ```
 
 ```{r PteMelLinear, echo=FALSE, warning=FALSE}

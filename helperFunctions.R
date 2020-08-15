@@ -221,7 +221,7 @@ compareFM <- function(female,male,topTitle='',vlines=NA){
 }
 
 #Function to extract marginal variance from terms from a GAM (a la Nakagawa and Schielzeth 2013)
-getR2Terms <- function(mod,intVal,thetaVal){ #Model object, plus intercept value from null model.
+getR2Terms <- function(mod,intVal,thetaVal,individual=FALSE){ #Model object, plus intercept value from null model.
   #Note from Appendix: intVal (exp(beta0)) should be obtained either from a model with centred or scaled variables (sense Schielzeth 2010), or an intercept‐only model while including all random effects. Not clear whether this should be done with theta as well, but I assume so.
   #Assumes models follow same structure as used in frAnalysis.R
   
@@ -242,8 +242,8 @@ getR2Terms <- function(mod,intVal,thetaVal){ #Model object, plus intercept value
   #            = ln(1 + 1/mu + 1/theta)
   #            = ln(1 + 1/exp(Intercept) + 1/theta)
   
-  c1 <- mod$coefficients #Coefs
-  m1 <- model.matrix(mod) #Model matrix
+  c1 <- mod$coefficients #Get coefs
+  m1 <- model.matrix(mod) #Get model matrix
   
   #Linear terms
   lt <- attributes(mod$pterms)$term.labels
@@ -260,10 +260,31 @@ getR2Terms <- function(mod,intVal,thetaVal){ #Model object, plus intercept value
   #Distribution-specific variance (sigma^2_d) - assumes intercept is 0
   sigmaD <- log(1+(1/intVal)+(1/thetaVal))
   
-  r2 <- c(sum(sigmaF$var[c(1,4:9)])/(sum(sigmaF$var)+sigmaD), #"Marginal" R2 (no spatial/temporal smoothers)
-          sum(sigmaF$var)/(sum(sigmaF$var)+sigmaD)) #Conditional R2
-  names(r2) <- c('Marginal','Conditional')
-  
-  return(r2)
+  if(individual){ #Return individual variance components, and let the user figure it out
+    return(rbind(sigmaF,data.frame(terms='sigmaD',var=sigmaD)))
+  } else {
+    r2 <- c(sum(sigmaF$var[!grepl('(day|E,N)',sigmaF$terms)])/(sum(sigmaF$var)+sigmaD), #"Marginal" R2 (no spatial/temporal smoothers)
+            sum(sigmaF$var)/(sum(sigmaF$var)+sigmaD)) #Conditional R2
+    names(r2) <- c('Marginal','Conditional')
+    return(r2)
+  }
 }
+
+#Capitalize first letter in a string
+firstUpper <- function(x){
+  paste0(toupper(substring(x,1,1)),substring(x,2,nchar(x)))
+}
+
+#Rounds to dig digits, converts to character, anything less than digits becomes "<0.xx1" (useful for tables)
+roundLess <- function(x,dig){
+  x <- as.character(round(x,dig))
+  x[x=='0'] <- paste0('<0.',strrep('0',dig-1),'1',collapse='')
+  return(x)
+}
+
+#Makes text bold in rMarkdown
+boldRMD <- function(x) paste0('**',x,'**') 
+
+#Makes text bold in LaTeX
+boldLaTeX <- function(x) paste0('\\textbf{',x,'}') 
 
