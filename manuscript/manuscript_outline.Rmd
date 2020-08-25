@@ -23,7 +23,7 @@ footnote:
   - code: 1
     text: "Corresponding Author"
 date: "Spring 2020"
-abstract: Ground-dwelling arthropods are important generalist predators in prairie agro-ecosystems. However, we don't know what types of landscape features are useful for which types of arthropods, and during which parts of the year. Habitat features may act as sources of arthropods during some times of the year, but act as sinks at other times. We modeled the activity density of four widely-distributed species of arthropods, and used functional regression to reveal their habitat preferences. We found that trees/shrubs, and roadside grasses acted as sources of arthropods. Other features did not function as significant sources or sinks. Farmers should consider retaining these landscape features in order to preserve populations of helpful generalist predators in their crops.
+abstract: Ground-dwelling arthropods are important generalist predators in prairie agro-ecosystems, and can use non-crop features as overwintering habitats. However, it is unclear which types of landscape features constitute useful non-crop habitat, and what spatial scale of habitat is required. Additionally, the same landscape feature may act as a sink or a source of arthropods at different times of the year, but this is rarely considered. We modeled the activity density of four highly-abundant species of Canadian prairie arthropods, and used functional regression to simultaneously consider both their habitat preferences and the timing of sources and sinks. We found that canola crops (_Brassica napus_ L.) acted as early-season sources, and that grasses and wetlands acted as late-season sinks of arthropods. Farmers should consider preserving existing grasslands and wetlands to act as reservoir habitats for the surrounding cropland.
 
 bibliography: refs.bib
 csl: ecology-letters.csl
@@ -155,36 +155,37 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 ```
 
-# Introduction - needs flushing out
+# Introduction
 
 <!-- Ralph's "throwaway paragraph" -->
 Arthropods are one of the most influential groups of animals in agricultural systems.
-Pest arthropods can cause huge amounts of damage to crops, resulting in yield losses for farmers and negative downstream economic effects.
-On the other hand, beneficial arthropods can deliver increased crop yields from extra pollination or free pest control.
-The seasonal "pulses" of food resources from agricultural land act as a bottom-up driver of arthropod communities, which include both native and introduced species.
-Agricultural land also constitutes 15 million km$^2$ (~36%) of land worldwide [@ramankutty2018], meaning that conservation of insect biodiversity should consider agricultural practices, as small changes in agricultural practices can have large effects globally.
-In particular, land managers and conservationists are interested in finding "win-win" practices; that is, practices that result in better conservation outcomes while achieving the same (or higher) crop yields.
+Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in negative downstream economic effects and malnutrition.
+On the other hand, spillover of beneficial arthropods from adjacent non-crop patches can deliver increased crop yields by providing ecosystem services such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
+Seasonal "pulses" of food resources from crop fields act as a bottom-up driver of their associated arthropod communities, meaning that agricultural land can act as a source of nutrients and individuals for adjacent non-crop land [@diekotter2010; @galpern2017].
+These important fluxes of mobile arthropods, both to crops and away from them, are key for managing both crop yield and biodiversity in agroecosystems.
+Finding "win-win" practices is of particular importance to land managers and conservationists; that is, practices that result in better conservation outcomes while achieving similar crop yields.
+Finally, agricultural land occupies 15 million km$^2$ (~36%) of land globally [@ramankutty2018], meaning that biodiversity conservation should pay particular attention to agricultural practices.
 
-One method of passively manipulating agricultural arthropods is through landscape management [@albrecht2010; @landis2000; @martin2020].
-Non-cultivated areas, such as natural or semi-natural land (SNL) can act as important habitat for some arthropods [@duelli2003].
-Ground-nesting bees are generally driven by flower and nest availability [@roulston2011], and beetles can be limited by water, food, and egg-laying sites [@lovei1996; @gardiner2010].
-However, while the effect of SNL on bees is generally positive, its effect on beetles and parasitoids less consistent [@macfadyen2013; @shackelford2013] 
-Other organisms may use SNL as travel corridors or overwintering sites, but may not be directly dependent on them for reproduction.
-Spillover from SNL occurs when organisms migrate from SNL into adjacent cropland, or from cropland into SNL [@tscharntke2005b]. 
-The degree to which spillover occurs depends on the life history of the organism in question, as well as their reliance on the specific type of SNL.
+Uncultivated semi-natural land (SNL) can act as important habitat for beneficial arthropods [@duelli2003], which may spill over into adjacent crops.
+Therefore, landscape management is a strategy to increase beneficial arthropod abundance in crops [@albrecht2010; @landis2000; @martin2020; but see @tscharntke2016; @karp2018].
+For example, bee abundance is largely driven by flower and nest availability [@roulston2011], and the effect of SNL on bee abundance and diversity is generally positive.
+Predatory arthopods such as beetles or spiders can be limited by water, food, and egg-laying sites [@lovei1996; @gardiner2010], but the effect of SNL on their abundance is less consistent [@macfadyen2013; @shackelford2013], as some taxa may use SNL as a travel corridor or overwintering site, not be obligately dependent on it for reproduction.
+Some taxa are not dependent on SNL at all, and thrive in cultivated landscapes, while others exclusively inhabit SNL and do not venture beyond the edge of cultivated fields.
+For example, carabid beetles are thought to reproduce in field margins, while the adults feed in fields [@desender1988].
+This depends on the life history of the organisms in question, such as the seasonal timing of emergence, feeding, and reproduction, as well as their traits such as dispersal capability.
 Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers [@oberg2008].
+This means that spillover of beneficial arthropods into crops depends not only on habitat type, but on time of the year, and the spatial scale of landscape that is relevant to the organism.
+
+<!-- Consider what this next paragraph should be about -->
+Spillover from SNL occurs when organisms migrate from SNL into adjacent cropland, but can also occur when arthropods migrate from cropland into SNL [@tscharntke2005b].
+That is certain habitat types may be sources of arthropods during some times of the year, but sinks during other times.
+
 
 <!-- Small patches of SNL can have a large effect if overall landscape lacks SNL (landscape contrast [@boetzl2020; @vanSchalkwyk2020]) -->
 <!-- Limited understanding of other arthropods (but see ``beetle hedges" from UK?) -->
 <!-- No-till agriculture is better for some ground beetles [@busch_Msc] -->
 <!-- Arachnids are similarly limited by food, shelter -->
 
-The effect of SNL on arthropod abundance also depends on the seasonal timing of emergence, feeding, and hibernation.
-For this reason, it is important to consider the effect as being inherently spatio-temporal.
-Arthropods move between landscape components depending on their life history.
-e.g. Carabid beetles are thought to reproduce in field margins, but adults feed in fields [@desender1988].
-This means that spillover depends not only on habitat type, but on time of the year.
-Certain habitat types may be sources of arthropods during some times of the year, but sinks during other times.
 <!-- Counts in pitfall traps are a proxy of activity density (not actual density), but this is probably an OK measure, at least within fields [@lang2000] -->
 
 Our understanding of how landscape features influence beneficial arthropod abundance is incomplete.
