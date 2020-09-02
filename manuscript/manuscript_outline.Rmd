@@ -159,62 +159,61 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
 
 <!-- Ralph's "throwaway paragraph" -->
 Arthropods are one of the most influential groups of animals in agricultural systems.
-Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in negative downstream economic effects and malnutrition.
+Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in downstream economic effects, food insecurity, and malnutrition.
 On the other hand, spillover of beneficial arthropods from adjacent non-crop patches can deliver increased crop yields by providing ecosystem services such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
 Seasonal "pulses" of food resources from crop fields act as a bottom-up driver of their associated arthropod communities, meaning that agricultural land can act as a source of nutrients and individuals for adjacent non-crop land [@diekotter2010; @galpern2017].
 These important fluxes of mobile arthropods, both to crops and away from them, are key for managing both crop yield and biodiversity in agroecosystems.
 Finding "win-win" practices is of particular importance to land managers and conservationists; that is, practices that result in better conservation outcomes while achieving similar crop yields.
-Finally, agricultural land occupies 15 million km$^2$ (~36%) of land globally [@ramankutty2018], meaning that biodiversity conservation should pay particular attention to agricultural practices.
+Finally, agricultural land occupies 15 million km$^2$ (~36%) of land globally [@ramankutty2018], meaning that conservation efforts should pay particular attention to agricultural practices.
 
 Uncultivated semi-natural land (SNL) can act as important habitat for beneficial arthropods [@duelli2003], which may spill over into adjacent crops.
 Therefore, landscape management is a strategy to increase beneficial arthropod abundance in crops [@albrecht2010; @landis2000; @martin2020; but see @tscharntke2016; @karp2018].
-For example, bee abundance is largely driven by flower and nest availability [@roulston2011], and the effect of SNL on bee abundance and diversity is generally positive.
-Predatory arthopods such as beetles or spiders can be limited by water, food, and egg-laying sites [@lovei1996; @gardiner2010], but the effect of SNL on their abundance is less consistent [@macfadyen2013; @shackelford2013], as some taxa may use SNL as a travel corridor or overwintering site, not be obligately dependent on it for reproduction.
+For example, wild bee abundance in agricultural landscapes is largely driven by flower and nest availability [@roulston2011], and the effect of SNL on bee abundance and diversity is generally positive.
+Predatory arthopods such as beetles or spiders can be limited by water, food, and egg-laying sites [@lovei1996; @purtauf2005; @gardiner2010], but the effect of SNL on their abundance and diversity is less consistent [@macfadyen2013; @shackelford2013] as some taxa may use SNL as a travel corridor or overwintering site, but are not completely dependent on it for reproduction.
 Some taxa are not dependent on SNL at all, and thrive in cultivated landscapes, while others exclusively inhabit SNL and do not venture beyond the edge of cultivated fields.
 For example, carabid beetles are thought to reproduce in field margins, while the adults feed in fields [@desender1988].
 This depends on the life history of the organisms in question, such as the seasonal timing of emergence, feeding, and reproduction, as well as their traits such as dispersal capability.
-Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers [@oberg2008].
-This means that spillover of beneficial arthropods into crops depends not only on habitat type, but on time of the year, and the spatial scale of landscape that is relevant to the organism.
+Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers[@oberg2008].
+<!-- Small patches of SNL can have a large effect if overall landscape lacks SNL (landscape contrast [@boetzl2020; @vanSchalkwyk2020]) -->
+In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale of landscape that is relevant to the organism.
 
 <!-- Consider what this next paragraph should be about -->
-Spillover from SNL occurs when organisms migrate from SNL into adjacent cropland, but can also occur when arthropods migrate from cropland into SNL [@tscharntke2005b].
-That is certain habitat types may be sources of arthropods during some times of the year, but sinks during other times.
 
-
-<!-- Small patches of SNL can have a large effect if overall landscape lacks SNL (landscape contrast [@boetzl2020; @vanSchalkwyk2020]) -->
 <!-- Limited understanding of other arthropods (but see ``beetle hedges" from UK?) -->
 <!-- No-till agriculture is better for some ground beetles [@busch_Msc] -->
 <!-- Arachnids are similarly limited by food, shelter -->
-
 <!-- Counts in pitfall traps are a proxy of activity density (not actual density), but this is probably an OK measure, at least within fields [@lang2000] -->
 
-Our understanding of how landscape features influence beneficial arthropod abundance is incomplete.
-The feeding and life-history characteristics of many predatory ground beetles and spiders is not well-documented, meaning that it is difficult to make generalizations of which types of habitat may increase their abundance.
-Choosing the spatial scale of analysis depends on the characteristics of the organisms [@ahrenfeldt2015]; for example, bumblebee abundance can be controlled by both local- and landscape-scale SNL abundance [@westphal2006].
-Finally, different SNL patches may act as sources or sinks of arthropods at different times of the year, but this is rarely considered [but see @desender1988].
+Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
+First, some habitat types may act as sources of arthropods during some times of the year, but as sinks during other times, meaning that the timing of spillover may not allign with key periods in crop development.
+Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
+Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
+For instance, bumblebee abundance can be controlled by both local- and landscape-scale SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
+Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders is often poorly-documented, especially in North America.
+This makes it difficult to make generalizations of which habitat types harbour beneficial arthropods, making it even more difficult to provide accurate information to farmers about land management practices.
 
-In this study, we used pitfall traps to determine how landscape composition affects the seasonal activity density of arthropods across a prairie agroecosystem.
-We hypothesized that:
-1. Untilled semi-natural land (SNL) provides egg-laying and feeding areas for predatory arthropods, meaning that nearby SNL should act as a source of arthropods during the early part of the season, and a sink during the later part of the season. 
-2. Crops in agricultural land act as sources of food for predatory arthropods during the growing season, while crop senescence at the end of the season causes a crash as pest popuations decrease. This should result in agricultural land becoming a sink for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
-3. Crops can act as a temporary feeding site for predators, but not as permanent habitat. Therefore, crops may act as a local sink for arthropods, but will also be negatively associated at larger (landscape-level) scales.
-Using a novel statistical technique, we were able to isolate seasonal signals of changes in arthropod abundance at multiple landscape scales.
+In this study, we used pitfall traps to determine how landscape composition affects the seasonal activity density of arthropods across a Canadian prairie agroecosystem.
+We considered the following hypotheses:
+1. Untilled semi-natural land (SNL) provides egg-laying and feeding areas for predatory arthropods, meaning that SNL should act as a source of arthropods during the early part of the season, and a sink during the later part of the season. 
+2. Crops act as sources of food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a sink for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
+3. Crops may act as a temporary feeding site for predators. Therefore, crops may act as a local sink for arthropods, but will also be negatively associated at larger (landscape-level) scales.
+Using a large pitfall trapping dataset, we were able to relate seasonal changes in arthropod abundance to landscape composition at multiple spatial scales, and found evidence of SNL acting as late-season sinks in abundance.
 
 # Methods
 
 ## Data collection
-
-We used a system of pitfall traps installed at roadsides, field margins, wetlands, and in-field sites across southern Alberta in 2017 (_need a map here_).
+We used a set of 169 pitfall traps installed at roadsides, field margins, wetlands, and in-field sites across southern Alberta, Canada in 2017 (_need a map here_).
 Pitfall traps consisted of 582 mL Solo® cups buried up to the rim, partially filled with ethylene glycol.
-All traps had 2 cm diameter wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
-Traps at roadsides were located 5m from the roads, while traps at in-field sites were installed 20, 100, 200m (?) along a transect from the nearest non-crop feature (wetland, grassland, pivot).
-Specimens were collected from the traps every 14 days (SD: 2.9), and were identified to species.
+All traps had 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
+Traps at roadsides were located 5m from the roads, while traps at in-field sites were installed at 0, 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassland, grassy field corners).
+Specimens were collected from the traps on average every 14 days (SD: 2.9), and were identified to species.
   
-We used three species of predatory arthropods that were present at very high abundances in the traps.
-_Pterostichus melanarius_ is predatory introduced ground beetle that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc].
-It is commonly found in untilled grasslands [@purtauf2005] and grassy field margins may act as larval habitat [@desender1988].
-_Pardosa distincta_ is a species of wolf spider that is common across the Canadian prairies, and is commonly found in ungrazed pastures [@carcamo2014].
-Finally, _Phallangium opilio_ is a widely-distributed generalist harvestman, whose habitat preferences are poorly understood. 
+We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species drive ecosystem service provision more than rare species [@winfree2015].
+_Pterostichus melanarius_ is a introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc].
+It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field margins as larval habitat [@desender1988].
+_Pardosa distincta_ and _Pardosa moesta_ are wolf spiders (Araneae: Lycosidae) that are common across the Canadian prairies, and are often found in ungrazed pastures [@carcamo2014].
+Finally, _Phallangium opilio_ is a widely-distributed generalist harvestman (Opiliones: Phalangiidae), whose habitat preferences are poorly understood. 
+They are commonly found in human-altered landscapes [@muster2014; @vandepoel2015Msc] and are generally nocturnal hunters and scavengers [@halaj2000; @allard2005; @allard2005b].
   
 To characterize landscape composition surrounding the traps, we used classified landscape data from @AAFC_data.
 <!-- + AAFC cropland landscape classifications are very accurate for cultivated fields (~90%), but are less accurate for non-crop areas (~70%) -->
