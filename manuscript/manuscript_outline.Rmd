@@ -152,6 +152,9 @@ varComp <- rownames_to_column(data.frame(gam.vcomp(PteMelMod$mod3),spp='Pterosti
   bind_rows(rownames_to_column(data.frame(gam.vcomp(OpilioMod$mod3),spp='Phalangium opilio'),'term')) %>%
   mutate(term=factor(term,levels=names(PteMelMod$mod3$sp)))
 
+#Get number of traps in each location
+NtrapsPer <- select(PteMelMod$tempTrap,ID,trapLoc,distFrom) %>% data.frame() %>% distinct() %>% group_by(trapLoc) %>% summarize(n=n())
+
 
 ```
 
@@ -202,16 +205,23 @@ Using a large pitfall trapping dataset, we were able to relate seasonal changes 
 # Methods
 
 ## Data collection
-We used a set of 169 pitfall traps installed at roadsides, field margins, wetlands, and in-field sites across southern Alberta, Canada in 2017 (_need a map here_).
-Pitfall traps consisted of 582 mL Solo® cups buried up to the rim, partially filled with ethylene glycol.
-All traps had 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
-Traps at roadsides were located 5m from the roads, while traps at in-field sites were installed at 0, 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassland, grassy field corners).
+We used a set of `r sum(NtrapsPer$n)` pitfall traps installed at roadsides (minimum of 5 m away from the road edge, `r with(NtrapsPer, sum(n[trapLoc=='ditch')` traps) and in-field locations (`r with(NtrapsPer, sum(n[trapLoc!='ditch')`) across southern Alberta, Canada in 2017 (Figure \@ref(fig:siteMap)).
+The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
+In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola')`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland')`), grassy field corners (`r with(NtrapsPer, sum(n[trapLoc=='pivot')`), and remnant prairie grassland (`r with(NtrapsPer, sum(n[trapLoc=='native')`).
+Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature, while the trap at 0 m was installed in the non-crop feature itself.
+We used 582 mL Solo® cups buried up to the rim and partially filled with ethylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
 Specimens were collected from the traps on average every 14 days (SD: 2.9), and were identified to species.
+
+```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field corners.'}  
+  include_graphics('../figures/maps/PF2017.png',dpi=NA)
+```
   
-We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species drive ecosystem service provision more than rare species [@winfree2015].
+We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare species [@winfree2015].
 _Pterostichus melanarius_ is a introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc].
 It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field margins as larval habitat [@desender1988].
-_Pardosa distincta_ and _Pardosa moesta_ are wolf spiders (Araneae: Lycosidae) that are common across the Canadian prairies, and are often found in ungrazed pastures [@carcamo2014].
+_Pardosa distincta_ and _Pardosa moesta_ are wolf spiders (Araneae: Lycosidae) that are common across the Canadian prairies and are often found in ungrazed pastures [@carcamo2014].
+_P. distincta_ is commonly found in disturbed environments [@collins1996; @wade2010], while _P. moesta_ appear to prefer less frequent disurbances [@kowal2011].
+_Pardosa_ use an active wandering predation strategy [@young1990], and may use road margins and wooded areas as habitat [@buddle2000; @drapela2011]. 
 Finally, _Phallangium opilio_ is a widely-distributed generalist harvestman (Opiliones: Phalangiidae), whose habitat preferences are poorly understood. 
 They are commonly found in human-altered landscapes [@muster2014; @vandepoel2015Msc] and are generally nocturnal hunters and scavengers [@halaj2000; @allard2005; @allard2005b].
   
