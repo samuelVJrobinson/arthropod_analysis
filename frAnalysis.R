@@ -66,15 +66,16 @@ stLegPosX <- 0.85 #Legend position X
 stLegPosY <- 0.3 #Legend position Y
 theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
+smoothCols <- c('blue','purple','red') #Colours for smoothing lines
 
 # Pterostichus melanarius ----------------------------------
 
 #Select only P. melanarius
 tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
-PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
-save(PteMelMod,file='./data/PteMelMod.Rdata')
-# load('./data/PteMelMod.Rdata')
+# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+# save(PteMelMod,file='./data/PteMelMod.Rdata')
+load('./data/PteMelMod.Rdata')
 
 #Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
 #Also tried running this with Cereal included, despite concurvity. Fits, but causes a bunch of weird instability in other results.
@@ -112,11 +113,15 @@ termNames[1] <- 'Linear terms'
 # termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 # termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
 # termNames <- gsub('ti\\(northing,easting,endjulian\\)','ti:spacetime',termNames)
+termNames <- gsub('endDayMat','Time',termNames)
+termNames <- gsub('distMat','Distance',termNames)
+termNames <- gsub('GrassWetland','Grassland',termNames)
+termNames <- gsub('TreeShrub','Woodland',termNames)
 
 N <- 1:nrow(checkMC) #Plot all smooth terms
 # N <- 4:nrow(checkMC) #Plot with only landscape smoothers
 lN <- length(N)
-png('./figures/coverCorPlots/concurvityEstimate_reduced.png',1200,1000,pointsize=15)
+png('./figures/coverCorPlots/concurvityEstimate_reduced.png',1200,1000,pointsize=20)
 matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
 abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
 abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
@@ -183,8 +188,9 @@ cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
 #Trap location 
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
-  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+  mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
@@ -193,14 +199,14 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>% 
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Grass/Wetland effect')
+  effectPlot(leg=F,cols=smoothCols)+labs(x='Distance (m)',y='Grassland effect')
 
 #Canola effect (space + time)
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=T)+labs(x='Distance (m)',y='Canola effect')
+  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
 
 #Pulse effect (time)
 p4 <- data.frame(endDayMat=149:241,Pulses=1,y=NA) %>% 
@@ -242,12 +248,12 @@ tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017) %>
 # tempArthM <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017,sex=='M') %>% group_by(BTID) %>% summarize(n=n())
 
 # Takes way longer to run. 5-10 mins +
-ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-# ParDisModF <- runMods(tempArthF,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
-# ParDisModM <- runMods(tempArthM,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Full model
+# ParDisModF <- runMods(tempArthF,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Female model
+# ParDisModM <- runMods(tempArthM,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Male model
 
-save(ParDisMod,file='./data/ParDisMod.Rdata')
-# load('./data/ParDisMod.Rdata')
+# save(ParDisMod,file='./data/ParDisMod.Rdata')
+load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
@@ -314,8 +320,9 @@ dispDays <- data.frame(doy=c(173,203,232)) %>%
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
-  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+  mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
@@ -324,7 +331,7 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>%
   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=T)+labs(x='Distance (m)',y='Canola effect')
+  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
 
 #Pasture (space)
 p3 <- expand.grid(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% 
@@ -337,7 +344,7 @@ p4 <- data.frame(endDayMat=149:241,TreeShrub=1,y=NA) %>%
   smoothPred(mod3,whichSmooth=which(grepl('TreeShrub',sapply(mod3$smooth,function(x) x$label)))[2]) %>% 
   rename(x=endDayMat) %>% 
   mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
-  effectPlot(leg=F)+labs(x='Time of year',y='Tree/Shrub effect')
+  effectPlot(leg=F)+labs(x='Time of year',y='Woodland effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,
@@ -412,8 +419,9 @@ dispDays <- data.frame(doy=c(173,203,232)) %>%
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
-  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+  mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
@@ -421,14 +429,14 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
 p2 <- expand.grid(distMat=seq(30,1500,30),GrassWetland=1,y=NA) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
   rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Grass/Wetland effect')
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Grassland effect')
 
 #Canola (space + time)
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Canola effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
 
 #Pulses (space)
 p4 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
@@ -441,7 +449,7 @@ p5 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>%
   smoothPred(mod3,whichSmooth=which(grepl('Urban',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Urban effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Road margin effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
@@ -521,8 +529,9 @@ dispDays <- data.frame(doy=c(173,203,232)) %>%
 #Trap location - less in canola, more in wetland/pivot
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96) %>% 
-  mutate(trapLoc=factor(trapLoc,labels=firstUpper(levels(trapLoc)))) %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+  mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
@@ -531,14 +540,14 @@ p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Grass/Wetland effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Grassland effect')
 
 #Tree/Shrub (space + time)
 p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('TreeShrub',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Tree/shrub effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Woodland effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
