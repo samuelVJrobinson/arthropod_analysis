@@ -108,7 +108,7 @@ plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 concurvity(mod3) #High concurvity
 checkMC <- concurvity(mod3,full=F)$estimate
 termNames <- rownames(checkMC)
-termNames[1] <- 'Linear terms'
+termNames[1] <- 'Trap location'
 # termNames <- gsub('s\\(distMat(,endDayMat)?\\)','s',gsub('\\:oRingMat2Prop\\$',':',rownames(checkMC)))
 # termNames <- gsub('ti\\(distMat(,endDayMat)?\\)','ti',termNames)
 # termNames <- gsub('s\\(endjulian\\)','s:time',gsub('s\\(easting,northing\\)','s:space',termNames))
