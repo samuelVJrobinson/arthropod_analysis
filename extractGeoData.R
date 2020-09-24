@@ -247,7 +247,8 @@ load('./data/geoDataAAFC.Rdata')
 #Problem: some land cover types are collinear with each other, but differs based on distances. Need to create a figure to properly visualize this
 
 #Function to examine correlation between % landscape categories at different distances
-corplot <- function(l,nam,value=NULL,xlabel=NULL){ #Requires list of matrices, names to use, and whether to use t-values or r values
+#Requires list of matrices, names to use, what correlation values to use (either 't','kendall'), and xlabel text
+corplot <- function(l,nam,value=NULL,xlabel=NULL){ 
   if(is.null(value)) stop('Type of correlation value not found')
   
   if(value=='t'){
@@ -261,18 +262,20 @@ corplot <- function(l,nam,value=NULL,xlabel=NULL){ #Requires list of matrices, n
          pch=ifelse(abs(slopes)>2,19,1),
          type='b')
     abline(h=c(-2,0,2),lty=c('dashed','solid','dashed'),col=c('red','black','red')) #Standard deviations
-  } else {
-    corvals <- lapply(1:ncol(l[[1]]),function(x) cor.test(l[[nam[1]]][,x],l[[nam[2]]][,x],method=value)) #Kendall correlation
-    y <- sapply(corvals,function(x) x$statistic)
-    sig <- sapply(corvals,function(x) x$p.value<0.05)
-    
-    plot(as.numeric(gsub('d','',colnames(l[[1]]))),
-         y,
-         xlab=xlabel,ylab=corvals[[1]]$method,main=paste0(nam[1],':',nam[2]),
-         pch=ifelse(sig,19,1),
-         type='b')
-    abline(h=c(0),lty=c('dashed'),col='black')
-  }
+
+    } else {
+      #Kendall rank order correlation
+      corvals <- lapply(1:ncol(l[[1]]),function(x) cor.test(l[[nam[1]]][,x],l[[nam[2]]][,x],method=value)) 
+      y <- sapply(corvals,function(x) x$statistic)
+      sig <- sapply(corvals,function(x) x$p.value<0.05) #Different from 0?
+      
+      plot(as.numeric(gsub('d','',colnames(l[[1]]))),
+           y,
+           xlab=xlabel,ylab=corvals[[1]]$method,main=paste0(nam[1],':',nam[2]),
+           pch=ifelse(sig,19,1),
+           type='b')
+      abline(h=c(0),lty=c('dashed'),col='black')
+    }
 }
 
 #Model of landscape effect (ring composition from AAFC rasters)
@@ -295,7 +298,8 @@ for(i in 1:length(oRingMat2Prop)){
   par(mfrow=c(5,4),mar=c(2,2,2,1)+0.1)
   for(j in c(1:length(oRingMat2Prop))[-i]){
     # corplot(oRingMat2Prop,c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),xlabel='Distance (m)',value='t') 
-    corplot(oRingMat2Prop,c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),xlabel='Distance (m)',value='kendall') 
+    corplot(l=oRingMat2Prop,nam=c(names(oRingMat2Prop)[i],names(oRingMat2Prop)[j]),
+            xlabel='Distance (m)',value='kendall') 
   }
   mainlab <- paste0(names(oRingMat2Prop)[i],' (',round(100*sapply(oRingMat2Prop,sum)[i]/sum(unlist(oRingMat2Prop)),3),'% total cover)')
   plot(0,0,type='n',axes=FALSE,xlim=c(-1,1),ylim=c(-1,1))
