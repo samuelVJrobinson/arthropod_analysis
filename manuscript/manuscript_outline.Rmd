@@ -243,7 +243,7 @@ However, increased counts of organisms in pitfall traps can represent higher act
 This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts in the traps represent the "activity-density" of a given organism.
 Despite this disadvantage, activity-density is generally positively related to ecosystem services, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
-```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field corners.'}  
+```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field corners.', out.width='100%'}  
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
@@ -273,8 +273,6 @@ Scalar-on-function regression is a special type of linear regression model ($y=X
 In our case, the proportion of landscape cover ($X$) within each annulus surrounding the trap is a function of distance away from the trap, meaning that the coefficients are a smoothed function of distance ($\beta_i = f(distance_i)$), and represent the additive effect of a given type of landscape cover at distances away from the trap (i.e. $X\beta$).
 This allows the possibility that the size of the landscape "grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010].
 It also allows for the possibility that certain land cover types may be locally beneficial, but detremental at wider scales, indicating that the cover type may not constitute a completely usable habitat.
-
-
 
 Scalar-on-function regression of activity-density was fit using generalized additive models [_mgcv_ version `r packageVersion('mgcv')`; @wood2017]. 
 Count data of arthropods were modeled using a negative binomial distribution with a log-link function and a single dispersion parameter ($\theta$).
@@ -333,7 +331,7 @@ Several landscape ``fingerprints" were evident in the landscape annuli, with cer
 Grassland cover was largely constant with distance, although a cluster of sites had uniformly high or low cover of grassland with distance.
 The pitfall traps caught a total of `r with(Ncatches,total[spp=='PteMel'])` _Pterostichus melanarius_, `r with(Ncatches,total[spp=='ParDis'])` _Pardosa distincta_, `r with(Ncatches,total[spp=='ParMoe'])` _Pardosa moesta_, and `r with(Ncatches,total[spp=='Opilio'])` _Phalangium opilio_ (mean trapping rates per day: `r with(Ncatches,paste(round(perDayMean,2),collapse=', '))`, SDs: `r with(Ncatches,paste(round(perDaySD,2),collapse=', '))`).
 
-```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', fig.width=7, fig.height=7}  
+```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', out.width='100%'}  
 coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p=100*round(p/sum(unique(p)),4)) %>% 
   mutate(cover=paste0(as.character(cover),' (',p,'%)'),prop=prop*100) %>% 
   mutate(cover=factor(cover,levels=unique(cover))) %>% 
@@ -352,11 +350,12 @@ Pulses acted as a late-season source, indicating that _P. melanarius_ may migrat
 Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were strong drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
 The landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
+<!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses "text references" instead. -->
+(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
 
-```{r PteMelLandscape, echo=FALSE, fig.cap='Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
   include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)
 ```
-
 
 ## *Wolf spiders:* Pardosa distincta *and* Pardosa moesta
 
@@ -370,11 +369,15 @@ _P. distincta_ was similarly affected by pulses: landscape-level abundance of pu
 Finally, activity-density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal) ; both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
 The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]*100`%  and `r r2Nakagawa$ParMoeMod[1]*100`% of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(ParDisMod[2]-ParDisMod[1])*100)`%  and `r with(r2Nakagawa,(ParMoeMod[2]-ParMoeMod[1])*100)`%, for _P. distincta_ and _P. moesta_ respectively.
 
-```{r ParDisLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa distincta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+(ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+
+```{r ParDisLandscape, echo=FALSE, fig.cap='(ref:ParDisCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_distincta_fixeff.png',dpi=NA)
 ```
 
-```{r ParMoeLandscape, echo=FALSE, fig.cap='Landscape influence on _Pardosa moesta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95% confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+
+```{r ParMoeLandscape, echo=FALSE, fig.cap='(ref:ParMoeCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_moesta_fixeff.png',dpi=NA)
 ```
 
@@ -387,12 +390,14 @@ Compare this to _P. melanarius_, which is also influenced by grassland and woodl
 The temporal and spatial components, as in the other two species, were both very strong (both p`r with(opilSmTerms,p[grepl('E,N',Smoother)])`).
 The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]*100`%  of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(OpilioMod[2]-OpilioMod[1])*100)`%.
 
-```{r OpilioLandscape, echo=FALSE, fig.cap='Landscape influence on _Phalangium opilio_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95% confidence regions. Dashed line on panels b-f represents zero effect. Coloured regions represent early-, mid-, and late-season effects (red, green, blue)'}  
+(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+
+```{r OpilioLandscape, echo=FALSE, fig.cap='(ref:OpilioCap)', out.width='100%'}  
   include_graphics('../figures/Opiliones_fixeff.png',dpi=NA)
 ```
 
 
-```{r rSquared, echo=FALSE}  
+```{r rSquared, echo=FALSE, out.width='100%'}  
   r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>% 
   pivot_wider(names_from=model,values_from=r2comp) %>% 
   mutate(terms=case_when(terms=='trapLoc' ~ 'Trap Location', terms=='s(day)' ~ 'Day of Year',
@@ -401,7 +406,7 @@ The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]
                          terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>% 
   kable(.,caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
         col.names=c('Term','$\\emph{Pterostichus melanarius}$','$\\emph{Pardosa distincta}$','$\\emph{Pardosa moesta}$','$\\emph{Phalangium opilio}$'),
-        digits=c(1,3,3,3,3),align='rllll',escape=FALSE) 
+        digits=c(1,3,3,3,3),align='rllll',escape=FALSE, table.attr = "style='width:30%;'") 
 ```
 
 # Discussion
@@ -474,23 +479,31 @@ Finally, future work should explicitly link landscape structure, arthropod abund
 
 \beginsupplement
 
-```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for reduced cover classes used in models'}  
+```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for reduced cover classes used in models', out.width='100%'}  
   include_graphics('../figures/coverCorPlots/concurvityEstimate_reduced.png',dpi=NA)
 ```
 
-```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pterostichus melanarius_ activity-density'}
+(ref:PteMelSTCap) Temporal and spatial components of _Pterostichus melanarius_ activity-density (after accounting for landscape composition and trap location).
+
+```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='(ref:PteMelSTCap)', out.width='100%'}
   include_graphics('../figures/Pterostichus_melanarius_raneff.png',dpi=NA)
 ```
 
-```{r ParDisSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Pardosa distincta_ activity-density'}
+(ref:ParDisSTCap) Temporal and spatial components of _Pardosa distincta_ activity-density (after accounting for landscape composition and trap location).
+
+```{r ParDisSpatiotemporal, echo=FALSE, fig.cap='(ref:ParDisSTCap)', out.width='100%'}
   include_graphics('../figures/Pardosa_distincta_raneff.png',dpi=NA)
 ```
 
-```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of \\emph{Pardosa moesta} activity-density'}
+(ref:ParMoeSTCap) Temporal and spatial components of _Pardosa moesta_ activity-density (after accounting for landscape composition and trap location).
+
+```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='', out.width='100%'}
   include_graphics('../figures/Pardosa_moesta_raneff.png',dpi=NA)
 ```
 
-```{r OpilioSpatiotemporal, echo=FALSE, fig.cap='Temporal and spatial components of _Phalangium opilio_ activity-density'}
+(ref:OpilioSTCap) Temporal and spatial components of _Phalangium opilio_ activity-density (after accounting for landscape composition and trap location).
+
+```{r OpilioSpatiotemporal, echo=FALSE, fig.cap='(ref:OpilioSTCap)', out.width='100%'}
   include_graphics('../figures/Opiliones_raneff.png',dpi=NA)
 ```
 
