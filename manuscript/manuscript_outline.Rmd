@@ -233,8 +233,8 @@ We used a set of `r sum(NtrapsPer$n)` pitfall traps installed in road margins (m
 Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempTrap$startjulian)),format='%j'),format='%B %d')`, and collections ended on `r format(as.Date(as.character(max(PteMelMod$tempTrap$endjulian)),format='%j'),format='%B %d')`, with collection occurring continuously and traps being emptied every `r round(mean(PteMelMod$tempTrap$trapdays),1)` days on average (SD: `r round(sd(PteMelMod$tempTrap$trapdays),1)`). 
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
 The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
-In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field margins (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
-Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature, while the trap at 0 m was installed in the non-crop feature itself.
+In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
+Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
 We used 582 mL Solo® cups buried up to the rim and partially filled with ethylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
 Specimens were identified to species using appropriate taxonomic literature [@dondale1990; @edgar1990; @vogel2004; @yigit2007].
 
@@ -243,13 +243,13 @@ However, increased counts of organisms in pitfall traps can represent higher act
 This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts in the traps represent the "activity-density" of a given organism.
 Despite this disadvantage, activity-density is generally positively related to ecosystem services, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
-```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field corners.', out.width='100%'}  
+```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field edges.', out.width='100%'}  
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
 We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare ones [@winfree2015].
 _Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc].
-It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field margins as larval habitat [@desender1988].
+It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field edges as larval habitat [@desender1988].
 _Pardosa_ are wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
 Both _Pardosa distincta_ and _Pardosa moesta_ are found in a wide variety of habitats, but are common in ungrazed pastures [@dondale1990; @carcamo2014].
 _P. distincta_ is commonly found in disturbed environments [@collins1996; @wade2010], while _P. moesta_ appear to prefer less frequent disturbances [@graham2003; @kowal2011; but see @dondale1990].
@@ -277,7 +277,8 @@ It also allows for the possibility that certain land cover types may be locally 
 Scalar-on-function regression of activity-density was fit using generalized additive models [_mgcv_ version `r packageVersion('mgcv')`; @wood2017]. 
 Count data of arthropods were modeled using a negative binomial distribution with a log-link function and a single dispersion parameter ($\theta$).
 To account for different lengths of trap exposure, log-days since trap placement were used as a fixed effect with their slope held at 1 ("offset" variable).
-We included day of year as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centre point) as a 2-dimensional smooth, in order to account for underlying spatial and temporal autocorrelation in the data.
+Trapping location was included as a fixed effect with 5 levels (canola, field edge, grassland, road margin, and wetlands) to account for the effect of local cover independent of the surrounding landscape composition. 
+Day of year was included as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centre point) were included as 2-dimensional smooths, in order to account for underlying spatial and temporal autocorrelation in the data.
 The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 
 For each landscape cover class, we used three scalar-on-function terms.
@@ -297,6 +298,13 @@ There is no agreed-upon threshold of "unacceptable" concurvity, but 0.5 is commo
 Trees and shrubs were combined into a single ``woodland" category, and grassland and wetland were combined into a single "grassland" category, as they were strongly positively correlated at all distances, indicating similar feature classes.
 Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola $\rightarrow$ wheat $\rightarrow$ barley) and the commonly-used 800 m block structure of farmland in our study region (quarter-sections).
 This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (grassland, canola, pasture, woodland, pulses, urban; see Figure \@ref(fig:concurvity)) 
+
+***
+**Box 1: Interpretation of Functional Regression Plots**
+
+This box explains how to interpret functional regression plots.
+
+***
   
 Functional regression plots of landscape composition reveal which cover classes are acting as sources or sinks of organisms, and at what spatial scale.
 Positive responses to nearby landscape cover classes indicate that the cover class acts as a net source (i.e. arthropods spill over *from* it).
@@ -329,7 +337,7 @@ Alternatively, a cover class could act as a sink by providing high-quality habit
 Grassland, cereal, and canola were the three most-abundant landcover classes surrounding our traps, accounting for `r coverList %>% group_by(cover) %>% summarize(p=sum(prop)) %>% ungroup() %>% arrange(desc(p)) %>% mutate(prop=round(100*p/sum(p),2)) %>% slice(1:3) %>% pull(prop) %>% sum `% of land cover (Figure \@ref(fig:landscapeComp)).
 Several landscape ``fingerprints" were evident in the landscape annuli, with cereal cover increasing with distance away, along with a corresponding decrease in canola cover.
 Grassland cover was largely constant with distance, although a cluster of sites had uniformly high or low cover of grassland with distance.
-The pitfall traps caught a total of `r with(Ncatches,total[spp=='PteMel'])` _Pterostichus melanarius_, `r with(Ncatches,total[spp=='ParDis'])` _Pardosa distincta_, `r with(Ncatches,total[spp=='ParMoe'])` _Pardosa moesta_, and `r with(Ncatches,total[spp=='Opilio'])` _Phalangium opilio_ (mean trapping rates per day: `r with(Ncatches,paste(round(perDayMean,2),collapse=', '))`, SDs: `r with(Ncatches,paste(round(perDaySD,2),collapse=', '))`).
+The pitfall traps caught a total of `r with(Ncatches,total[spp=='PteMel'])` _Pterostichus melanarius_, `r with(Ncatches,total[spp=='ParDis'])` _Pardosa distincta_, `r with(Ncatches,total[spp=='ParMoe'])` _Pardosa moesta_, and `r with(Ncatches,total[spp=='Opilio'])` _Phalangium opilio_ (mean trapping rates per day: `r with(Ncatches,paste(round(perDayMean,2),collapse=', '))`, SD: `r with(Ncatches,paste(round(perDaySD,2),collapse=', '))`, respectively).
 
 ```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', out.width='100%'}  
 coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p=100*round(p/sum(unique(p)),4)) %>% 
@@ -351,7 +359,7 @@ Finally, _P. melanarius_ activity-density had a strong temporal and spatial comp
 The landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
 <!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses "text references" instead. -->
-(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
   include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)
@@ -369,13 +377,13 @@ _P. distincta_ was similarly affected by pulses: landscape-level abundance of pu
 Finally, activity-density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal) ; both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
 The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]*100`%  and `r r2Nakagawa$ParMoeMod[1]*100`% of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(ParDisMod[2]-ParDisMod[1])*100)`%  and `r with(r2Nakagawa,(ParMoeMod[2]-ParMoeMod[1])*100)`%, for _P. distincta_ and _P. moesta_ respectively.
 
-(ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+(ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r ParDisLandscape, echo=FALSE, fig.cap='(ref:ParDisCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_distincta_fixeff.png',dpi=NA)
 ```
 
-(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r ParMoeLandscape, echo=FALSE, fig.cap='(ref:ParMoeCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_moesta_fixeff.png',dpi=NA)
@@ -383,14 +391,14 @@ The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]
 
 ## *Harvestman:* Phalangium opilio 
 
-_Phalangium opilio_ activity-density was strongly influenced by trap location, with pivot corners and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a).
+_Phalangium opilio_ activity-density was strongly influenced by trap location, with grassy field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a).
 Landscape composition explained `r filter(r2Nakagawa2,grepl('Opilio',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`% of variance in _P. opilio_ activity-density.
 Nearby grassland (p=`r with(opilSmTerms,p[Smoother=='ti(Distance,Day):GrassWetland'])`) and woodland (p=`r with(opilSmTerms,p[Smoother=='s(Distance):TreeShrub'])`) both had negative effects on _P. opilio_ activity-density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c).
 Compare this to _P. melanarius_, which is also influenced by grassland and woodland, but where the effect was negative _late_ in the season.
 The temporal and spatial components, as in the other two species, were both very strong (both p`r with(opilSmTerms,p[grepl('E,N',Smoother)])`).
 The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]*100`%  of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(OpilioMod[2]-OpilioMod[1])*100)`%.
 
-(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, green, blue).
+(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r OpilioLandscape, echo=FALSE, fig.cap='(ref:OpilioCap)', out.width='100%'}  
   include_graphics('../figures/Opiliones_fixeff.png',dpi=NA)
@@ -402,25 +410,13 @@ The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]
 r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>%
   pivot_wider(names_from=model,values_from=r2comp) %>%
   mutate(terms=case_when(terms=='trapLoc' ~ 'Trap Location', terms=='s(day)' ~ 'Day of Year',
-                         terms=='s(E,N)' ~ 'Spatial Location', terms=='GrassWetland' ~ 'Grass/Wetland',
-                         terms=='TreeShrub' ~ 'Trees/Shrubs', terms=='sigmaD' ~ 'Residual',
+                         terms=='s(E,N)' ~ 'Spatial Location', terms=='GrassWetland' ~ 'Grassland',
+                         terms=='TreeShrub' ~ 'Woodland', terms=='sigmaD' ~ 'Residual',
                          terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>%
   kable(.,format='latex',caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
         col.names=linebreak(x=c('Term','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
                               '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}'),align='l'),
         digits=c(1,3,3,3,3),align='rllll',escape=FALSE)
-# test_data <- data.frame(Mean = runif(5, 3.71, 7.72),
-#                         N = sample(57:59, 5, replace = TRUE),
-#                         sd = c(1, rep(0, 4)),
-#                         d = rep(1, 5),
-#                         naod = sample(1:4, 5, replace = TRUE),
-#                         a = sample(5:12, 5, replace = TRUE),
-#                         sa = sample(37:44, 5, replace = TRUE))
-# 
-# kable(test_data,"latex" ,booktabs=T, align="c",
-#       col.names=linebreak(c('Mean','\\textit{N}' ,'Strongly\n Disagree','Disagree','Neither Agree\n or Disagree','Agree','Strongly\n Agree')),
-#       row.names = T,escape=F) %>%
-#   row_spec(0,align = "c")
   
 ```
 
@@ -474,7 +470,7 @@ This suggests that _Pardosa_ dispersal distances may be further than previously 
 _Phalangium opilio_ activity-density responded to grass and wetland cover, as well as trees and shrubs, but the trap location and landscape explained only `r r2Nakagawa$OpilioMod[1]*100`% of the variance.
 Other studies have found that _P. opilio_ is mostly found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc].
 Since most of our study area was in or near farmed land, the lack of variation is understandable, but there were a few notable landscape-level patterns that emerged.
-_P. opilio_ activity-density was higher in grassy pivot corners and wetlands, but grasslands and wetlands acted as a local sink of _P. opilio_ until late in the season.
+_P. opilio_ activity-density was higher in grassy field edges and wetlands, but grasslands and wetlands acted as a local sink of _P. opilio_ until late in the season.
 These indicate that while grass and wetlands could act as a reservoir, spillover into other land cover types may be limited, as _P. opilio_ avoids heavily grazed areas, possibly due to low humidity [@sajna2011].
 _P. opilio_ is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern: forests act as a weak sink for _P. opilio_, at least early in the year.
