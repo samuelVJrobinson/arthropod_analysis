@@ -56,7 +56,7 @@ header-includes:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
-# library(kableExtra)
+library(kableExtra)
 library(tidyverse)
 library(mgcv)
 
@@ -398,15 +398,30 @@ The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]
 
 
 ```{r rSquared, echo=FALSE, out.width='100%'}  
-  r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>% 
-  pivot_wider(names_from=model,values_from=r2comp) %>% 
+
+r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>%
+  pivot_wider(names_from=model,values_from=r2comp) %>%
   mutate(terms=case_when(terms=='trapLoc' ~ 'Trap Location', terms=='s(day)' ~ 'Day of Year',
                          terms=='s(E,N)' ~ 'Spatial Location', terms=='GrassWetland' ~ 'Grass/Wetland',
                          terms=='TreeShrub' ~ 'Trees/Shrubs', terms=='sigmaD' ~ 'Residual',
-                         terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>% 
-  kable(.,caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
-        col.names=c('Term','$\\emph{Pterostichus melanarius}$','$\\emph{Pardosa distincta}$','$\\emph{Pardosa moesta}$','$\\emph{Phalangium opilio}$'),
-        digits=c(1,3,3,3,3),align='rllll',escape=FALSE, table.attr = "style='width:30%;'") 
+                         terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>%
+  kable(.,format='latex',caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
+        col.names=linebreak(x=c('Term','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
+                              '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}'),align='l'),
+        digits=c(1,3,3,3,3),align='rllll',escape=FALSE)
+# test_data <- data.frame(Mean = runif(5, 3.71, 7.72),
+#                         N = sample(57:59, 5, replace = TRUE),
+#                         sd = c(1, rep(0, 4)),
+#                         d = rep(1, 5),
+#                         naod = sample(1:4, 5, replace = TRUE),
+#                         a = sample(5:12, 5, replace = TRUE),
+#                         sa = sample(37:44, 5, replace = TRUE))
+# 
+# kable(test_data,"latex" ,booktabs=T, align="c",
+#       col.names=linebreak(c('Mean','\\textit{N}' ,'Strongly\n Disagree','Disagree','Neither Agree\n or Disagree','Agree','Strongly\n Agree')),
+#       row.names = T,escape=F) %>%
+#   row_spec(0,align = "c")
+  
 ```
 
 # Discussion
@@ -497,7 +512,7 @@ Finally, future work should explicitly link landscape structure, arthropod abund
 
 (ref:ParMoeSTCap) Temporal and spatial components of _Pardosa moesta_ activity-density (after accounting for landscape composition and trap location).
 
-```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='', out.width='100%'}
+```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='(ref:ParMoeSTCap)', out.width='100%'}
   include_graphics('../figures/Pardosa_moesta_raneff.png',dpi=NA)
 ```
 
