@@ -25,18 +25,22 @@ expFun <- function(a,b,d,xRange=c(0,1),n=100){
 }
 plot(expFun(1,0.05,-0.1)); abline(h=0)
 
+#Set seed
+set.seed(1)
+
 #Positively sloped line
-p1 <- apply(mapply(lineFun,int=rnorm(1000,0,0.1),slope=rnorm(1000,0.5,0.1),MoreArgs=list(n=1000)),
+p1 <- apply(mapply(lineFun,int=rnorm(1000,1,0.1),slope=rnorm(1000,0.5,0.1),MoreArgs=list(n=1000)),
       1,function(x) quantile(x,c(0.05,0.5,0.95))) %>% t(.) %>% 
   data.frame(x=seq(0,1,length.out=length(.[,1])),.) %>% 
   rename(lwr=`X5.`,med=`X50.`,upr=`X95.`) %>% 
   ggplot(aes(x,med))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
-  labs(y='Response (y)',x='Proportion cover')+#ylim(-1.5,1.5)+
-  annotate('segment',x=0.75,xend=0.75,y=-0.5+0.75,yend=-0.5+1)+
-  annotate('segment',x=0.75,xend=1,y=-0.5+1,yend=-0.5+1)+
-  annotate('segment',x=0.5,xend=0.7,y=-0.3+1,yend=-0.45+1,arrow=arrow())+
-  annotate('text',x=0.4,y=0.7,label='beta == 0.5',parse=TRUE)
+  labs(y='Activity Density (y)',x='Proportion cover')+#ylim(-1.5,1.5)+
+  annotate('segment',x=0.75,xend=0.75,y=0.5+0.75,yend=0.5+1,linetype='dashed')+
+  annotate('segment',x=0.75,xend=1,y=0.5+1,yend=0.5+1,linetype='dashed')+
+  annotate('segment',x=0.5,xend=0.7,y=0.7+1,yend=0.55+1,arrow=arrow())+
+  annotate('text',x=0.4,y=1.7,label='beta == 0.5',parse=TRUE)+
+  annotate('text',x=0.25,y=1.2,label='hat(y) == alpha + beta %*% Proportion~Cover',parse=TRUE)
   
 #Actual function: y = -0.5 + 1 * x
 #Inverse: x + 0.5 = y
@@ -73,10 +77,12 @@ p4 <- apply(mapply(lineFun,int=rnorm(1000,0,0.1),slope=rnorm(1000,-0.5,0.1),More
   rename(lwr=`X5.`,med=`X50.`,upr=`X95.`) %>% 
   ggplot(aes(x,med))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+geom_hline(yintercept=0,linetype='dashed')+
-  annotate('text',x=700,y=1,label='Positive effect of nearby cover')+
+  annotate('text',x=700,y=1,label='Positive early effect of cover')+
   annotate('segment',x=450,xend=200,y=1,yend=0.6,arrow=arrow())+
-  annotate('text',x=300,y=-1,label='Negative effect of far-away cover')+
-  annotate('segment',x=575,xend=800,y=-1,yend=-0.6,arrow=arrow())+
-  labs(x='Distance',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
+  annotate('text',x=300,y=-1,label='Negative late effect cover')+
+  annotate('segment',x=525,xend=800,y=-1,yend=-0.6,arrow=arrow())+
+  scale_x_continuous(breaks=seq(0,1000,250),labels=seq(100,200,25))+
+  labs(x='Day of year',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
 
-ggarrange(p1,p2,p3,p4,labels=letters[1:4],nrow=2,ncol=2) #Plot spatial/temporal effects
+pAll <- ggarrange(p1,p2,p3,p4,labels=letters[1:4],nrow=2,ncol=2) #Plot spatial/temporal effects
+ggsave('./figures/frExample.png',pAll,height=8,width=10)

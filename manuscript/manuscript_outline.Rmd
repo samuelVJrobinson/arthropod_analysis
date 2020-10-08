@@ -252,7 +252,7 @@ _Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: 
 It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field edges as larval habitat [@desender1988].
 _Pardosa_ are wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
 Both _Pardosa distincta_ and _Pardosa moesta_ are found in a wide variety of habitats, but are common in ungrazed pastures [@dondale1990; @carcamo2014].
-_P. distincta_ is commonly found in disturbed environments [@collins1996; @wade2010], while _P. moesta_ appear to prefer less frequent disturbances [@graham2003; @kowal2011; but see @dondale1990].
+_P. distincta_ is also commonly found in disturbed environments [@collins1996; @wade2010], while _P. moesta_ appear to prefer less frequent disturbances [@graham2003; @kowal2011; but see @dondale1990].
 Other _Pardosa_ are known to use road margins and wooded areas as habitat [@buddle2000; @drapela2011].
 Finally, _Phallangium opilio_ is an introduced harvestman (Opiliones: Phalangiidae) that is found in drier disturbed areas [@bragg2009].
 Juveniles hatch from eggs during the spring, becoming adults during the summer, and eggs are laid during the fall [adults do not overwinter; @bragg2009].
@@ -267,11 +267,11 @@ The ten most-common cover classes surrounding our sites represented 98% of the t
 
 ## Statistics
 
-Functional regression [@ramsay2004; @yen2014] was to incorporate landscape information at different distances, allowing assessment of both local and regional landscape composition [@galpern2020].
+Functional regression [@ramsay2004; @yen2014] was used to incorporate landscape information at different distances, allowing assessment of both local and regional landscape composition [@galpern2020].
 Scalar-on-function regression is a special type of linear regression model ($y=X\beta + e$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$, and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the predictors.
 <!-- As an example of scalar-on-function regression, biomass in a plot (scalar) could be modeled as a smoothed function of monthly average temperatures at that plot (function), meaning that the effect of monthly temperatures would also be a function of time. -->
 In our case, the proportion of landscape cover ($X$) within each annulus surrounding the trap is a function of distance away from the trap, meaning that the coefficients are a smoothed function of distance ($\beta_i = f(distance_i)$), and represent the additive effect of a given type of landscape cover at distances away from the trap (i.e. $X\beta$).
-This allows the possibility that the size of the landscape "grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010].
+This allows for the possibility that the size of the landscape "grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010].
 It also allows for the possibility that certain land cover types may be locally beneficial, but detremental at wider scales, indicating that the cover type may not constitute a completely usable habitat.
 
 Scalar-on-function regression of activity-density was fit using generalized additive models [_mgcv_ version `r packageVersion('mgcv')`; @wood2017]. 
@@ -300,15 +300,24 @@ Cereal was removed from the model, as it was negatively correlated with canola c
 This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (grassland, canola, pasture, woodland, pulses, urban; see Figure \@ref(fig:concurvity)) 
 
 ***
-**Box 1: Interpretation of Functional Regression Plots**
+**Box 1: Interpreting Functional Regression Plots**
 
-This box explains how to interpret functional regression plots.
+Functional linear regression is a special case of linear regression, where both the independent variable is predicted by a functional dependent variable, meaning that the slope is a function (vector) rather a fixed (scalar) value [@ramsay2004; @yen2014].
+Therefore, the interpretation of a functional regression plot is very different from that of a simple linear regression plot.
+Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity density_ (_y_) and a single predictor, _Proportion cover_ (_x_), which is measured in a circle of a fixed radius (_Distance_) surrounding each trap.
+If we suppose that the relationship between _x_ and _y_ is similar at all radii at which _x_ is measured, then Figure \@ref(fig:frExample)b shows the resulting functional linear regression plot, where the slope ($\beta$) is the same at all distances.
+In reality it is more likely that nearby cover will be more influential on activity density than far-away cover, which would result in a relationship similar to Figure \@ref(fig:frExample)c.
+As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover (measured within a fixed radius) as a predictor of measurements taken across time, allowing the effect of proportion cover to vary over the course of the season (Figure \@ref(fig:frExample)d).
+Finally, proportion cover over distance and time may be combined into a smoothed surface of effects, representing the spatio-temporal influence of landscape cover on activity density.
+
+```{r frExample, echo=FALSE, fig.cap='Examples of (functional) linear regression plots. \\textbf{a)} shows a simple linear regression plot, with a single slope value for a single regressor. \\textbf{b)} shows the equivalent plot in functional regression form, where the the slope is a smoothed function that maps onto a function-valued regressor. \\textbf{c)} and \\textbf{d)} show functional linear regression plots where the slope varies with the location of the regressor.', out.width='100%'}  
+  include_graphics('../figures/frExample.png',dpi=NA)
+```
 
 ***
   
 Functional regression plots of landscape composition reveal which cover classes are acting as sources or sinks of organisms, and at what spatial scale.
 Positive responses to nearby landscape cover classes indicate that the cover class acts as a net source (i.e. arthropods spill over *from* it).
-__Paul, do we need a separate box/figure explaining how to interpret these plots, or should we just include references?__
 However, negative responses to nearby landscape cover classes can indicate one of two things:
 1) It may indicate that the cover class acts as a sink (i.e. organisms spill over *into* it) or 2) it may indicate that the cover class acts as a source, but it is unoccupied (i.e. no organisms available to spill over).
 We consider 1) to be the more likely scenario, as it is unlikely that any one cover class is *completely* unoccupied.
@@ -418,6 +427,20 @@ r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),
                               '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}'),align='l'),
         digits=c(1,3,3,3,3),align='rllll',escape=FALSE)
   
+```
+
+```{r resultsTab, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+mytable = data.frame(
+    CoverClass = c("Grassland", "Canola", "Pasture", "Woodland", "Pulses", "Road margins"),
+    PteMel = c('* Local sink (late)','* Local source (early) \n* Landscape sink (early)',' ',' ','* Source (late)',' '),
+    ParDis = c(' ',' ','* Landscape sink',' * Sink (late)',' ',' '),
+    ParMoe = c('* Local sink \n* Landscape source','* Local source (early) \n* Local sink (late)',' ',' ','* Landscape source','* Local source (early) \n*Local sink (late) \n* Landscape sink (early) \n* Landscape source (late)'),
+    Opilio = c('* Local sink (early)',' ',' ','* Local sink (early) \n* Landscape source (mid)',' ',' ')
+    )
+
+names(mytable) <- c('Cover class','_Pterosticus\nmelanarius_','_Pardosa distincta_','_Pardosa moesta_','Phalangium opilio')
+
+pander::pander(mytable, keep.line.breaks = TRUE, style = 'grid', justify = 'left')
 ```
 
 # Discussion
