@@ -438,18 +438,18 @@ p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>%
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
 
-#Pulses (space)
-p4 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Pulses',sapply(mod3$smooth,function(x) x$label)))[1]) %>%
-  rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Pulse effect')
-
 #Urban effect (space + time)
-p5 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>% 
+p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Urban',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
   effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Road margin effect')
+
+#Pulses (space)
+p5 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
+  smoothPred(mod3,whichSmooth=which(grepl('Pulses',sapply(mod3$smooth,function(x) x$label)))[1]) %>%
+  rename(x=distMat) %>% 
+  effectPlot(leg=F)+labs(x='Distance (m)',y='Pulse effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,

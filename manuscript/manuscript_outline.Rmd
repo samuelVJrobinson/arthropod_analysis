@@ -37,15 +37,17 @@ abstract: Ground-dwelling arthropods are important generalist predators in agro-
 
 bibliography: refs.bib
 csl: ecology-letters.csl
+geometry: "left=3cm,right=3cm,top=3cm,bottom=3cm"
 output: 
   bookdown::pdf_book:
     base_format: rticles::elsevier_article
     toc: false
     fig_caption: true
 header-includes: 
-  \usepackage{tcolorbox} 
   \usepackage{float} \floatplacement{figure}{H} 
   \newcommand{\beginsupplement}{\setcounter{table}{0} \newpage \renewcommand{\thetable}{S\arabic{table}} \setcounter{figure}{0} \renewcommand{\thefigure}{S\arabic{figure}}}
+  \usepackage{setspace}
+  \linenumbers
 ---
 
 <!-- This argument in YAML header adds "manuscript_appendix.md" after document -->
@@ -190,8 +192,10 @@ Ncatches <- lapply(list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod),function(x){
 
 ```
 
-# Introduction
+\newpage
+\doublespacing
 
+# Introduction
 Arthropods are one of the most influential groups of animals in agricultural systems.
 Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in downstream economic effects, food insecurity, and malnutrition.
 On the other hand, spillover of beneficial arthropods from adjacent non-crop patches can deliver increased crop yields by providing ecosystem services such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
@@ -230,9 +234,9 @@ Using a large pitfall trapping dataset, we related seasonal changes in arthropod
 
 ## Data collection
 We used a set of `r sum(NtrapsPer$n)` pitfall traps installed in road margins (minimum of 5 m away from the road edge, `r with(NtrapsPer, sum(n[trapLoc=='ditch']))` traps) and in-field locations (`r with(NtrapsPer, sum(n[trapLoc!='ditch']))`) across southern Alberta, Canada in 2017 (Figure \@ref(fig:siteMap)).
+The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
 Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempTrap$startjulian)),format='%j'),format='%B %d')`, and collections ended on `r format(as.Date(as.character(max(PteMelMod$tempTrap$endjulian)),format='%j'),format='%B %d')`, with collection occurring continuously and traps being emptied every `r round(mean(PteMelMod$tempTrap$trapdays),1)` days on average (SD: `r round(sd(PteMelMod$tempTrap$trapdays),1)`). 
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
-The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
 In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
 Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
 We used 582 mL Solo® cups buried up to the rim and partially filled with ethylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
@@ -279,7 +283,6 @@ Count data of arthropods were modeled using a negative binomial distribution wit
 To account for different lengths of trap exposure, log-days since trap placement were used as a fixed effect with their slope held at 1 ("offset" variable).
 Trapping location was included as a fixed effect with 5 levels (canola, field edge, grassland, road margin, and wetlands) to account for the effect of local cover independent of the surrounding landscape composition. 
 Day of year was included as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centre point) were included as 2-dimensional smooths, in order to account for underlying spatial and temporal autocorrelation in the data.
-The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 
 For each landscape cover class, we used three scalar-on-function terms.
 First, we used the proportion cover in the annuli surrounding each trap location (spatial effect of cover class).
@@ -288,7 +291,9 @@ Finally, we used a tensor-product interaction of landscape cover and day of year
 We used 10 basis dimensions for the spatial and temporal landscape smoothers, and 16 basis dimensions for the spatio-temporal interaction.
 This was deemed adequate, as the effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
 To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
+The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 Finally, we calculated the R$^2$ for each group of terms [@nakagawa2013; @nakagawa2017].
+
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
 
 Preliminary model fits revealed that some of the landscape terms in our model were strongly concurved with each other, so we removed them from the model or combined them.
@@ -297,7 +302,7 @@ There is no agreed-upon threshold of "unacceptable" concurvity, but 0.5 is commo
 <!-- Some landscape terms were strongly concurved , namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63). -->
 Trees and shrubs were combined into a single ``woodland" category, and grassland and wetland were combined into a single "grassland" category, as they were strongly positively correlated at all distances, indicating similar feature classes.
 Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola $\rightarrow$ wheat $\rightarrow$ barley) and the commonly-used 800 m block structure of farmland in our study region (quarter-sections).
-This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (grassland, canola, pasture, woodland, pulses, urban; see Figure \@ref(fig:concurvity)) 
+This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (grassland, canola, pasture, woodland, pulses, urban; see Figure \@ref(fig:concurvity)).
 
 ***
 **Box 1: Interpreting Functional Regression Plots**
@@ -324,6 +329,8 @@ We consider 1) to be the more likely scenario, as it is unlikely that any one co
 <!-- As these data were collected from a single year, this model does not consider the next-generation fitness consequences of spillover. -->
 For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a sink but never as a source.
 Alternatively, a cover class could act as a sink by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as a source at other times (e.g. during emergence).
+For brevity in the subsequent Results section, we refer to "local" and "landscape"-level effects; local refers to the effects of landscape composition at scales of <500m, whereas landscape refers to scales >500 m.
+Similarly, we refer to "early", "mid", and "late"-season effects, where landscape composition affected abundance from June - July, July - August, or August - September.
 
 <!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity-density -->
 <!--   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data  -->
@@ -348,26 +355,26 @@ Several landscape ``fingerprints" were evident in the landscape annuli, with cer
 Grassland cover was largely constant with distance, although a cluster of sites had uniformly high or low cover of grassland with distance.
 The pitfall traps caught a total of `r with(Ncatches,total[spp=='PteMel'])` _Pterostichus melanarius_, `r with(Ncatches,total[spp=='ParDis'])` _Pardosa distincta_, `r with(Ncatches,total[spp=='ParMoe'])` _Pardosa moesta_, and `r with(Ncatches,total[spp=='Opilio'])` _Phalangium opilio_ (mean trapping rates per day: `r with(Ncatches,paste(round(perDayMean,2),collapse=', '))`, SD: `r with(Ncatches,paste(round(perDaySD,2),collapse=', '))`, respectively).
 
-```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', out.width='100%'}  
+```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', fig.width=5, fig.height=5}  
 coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p=100*round(p/sum(unique(p)),4)) %>% 
   mutate(cover=paste0(as.character(cover),' (',p,'%)'),prop=prop*100) %>% 
   mutate(cover=factor(cover,levels=unique(cover))) %>% 
   ggplot(aes(dist,prop,group=site))+geom_line(alpha=0.2)+
-  facet_wrap(~cover,ncol=4)+theme_classic()+labs(y='Percent cover',x='Inner radius of annuli (m)')
-
+  facet_wrap(~cover,ncol=4)+theme_classic()+theme(axis.text = element_text(size = 8),strip.text=element_text(size=8))+
+  labs(y='Percent cover',x='Inner radius of annuli (m)')
 ```
 
 ## *Ground beetle:* Pterostichus melanarius
 
 _P. melanarius_ activity-density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:PteMelLinear), \@ref(tab:PteMelSmooth)).
 Canola crops had a marginally higher activity-density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a).
-Grassland cover was the most important land cover type in explaining in activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and nearby grassland had a neutral effect early in the summer but a negative effect later in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
-Nearby canola had a positive effect in the early summer, but far-away canola (>800 m) had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density than those with only local canola cover.
+Grassland cover was the most important land cover type in explaining in activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local (<500 m) grassland had a neutral effect early in the summer but a negative effect later in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
+Local canola had a positive effect in the early season, but landscape-level canola (>500 m) had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density.
 Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest.
-Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were strong drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
-The landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
+Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were important drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
+Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
-<!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses "text references" instead. -->
+<!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses the following "text references" instead. -->
 (ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
@@ -378,13 +385,18 @@ The landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]
 
 Activity density of _P. distincta_ and _P. moesta_ was influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth)), but landscape composition had relatively weak effects on both species ($R^2$: `r filter(r2Nakagawa2,grepl('Par',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% group_by(model) %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`).
 Unlike _P. melanarius_, both _Pardosa_ species had far lower activity-density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a).
-Nearby canola appeared to act as a source of _P. moesta_ and a weak source of _P. distincta_, as activity-density was positively related to the local proportion of canola early in the season, but negatively related later in the season (Figures \@ref(fig:ParDisLandscape)b, \@ref(fig:ParMoeLandscape)c, p=`r with(pdisSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`, `r with(pmoeSmTerms,p[Smoother=='ti(Distance,Day):Canola'])`).
-Urban land cover had a similar effect on _P. moesta_, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)f).
-Trees and shrubs acted as a sink for _P. distincta_ later in the season, and as a weak source early on in the season for _P. moesta_ (Figures \@ref(fig:ParDisLandscape)d, \@ref(fig:ParMoeLandscape)d).
-Grasslands had a local negative effect on _P. moesta_, but a positive landscape-level effect, indicating that while these cover types act as a sink, the general amount of grassland in the area had a positive effect on _P. moesta_ abundance.
-_P. distincta_ was similarly affected by pulses: landscape-level abundance of pulses had a positive effect, but the local effect was neutral.
-Finally, activity-density of both _Pardosa_ species had a very strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal) ; both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
-The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]*100`%  and `r r2Nakagawa$ParMoeMod[1]*100`% of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(ParDisMod[2]-ParDisMod[1])*100)`%  and `r with(r2Nakagawa,(ParMoeMod[2]-ParMoeMod[1])*100)`%, for _P. distincta_ and _P. moesta_ respectively.
+Activity-density of both _Pardosa_ species had a strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal); both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
+
+_P. distincta_ activity density responded to pasture and woodlands; landscape-level pasture cover had a negative effect (Figure \@ref(fig:ParDisLandscape)b), while woodlands had a negative effect late in the season (Figure \@ref(fig:ParDisLandscape)c).
+This suggests that large amounts of pasture are unsuitable habitat for _P. distincta_, and that they may migrate into woodlands later in the season.
+However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)`) than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be locally abundant in certain cover types, it is very generalistic in its overall habitat preferences.
+
+_P. moesta_ activity density responded to grassland, canola, and road margins.
+Grasslands had a local negative effect, but a positive landscape-level effect, indicating that while these cover types act as a local sink, the general amount of grassland in the area had a positive effect (Figure \@ref(fig:ParMoeLandscape)b).
+Nearby local canola had a positive early effect on activity-density, but a negative local effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
+Local road margins had a similar effect, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)d).
+Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
+Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)`) in _P. moesta_ activity density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also highly generalistic in its overall habitat preferences.
 
 (ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
@@ -401,9 +413,10 @@ The landscape composition and trap location explained `r r2Nakagawa$ParDisMod[1]
 ## *Harvestman:* Phalangium opilio 
 
 _Phalangium opilio_ activity-density was strongly influenced by trap location, with grassy field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a).
-Landscape composition explained `r filter(r2Nakagawa2,grepl('Opilio',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`% of variance in _P. opilio_ activity-density.
-Nearby grassland (p=`r with(opilSmTerms,p[Smoother=='ti(Distance,Day):GrassWetland'])`) and woodland (p=`r with(opilSmTerms,p[Smoother=='s(Distance):TreeShrub'])`) both had negative effects on _P. opilio_ activity-density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c).
-Compare this to _P. melanarius_, which is also influenced by grassland and woodland, but where the effect was negative _late_ in the season.
+Nearby grassland and woodland both had negative effects on _P. opilio_ activity-density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c), suggesting that either these landscape cover classes 
+
+
+<!-- Landscape composition explained `r filter(r2Nakagawa2,grepl('Opilio',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`% of variance in _P. opilio_ activity-density. -->
 The temporal and spatial components, as in the other two species, were both very strong (both p`r with(opilSmTerms,p[grepl('E,N',Smoother)])`).
 The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]*100`%  of variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(OpilioMod[2]-OpilioMod[1])*100)`%.
 
@@ -415,18 +428,16 @@ The landscape composition and trap location explained `r r2Nakagawa$OpilioMod[1]
 
 
 ```{r rSquared, echo=FALSE, out.width='100%'}  
-
 r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),r2comp=r2comp*1) %>%
   pivot_wider(names_from=model,values_from=r2comp) %>%
   mutate(terms=case_when(terms=='trapLoc' ~ 'Trap Location', terms=='s(day)' ~ 'Day of Year',
                          terms=='s(E,N)' ~ 'Spatial Location', terms=='GrassWetland' ~ 'Grassland',
                          terms=='TreeShrub' ~ 'Woodland', terms=='sigmaD' ~ 'Residual',
                          terms=='Urban' ~ 'Road margins', TRUE ~ terms)) %>%
-  kable(.,format='latex',caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance attributable to each term.',
+  kable(.,format='latex',caption='R$^2_{GLMM}$ for model components, representing the proportion of total variance explained by each term. R$^2$ was calculated using methods from Nakagawa et al. 2013 and Nakagawa et al. 2017.',
         col.names=linebreak(x=c('Term','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
                               '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}'),align='l'),
         digits=c(1,3,3,3,3),align='rllll',escape=FALSE)
-  
 ```
 
 ```{r resultsTab, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
@@ -455,11 +466,11 @@ mytable <- data.frame(
 
 mytable %>%
   mutate_all(linebreak) %>%  # required for linebreaks to work
-  kable(.,format='latex',caption='Summary of model results. Cover classes with weak effects on activity density are not shown.',
+  kable(.,format='latex',caption='Summary of model results. \\emph{Local/Landscape} denotes cover classes <500m or >500m away from the trap location, respectively. +/-- indicates positive or negative effects of the cover class, and \\emph{Early/Mid/Late} denotes whether the effects were present earlier or later during the season. Cover classes with weak effects on activity density are not shown.',
         col.names=linebreak(x=c('Cover class','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
                               '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}')),
         align='rllll',escape=FALSE) %>% 
-  column_spec(1, width = "4em") %>% column_spec(c(2:5), width = "8em") # fix column widths
+  column_spec(1, width = "4em") %>% column_spec(c(2:5), width = "9em") # fix column widths
 ```
 
 # Discussion
