@@ -429,18 +429,37 @@ r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),
   
 ```
 
-```{r resultsTab, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-mytable = data.frame(
+```{r resultsTab, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+#Based on example from:
+# https://stackoverflow.com/questions/31011265/how-to-write-bullet-lists-in-a-table-using-rmarkdown-and-pandoc
+# #Note: this works, but it's very ugly. Trying kable instead
+# mytable <- data.frame(
+#     CoverClass = c("Grassland", "Canola", "Pasture", "Woodland", "Pulses", "Road margins"),
+#     PteMel = c('* Local sink ','* Local source (early) \n* Landscape sink (early)',' ',' ','* Source (late)',' '),
+#     ParDis = c(' ',' ','* Landscape sink',' * Sink (late)',' ',' '),
+#     ParMoe = c('* Local sink \n* Landscape source','* Local source (early) \n* Local sink (late)',' ',' ','* Landscape source','* Local source (early) \n* Local sink (late) \n* Landscape sink (early) \n* Landscape source (late)'),
+#     Opilio = c('* Local sink (early)',' ',' ','* Local sink (early) \n* Landscape source (mid)',' ',' ')
+#     )
+# colnames(mytable) <- c('Cover class','_Pterosticus_ _melanarius_','_Pardosa_ _distincta_','_Pardosa_ _moesta_','_Phalangium_ _opilio_')
+# pander(mytable, keep.line.breaks = TRUE, style = 'grid', justify = 'left', split.table=1000)
+
+#Based on example from:
+# https://stackoverflow.com/questions/52962411/table-with-long-text-bullet-points-and-specific-table-width
+mytable <- data.frame(
     CoverClass = c("Grassland", "Canola", "Pasture", "Woodland", "Pulses", "Road margins"),
-    PteMel = c('* Local sink (late)','* Local source (early) \n* Landscape sink (early)',' ',' ','* Source (late)',' '),
-    ParDis = c(' ',' ','* Landscape sink',' * Sink (late)',' ',' '),
-    ParMoe = c('* Local sink \n* Landscape source','* Local source (early) \n* Local sink (late)',' ',' ','* Landscape source','* Local source (early) \n*Local sink (late) \n* Landscape sink (early) \n* Landscape source (late)'),
-    Opilio = c('* Local sink (early)',' ',' ','* Local sink (early) \n* Landscape source (mid)',' ',' ')
+    PteMel = c('$\\cdot$ Local -- (late)','$\\cdot$ Local + (early) \n$\\cdot$ Landscape -- (early)',' ',' ','$\\cdot$ Overall + (late)',' '),
+    ParDis = c(' ',' ','$\\cdot$ Landscape --',' $\\cdot$ Overall -- (late)',' ',' '),
+    ParMoe = c('$\\cdot$ Local -- \n$\\cdot$ Landscape +','$\\cdot$ Local + (early) \n$\\cdot$ Local -- (late)',' ',' ','$\\cdot$ Landscape +','$\\cdot$ Local + (early) \n$\\cdot$ Local -- (late) \n$\\cdot$ Landscape -- (early) \n$\\cdot$ Landscape + (late)'),
+    Opilio = c('$\\cdot$ Local -- (early)',' ',' ','$\\cdot$ Local -- (early) \n$\\cdot$ Landscape + (mid)',' ',' ')
     )
 
-names(mytable) <- c('Cover class','_Pterosticus\nmelanarius_','_Pardosa distincta_','_Pardosa moesta_','Phalangium opilio')
-
-pander::pander(mytable, keep.line.breaks = TRUE, style = 'grid', justify = 'left')
+mytable %>%
+  mutate_all(linebreak) %>%  # required for linebreaks to work
+  kable(.,format='latex',caption='Summary of model results. Cover classes with weak effects on activity density are not shown.',
+        col.names=linebreak(x=c('Cover class','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
+                              '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}')),
+        align='rllll',escape=FALSE) %>% 
+  column_spec(1, width = "4em") %>% column_spec(c(2:5), width = "8em") # fix column widths
 ```
 
 # Discussion

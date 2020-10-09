@@ -326,12 +326,12 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
-#Canola (space + time: weak)
-p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
+# #Canola (space + time: weak)
+# p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+#   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
+#   rename(x=distMat,y=endDayMat) %>% 
+#   mutate(y=factor(y,labels=dispDays$date)) %>% 
+#   effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
 
 #Pasture (space)
 p3 <- expand.grid(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% 
@@ -347,8 +347,8 @@ p4 <- data.frame(endDayMat=149:241,TreeShrub=1,y=NA) %>%
   effectPlot(leg=F)+labs(x='Time of year',y='Woodland effect')
 
 #Plot landscape effects
-fixeffPlot <- ggarrange(p1,p2,p3,p4,
-                        labels=letters[1:4],nrow=2,ncol=2,
+fixeffPlot <- ggarrange(p1,p3,p4,
+                        labels=letters[1:3],nrow=2,ncol=2,
                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
 ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,raneffPlot,fixeffPlot) #Cleanup
