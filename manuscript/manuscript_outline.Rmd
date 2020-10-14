@@ -322,29 +322,15 @@ Finally, proportion cover over distance and time may be combined into a smoothed
 ***
   
 Functional regression plots of landscape composition reveal which cover classes are acting as sources or sinks of organisms, and at what spatial scale.
-Positive responses to nearby landscape cover classes indicate that the cover class acts as a net source (i.e. arthropods spill over *from* it).
+Positive effects of nearby landscape cover classes indicate that the cover class acts as a net source (i.e. arthropods spill over *from* it).
 However, negative responses to nearby landscape cover classes can indicate one of two things:
 1) It may indicate that the cover class acts as a sink (i.e. organisms spill over *into* it) or 2) it may indicate that the cover class acts as a source, but it is unoccupied (i.e. no organisms available to spill over).
 We consider 1) to be the more likely scenario, as it is unlikely that any one cover class is *completely* unoccupied.
 <!-- As these data were collected from a single year, this model does not consider the next-generation fitness consequences of spillover. -->
 For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a sink but never as a source.
 Alternatively, a cover class could act as a sink by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as a source at other times (e.g. during emergence).
-For brevity in the subsequent Results section, we refer to "local" and "landscape"-level effects; local refers to the effects of landscape composition at scales of <500m, whereas landscape refers to scales >500 m.
+For brevity in the following Results section, we refer to "local" and "landscape"-level effects; local refers to the effects of landscape composition at scales of <500m, whereas landscape refers to scales >500 m.
 Similarly, we refer to "early", "mid", and "late"-season effects, where landscape composition affected abundance from June - July, July - August, or August - September.
-
-<!-- * We used 4 nested models to gauge the relative importance of landscape composition for arthropod activity-density -->
-<!--   + Model 1 consisted of a temporal and spatial smoothers (``random effects"), necessary to account for the underlying spatiotemporal structure of the data  -->
-<!--   + Smoothers can be thought of as random effects, where the coefficients follow a probability distribution defined by a fixed smoothing coefficient $\lambda$ [@wood2017]  -->
-<!--   + Model 2 added a local cover term, to account for the specific effect of local cover on activity-density -->
-<!--   + Model 3 added a smoother term for the landscape rings, modeling the effect of non-crop cover at varying distances on activity-density -->
-<!--   + Model 4, similar to model 3, modeled the effect of all underlying cover classes (crop and non-crop) at varying distances -->
-
-<!-- Model    | Independent variables                                     | $r$ Formula -->
-<!-- -------- | --------------------------------------------------------- | ----------------------------------------------- -->
-<!-- 1        | Phenology + Geography                                     | activity-density ~ s(Day) + s(E,N) -->
-<!-- 2        | Phenology + Geography + Local cover                       | activity-density ~ s(Day) + s(E,N) + Trap Location -->
-<!-- 3        | Phenology + Geography + Local cover + Landscape (general) | activity-density ~ s(Day) + s(E,N) + Trap Location + s(Non-crop Cover)-->
-<!-- 4        | Phenology + Geography + Local cover + Landscape (specific)| activity-density ~ s(Day) + s(E,N) + Trap Location + s(Cover 1) + s(Cover 2) + ... + s(Cover n) -->
 
 # Results
 
@@ -496,18 +482,9 @@ The effect of pulse crops on carabid abundance is not well-studied, but our resu
 Carabids are predators of pea-leaf weevils (_Sitona lineatus_) on other Fabaceae [@hamon1990], and _P. melanarius_ can prey upon other carabids that are predators of _S. lineatus_, such as _Bembidion quadrimaculatum_ [@vankosky2011], so this effect may be direct or indirect.
 We did not consider the influence of previous years' crops, although carabids tend to be more abundant in areas of high crop rotation [@busch_Msc; @bertrand2016].
 
-<!-- + Carabid diversity is higher in no-till agriculture [@bourassa2008, @puech2014] -->
-<!-- Surprisingly, flax acted as a local and landscape level sink for _P. melanarius_, and as an overall sink for _P. opilio_, suggesting that it may be inappropriate feeding or nesting cover for these beneficial arthropods. -->
-<!-- Flax is more sensitive to weed competition than other small grains [@friesen1986; @kandel2020], so weed control tends to be more intense. -->
-<!-- Lower weed abundance may cause flax fields to have lower levels of weed seeds to feed on, causing seed-feeding carabids to move to other locations [@trichard2014]. -->
-<!-- Alternatively, it could be that plant structural diversity due to extensive weed control, meaning that carabids have lower amounts of attractive ground cover [@butts2003; @clark1993]. -->
-<!-- Why this occurs in flax fields but not canola or pulse crops is unclear, but may have to do with decreased shading or ground cover being less attractive to carabids [@butts2003]. -->
-<!-- To our knowledge, there is no published research investigating effects of flax cropping on beneficial arthropods, so the causes of this pattern are speculative. -->
- 
 The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but it explained only a small fraction of their activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`, `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`).
 This means that both species of _Pardosa_ appear to have very general habitat preferences, but may be somewhat influenced by certain cover types.
-
-Pasture had a negative effect at the landscape scale, and woodland acted as a late season sink, suggesting that _P. distincta_ use shrubs and trees for overwintering or winter foraging [@aitchison1984; @buddle2000].
+Pasture had a negative effect at the landscape scale, and woodland had a late-season negative effect, suggesting that _P. distincta_ move to shrubs and trees for overwintering or winter foraging [@aitchison1984; @buddle2000].
 _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2008; @drapela2011; @kowal2011], but _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010].
 @moring1994 showed that _P. distincta_ were more active in grassy habitats, which we found partial evidence of, as _P. distincta_ tended to have higher activity-density in trap locations with higher grass cover (Figure \@ref(fig:ParDisLandscape)a).
 Canola had an early-season positive effect on _P. moesta_, indicating that _P. moesta_ and _P. melanarius_ may both use canola as foraging grounds.
@@ -520,7 +497,7 @@ Therefore, _Pardosa_ dispersal distances may be further than previously thought,
 _Phalangium opilio_ activity-density responded to grass and wetland cover, as well as trees and shrubs.
 Other studies have found that _P. opilio_ is mostly found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc].
 Since most of our study area was in or near farmed land, the lack of variation is understandable, but there were a few notable landscape-level patterns that emerged.
-_P. opilio_ activity-density was higher in grassy field edges and wetlands, but grasslands and wetlands acted as a local sink of _P. opilio_ until late in the season.
+_P. opilio_ activity-density was higher in grassy field edges and wetlands, but grasslands and wetlands had a local negative effect on _P. opilio_ until late in the season.
 These indicate that while grass and wetlands could act as a reservoir, spillover into other land cover types may be limited, as _P. opilio_ avoids heavily grazed areas, possibly due to low humidity [@sajna2011].
 _P. opilio_ is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern: forests had a weak negative effect on _P. opilio_, at least early in the year.
@@ -530,10 +507,15 @@ However, there was also a strong East-West spatial random effect in both _P. opi
 
 Many other studies have considered the overall effect of SNL on ecosystem service provision, but we have highlighted the different spatial and temporal aspects of ecosystem service provision.
 We have shown how a relatively straightforward statistical technique can be used to consider multiple spatial scales of landscape composition, providing richer inference about the processes acting on beneficial arthropods.
-Different types of SNL act as sinks or sources at different times of year, but our results reveal the changes in sinks and sources within an agricultural landscape.
-These patterns imply movement of organisms between landscape features, but since we did not directly measure this, future studies should directly examine arthropod movement and life-history within matrices of cover types, with the goal of integrating landscape ecology and behavioural processes into a single model [@lima1996].
+Our results show empirical evidence of arthropod migration between cover types at different times of year, which is rarely considered beyond single-field studies.
+Since we did not directly track individual movements, future studies should directly examine arthropod movement and life-history within matrices of cover types, with the goal of integrating landscape ecology and behavioural processes into a single model [@lima1996].
 This would also allow direct inference about landscape categories that were combined in our dataset, allowing us to consider different landscape categories independently.
 Finally, future work should explicitly link landscape structure, arthropod abundance, and ecosystem services [@gagic2017].
+
+# Implications
+
+
+
 
 \newpage 
 
