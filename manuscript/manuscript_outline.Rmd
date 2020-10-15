@@ -12,10 +12,10 @@ author:
     footnote: 1
   - name: Diane Edwards
     email: diane.edwards.ca@gmail.com
-    affiliation: University of Calgary
+    affiliation: Ambrose University
   - name: Jess Vickruck
     email: jessica.vickruck@canada.ca
-    affiliation: Agriculture and Agri-Food Canada
+    affiliation: University of Calgary
   - name: Lincoln Best
     email: lincoln.best@oregonstate.edu
     affiliation: Oregon State University
@@ -25,8 +25,8 @@ author:
 address:
   - code: University of Calgary
     address: 2500 University Drive NW, Calgary, AB, Canada
-  - code: Agriculture and Agri-Food Canada
-    address: 850 Lincoln Road, Fredericton, NB, Canada
+  - code: Ambrose University
+    address: 150 Ambrose Circle SW, Calgary, AB
   - code: Oregon State University
     address: 1500 SW Jefferson Way, Corvallis, OR, USA
 footnote:
@@ -197,7 +197,7 @@ Ncatches <- lapply(list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod),function(x){
 
 # Introduction
 Arthropods are one of the most influential groups of animals in agricultural systems.
-Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in downstream economic effects, food insecurity, and malnutrition.
+Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in negative downstream economic effects and food insecurity.
 On the other hand, spillover of beneficial arthropods from adjacent non-crop patches can deliver increased crop yields by providing ecosystem services such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
 Seasonal "pulses" of food resources from crop fields act as a bottom-up driver of their associated arthropod communities, meaning that agricultural land can act as a source of nutrients and individuals for adjacent non-crop land [@diekotter2010; @galpern2017].
 These important fluxes of mobile arthropods, both to crops and away from them, are key for managing both crop yield and biodiversity in agroecosystems.
@@ -216,11 +216,11 @@ Non-adjacent cropland can also influence arthropod abundance if the organisms ar
 In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism gathers resources.
 
 Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
-First, some habitat types may act as sources of arthropods during some times of the year, but as sinks during other times, meaning that the timing of spillover may not align with key periods in crop development.
+First, some non-crop habitat may act as sources of arthropods during some times of the year, but as sinks during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods in crop development.
 Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
 Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
-For instance, bumblebee abundance can be controlled by both local- and landscape-scale SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
-Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders is often poorly-documented, especially in North America.
+For instance, bumblebee abundance can be controlled by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
+Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
 This makes it difficult to make generalizations of which habitat types harbour beneficial arthropods, making it even more difficult to provide accurate information to farmers about land management practices.
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal activity-density of arthropods across a large Canadian prairie agroecosystem.
@@ -251,8 +251,8 @@ Despite this disadvantage, activity-density is generally positively related to e
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
-We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare ones [@winfree2015].
-_Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist [@carcamo1994; @larsen2003; @busch_Msc].
+We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare species [@winfree2015], but their habitat preferences are still poorly understood.
+_Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist known to prey upon crop pests [@carcamo1994; @larsen2003; @busch_Msc].
 It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field edges as larval habitat [@desender1988].
 _Pardosa_ are wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
 Both _Pardosa distincta_ and _Pardosa moesta_ are found in a wide variety of habitats, but are common in ungrazed pastures [@dondale1990; @carcamo2014].
@@ -338,7 +338,8 @@ Similarly, we refer to "early", "mid", and "late"-season effects, where landscap
 
 Grassland, cereal, and canola were the three most-abundant landcover classes surrounding our traps, accounting for `r coverList %>% group_by(cover) %>% summarize(p=sum(prop)) %>% ungroup() %>% arrange(desc(p)) %>% mutate(prop=round(100*p/sum(p),2)) %>% slice(1:3) %>% pull(prop) %>% sum `% of land cover (Figure \@ref(fig:landscapeComp)).
 Several landscape ``fingerprints" were evident in the landscape annuli, with cereal cover increasing with distance away, along with a corresponding decrease in canola cover.
-Grassland cover was largely constant with distance, although a cluster of sites had uniformly high or low cover of grassland with distance.
+Study sites were originally chosen for sampling arthropods surrounding canola agroecosystems, so canola was a dominant signal in the landscape, but there was also a large amount of variation in grassland and pasture surrounding each site (Figure \@ref(fig:landscapeComp)).
+Grassland cover was largely constant with distance, but a cluster of sites had uniformly high or low cover of grassland with distance.
 The pitfall traps caught a total of `r with(Ncatches,total[spp=='PteMel'])` _Pterostichus melanarius_, `r with(Ncatches,total[spp=='ParDis'])` _Pardosa distincta_, `r with(Ncatches,total[spp=='ParMoe'])` _Pardosa moesta_, and `r with(Ncatches,total[spp=='Opilio'])` _Phalangium opilio_ (mean trapping rates per day: `r with(Ncatches,paste(round(perDayMean,2),collapse=', '))`, SD: `r with(Ncatches,paste(round(perDaySD,2),collapse=', '))`, respectively).
 
 ```{r landscapeComp, echo=FALSE, fig.cap='Landscape composition in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-figure heading.', fig.width=5, fig.height=5}  
@@ -354,14 +355,14 @@ coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p
 
 _P. melanarius_ activity-density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:PteMelLinear), \@ref(tab:PteMelSmooth)).
 Canola crops had a marginally higher activity-density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a).
-Grassland cover was the most important land cover type in explaining in activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local (<500 m) grassland had a neutral effect early in the summer but a negative effect later in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
-Local canola had a positive effect in the early season, but landscape-level canola (>500 m) had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density.
+Grassland cover was the most important land cover type in explaining activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local (<500 m) grassland had a negative effect late in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
+Local canola had a positive effect in the early season, but landscape-level (>500 m) canola had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density.
 Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest.
 Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were important drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
 Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
 <!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses the following "text references" instead. -->
-(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
+(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and canola at distances away from each trap. d) is a functional regression plot over time, showing the effect of pulses at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence intervals (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (red, purple, blue).
 
 ```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
   include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)

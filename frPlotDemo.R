@@ -52,7 +52,7 @@ p2 <- apply(mapply(lineFun,int=rnorm(1000,0.5,0.1),slope=rnorm(1000,0,0.1),MoreA
   rename(lwr=`X5.`,med=`X50.`,upr=`X95.`) %>% 
   ggplot(aes(x,med))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+geom_hline(yintercept=0,linetype='dashed')+
-  annotate('text',x=500,y=-0.75,label='Effect of cover is uniform at all distances')+
+  annotate('text',x=500,y=-0.75,label='Effect of cover is positive at all distances')+
   annotate('segment',x=400,xend=300,y=-0.5,yend=0.2,arrow=arrow())+
   annotate('segment',x=600,xend=700,y=-0.5,yend=0.2,arrow=arrow())+
   labs(x='Distance',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
