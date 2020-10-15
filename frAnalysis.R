@@ -179,8 +179,8 @@ ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=stFigX,he
 #Plot significant landscape effects
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% 
-  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+  mutate(date=c('Early','Mid','Late')) 
 
 #Get order of terms to plot
 cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
@@ -314,8 +314,8 @@ ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=stFigX,height=s
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% 
-  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+  mutate(date=c('Early','Mid','Late')) 
 
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
@@ -413,8 +413,8 @@ ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=stFigX,height=stFi
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% 
-  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+  mutate(date=c('Early','Mid','Late')) 
 
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
@@ -523,8 +523,8 @@ ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=stFigX,height=stFigY,sc
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% 
-  mutate(date=c('June 20','July 20','August 20')) #Actually June/July 22, but close enough...
+dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+  mutate(date=c('Early','Mid','Late')) 
 
 #Trap location - less in canola, more in wetland/pivot
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
