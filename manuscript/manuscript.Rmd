@@ -267,7 +267,7 @@ AAFC cropland landscape classifications from 2017 were very accurate for cultiva
 We combined functionally similar landscape categories (cereals: _Triticum aestivum_ and _Hordeum vulgare_, pulses: _Pisum sativum_ and _Lens culinaris_, forest: coniferous and broadleaf). 
 <!-- The radius of the circle necessary to characterize the landscape depends on the scale of the landscape that matters to a given organism [@addicott1987]. -->
 At each site, we extracted the proportion of each cover class within 30m annuli (rings), with the inner radius of each annulus ranging from 30 to 1470m in increments of 30m (total of 49 annuli, 1.5 km maximum).
-The ten most-common cover classes surrounding our sites represented 98% of the total land cover in our study region: grassland, cereal, canola, pasture, pulses, wetland, urban (road margins), shrubland, flax, and forest (Figure \@ref(fig:landscapeComp)); flax was removed, as only a single site had nearby flax cover.
+The ten most-common cover classes surrounding our sites represented 98% of the total land cover in our study region: grassland, cereal, canola, pasture, pulses, wetland, urban (road margins), shrubland, flax, and forests (Figure \@ref(fig:landscapeComp)); flax was removed, as only a single site had nearby flax cover.
 
 ## Analysis
 
@@ -292,7 +292,7 @@ We used 10 basis dimensions for the spatial and temporal landscape smoothers, an
 This was deemed adequate, as the effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
 To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
 The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
-Finally, we calculated the R$^2$ for each group of terms [@nakagawa2013; @nakagawa2017].
+Finally, we calculated the proportion of explained variance (R$^2$) for each set of terms [@nakagawa2013; @nakagawa2017].
 
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
 
@@ -300,7 +300,7 @@ Preliminary model fits revealed that some of the landscape terms in our model we
 Concurvity is a nonlinear analogue of multicollinearity which can bias estimates of standard errors [@buja1989].
 There is no agreed-upon threshold of "unacceptable" concurvity, but 0.5 is commonly used [@dominici2002; @ramsay2003]. 
 <!-- Some landscape terms were strongly concurved , namely forest and shrubland (max: 0.71), canola and cereal (max: 0.74), and grassland and wetland (max: 0.63). -->
-Trees and shrubs were combined into a single ``woodland" category, and grassland and wetland were combined into a single "grassland" category, as they were strongly positively correlated at all distances, indicating similar feature classes.
+Forests and shrubland were combined into a single ``woodland" category, and grassland and wetland were combined into a single "grassland" category, as they were strongly positively correlated at all distances, indicating similar feature classes.
 Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola $\rightarrow$ wheat $\rightarrow$ barley) and the commonly-used 800 m block structure of farmland in our study region (quarter-sections).
 This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (cropland: canola, pulses; SNL: grassland, pasture, woodland, roadside; see Figure \@ref(fig:concurvity)).
 
@@ -355,10 +355,10 @@ coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p
 
 _P. melanarius_ activity-density was strongly influenced by trap location and landscape composition (Tables \@ref(tab:PteMelLinear), \@ref(tab:PteMelSmooth)).
 Canola crops had a marginally higher activity-density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a).
-Grassland cover was the most important land cover type in explaining activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local (<500 m) grassland had a negative effect late in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
-Local canola had a positive effect in the early season, but landscape-level (>500 m) canola had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density.
-Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest.
-Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p<0.001), indicating that phenology and local geographic factors were important drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
+Grassland cover was the most important land cover type in explaining activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local grassland had a negative effect late in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
+Local canola had a positive effect in the early season, but landscape-level canola had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density (Figure \@ref(fig:PteMelLandscape)c).
+Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest (Figure \@ref(fig:PteMelLandscape)d).
+Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p `r with(pmelSmTerms,p[Smoother=='s(E,N)'])`), indicating that phenology and local geographic factors were important drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
 Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
 <!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses the following "text references" instead. -->
@@ -370,21 +370,21 @@ Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100
 
 ## *Wolf spiders:* Pardosa distincta *and* Pardosa moesta
 
-Activity density of _P. distincta_ and _P. moesta_ was influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth)), but landscape composition had relatively weak effects on both species ($R^2$: `r filter(r2Nakagawa2,grepl('Par',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% group_by(model) %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`).
+Activity density of _P. distincta_ and _P. moesta_ was influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeLinear), \@ref(tab:ParMoeSmooth)), but landscape composition had relatively weak effects on both species ($R^2$: `r filter(r2Nakagawa2,grepl('Par',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% group_by(model) %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`).
 Unlike _P. melanarius_, both _Pardosa_ species had far lower activity-density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a).
 Activity-density of both _Pardosa_ species had a strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal); both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
 
-_P. distincta_ activity density responded to pasture and woodlands; landscape-level pasture cover had a negative effect (Figure \@ref(fig:ParDisLandscape)b), while woodlands had a negative effect late in the season (Figure \@ref(fig:ParDisLandscape)c).
-This suggests that large amounts of pasture are unsuitable habitat for _P. distincta_, and that they may migrate into woodlands later in the season.
-However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)`) than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be locally abundant in certain cover types, it is highly general in its overall habitat preferences.
-Additionally, the lack of any effect of canola crops suggests that this species does not aggregate to these crops, suggesting that its ecosystem service potential to farmers is limited.
+_P. distincta_ activity density was negatively affected by landscape-level pasture (Figure \@ref(fig:ParDisLandscape)b), while woodlands had a negative effect late in the season (Figure \@ref(fig:ParDisLandscape)c).
+This suggests that large amounts of pasture are unsuitable habitat for _P. distincta_, and that they migrate into woodlands later in the season.
+However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be locally abundant in certain cover types, it is highly general in its overall habitat preferences.
+<!-- The weak effect of canola crops (p>0.07) suggests that this species does not aggregate into these crops, meaning that its ecosystem service potential to farmers is limited. -->
 
 _P. moesta_ activity density responded to grassland, canola, and road margins.
 Grasslands had a local negative effect, but a positive landscape-level effect, indicating that while these cover types act as a local sink, the general amount of grassland in the area had a positive effect (Figure \@ref(fig:ParMoeLandscape)b).
-Nearby local canola had a positive early effect on activity-density, but a negative local effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
-Local road margins had a similar effect, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)d).
+Local canola cover had a positive early effect on activity-density, but a negative local effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
+Local road margins also had a similar effect, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)d).
 Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
-Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)`) in _P. moesta_ activity density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences.
+Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
 
 (ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. a) shows the effect of local trap location, b) is a functional regression plot of the proportion pasture at distances away from each trap, and c) is a functional regression plot over time, showing the effect of woodland at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (blue = June, purple = July, red = August).
 
@@ -505,7 +505,7 @@ We did not consider the influence of previous years' crops, although carabids te
 
 The wolf spiders _Pardosa distincta_ and _Pardosa moesta_ both responded to landscape composition, but it explained only a small fraction of their activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`, `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`).
 This means that both species of _Pardosa_ appear to have very general habitat preferences, but may be somewhat influenced by certain cover types.
-Pasture had a negative effect at the landscape scale, and woodland had a late-season negative effect, suggesting that _P. distincta_ move to shrubs and trees for overwintering or winter foraging [@aitchison1984; @buddle2000].
+Pasture had a negative effect at the landscape scale, and woodland had a late-season negative effect, suggesting that _P. distincta_ move to woodlands for overwintering or winter foraging [@aitchison1984; @buddle2000].
 _Pardosa_ are found in areas close to disturbed roadside strips [@drapela2008; @drapela2011; @kowal2011], but _P. distincta_ appears to be less sensitive to disturbances than _P. moesta_ [@collins1996; @wade2010].
 @moring1994 showed that _P. distincta_ were active in grassy habitats, which we found partial evidence of, as _P. distincta_ tended to have higher activity-density in trap locations with higher grass cover (Figure \@ref(fig:ParDisLandscape)a).
 Canola had an early-season positive effect on _P. moesta_, indicating that _P. moesta_ and _P. melanarius_ may both use canola as foraging grounds.
@@ -515,7 +515,7 @@ Wolf spiders (Lycosidae) employ a wandering-active predation strategy [@young199
 While trapping location explained a large proportion of variance for both species (`r round(filter(r2Nakagawa2,model=='ParDisMod',grepl('trapLoc',terms))$r2comp,2)` and `r round(filter(r2Nakagawa2,model=='ParMoeMod',grepl('trapLoc',terms))$r2comp,2)`), several landscape features were also important at large spatial scales, including grass and wetland, pasture, pulses, and road margins. 
 Therefore, _Pardosa_ dispersal distances may be further than previously thought, either through ballooning as juveniles [@richter1970; @greenstone1982] or through other long-distance travel.
 
-_Phalangium opilio_ activity-density responded to grass and wetland cover, as well as trees and shrubs.
+_Phalangium opilio_ activity-density responded to grass and wetland cover, as well as wooded landscapes.
 Other studies have found that _P. opilio_ is mostly found in human-altered landscapes with a large proportion of farming [@muster2014; @vandepoel2015Msc].
 Since most of our study area was in or near farmed land, the lack of variation is understandable, but there were a few notable landscape-level patterns that emerged.
 _P. opilio_ activity-density was higher in grassy field edges and wetlands, but grasslands and wetlands had a local negative effect on _P. opilio_ until late in the season.
