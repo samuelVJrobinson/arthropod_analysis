@@ -55,7 +55,7 @@ p2 <- apply(mapply(lineFun,int=rnorm(1000,0.5,0.1),slope=rnorm(1000,0,0.1),MoreA
   annotate('text',x=500,y=-0.75,label='Effect of cover is positive at all distances')+
   annotate('segment',x=400,xend=300,y=-0.5,yend=0.2,arrow=arrow())+
   annotate('segment',x=600,xend=700,y=-0.5,yend=0.2,arrow=arrow())+
-  labs(x='Distance from sampling location',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
+  labs(x='Distance from sampling location (radius of annulus)',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
 
 #Exponential
 p3 <- apply(mapply(expFun,a=rnorm(1000,1,0.2),b=rnorm(1000,0.05,0.002),d=rnorm(1000,-0.02,0.1),MoreArgs=list(n=1000)),
@@ -68,7 +68,7 @@ p3 <- apply(mapply(expFun,a=rnorm(1000,1,0.2),b=rnorm(1000,0.05,0.002),d=rnorm(1
   annotate('segment',x=350,xend=100,y=1,yend=0.6,arrow=arrow())+
   annotate('text',x=500,y=-0.75,label='Neutral effect of far-away cover')+
   annotate('segment',x=600,xend=600,y=-0.5,yend=-0.2,arrow=arrow())+
-  labs(x='Distance from sampling location',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
+  labs(x='Distance from sampling location (radius of annulus)',y=expression(paste('Slope of proportion cover (',beta,')')))+ylim(-1.5,1.5)
 
 #Negatively sloped line
 p4 <- apply(mapply(lineFun,int=rnorm(1000,0,0.1),slope=rnorm(1000,-0.5,0.1),MoreArgs=list(n=1000)),
