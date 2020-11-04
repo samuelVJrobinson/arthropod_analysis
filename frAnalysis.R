@@ -66,7 +66,7 @@ stLegPosX <- 0.85 #Legend position X
 stLegPosY <- 0.3 #Legend position Y
 theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
-smoothCols <- c('blue','purple','red') #Colours for smoothing lines
+smoothCols <- c('blue','red') #Colours for smoothing lines
 
 # Pterostichus melanarius ----------------------------------
 
@@ -101,7 +101,7 @@ tempTrap %>% mutate(resid=resid(mod3)) %>%
   as_Spatial() %>% variogram(resid~1,.) %>% plot()
 
 #Check k values and residual distribution
-par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+par(mfrow=c(2,2)); gam.check(mod3); abline(0,1,col='red'); par(mfrow=c(1,1)); 
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
 #Check for concurvity between smoothers
@@ -179,8 +179,9 @@ ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=stFigX,he
 #Plot significant landscape effects
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-  mutate(date=c('Early','Mid','Late')) 
+# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+dispDays <- data.frame(doy=c(173,232)) %>% 
+  mutate(date=c('Early','Late')) 
 
 #Get order of terms to plot
 cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
@@ -195,18 +196,18 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Grass/wetland effect (space + time)
-p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
+p2 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>% 
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=F,cols=smoothCols)+labs(x='Distance (m)',y='Grassland effect')
+  effectPlot(leg=F,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Grassland effect')
 
 #Canola effect (space + time)
-p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Canola=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
+  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
 
 #Pulse effect (time)
 p4 <- data.frame(endDayMat=149:241,Pulses=1,y=NA) %>% 
@@ -277,7 +278,7 @@ ggplot(sumres,aes(x=E,y=N,size=res,col=res))+geom_point(alpha=0.5)+
 gam(res~s(E,N),data=sumres) %>% plot(.,scheme=2,rug=F)
 
 #Check k values and residual distribution
-par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+par(mfrow=c(2,2)); gam.check(mod3); abline(0,1,col='red'); par(mfrow=c(1,1)); 
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
 #Smoothing term estimates - problem here with distance term for TreeShrub, but this appears to be caused by the large number of terms. When "Urban" is dropped (weak effects), smoothing estimate for TreeShrub is fine, and no other effects change.
@@ -314,8 +315,9 @@ ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=stFigX,height=s
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-  mutate(date=c('Early','Mid','Late')) 
+# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+dispDays <- data.frame(doy=c(173,232)) %>% 
+  mutate(date=c('Early','Late')) 
 
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
@@ -327,17 +329,17 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 # #Canola (space + time: weak)
-# p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+# p2 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Canola=1) %>% 
 #   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
 #   rename(x=distMat,y=endDayMat) %>% 
 #   mutate(y=factor(y,labels=dispDays$date)) %>% 
-#   effectPlot(leg=T,cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
+#   effectPlot(leg=T,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
 
 #Pasture (space)
 p3 <- expand.grid(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Pasture',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
   rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Pasture effect')
+  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Pasture effect')
 
 #Tree/shrub (time)
 p4 <- data.frame(endDayMat=149:241,TreeShrub=1,y=NA) %>% 
@@ -376,7 +378,7 @@ plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 #Check for multicollinearity (same as above)
 
 #Check k values and residual distribution
-par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+par(mfrow=c(2,2)); gam.check(mod3); abline(0,1,col='red'); par(mfrow=c(1,1)); 
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
 #Smoothing term estimates
@@ -413,8 +415,9 @@ ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=stFigX,height=stFi
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-  mutate(date=c('Early','Mid','Late')) 
+# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+dispDays <- data.frame(doy=c(173,232)) %>% 
+  mutate(date=c('Early','Late')) 
 
 #Trap location - far less in canola
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
@@ -429,27 +432,27 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
 p2 <- expand.grid(distMat=seq(30,1500,30),GrassWetland=1,y=NA) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
   rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Grassland effect')
+  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Grassland effect')
 
 #Canola (space + time)
-p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Canola=1) %>% 
+p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Canola=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Canola effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
 
 #Urban effect (space + time)
-p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),Urban=1) %>% 
+p4 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Urban=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Urban',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Road margin effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Road margin effect')
 
 #Pulses (space)
 p5 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('Pulses',sapply(mod3$smooth,function(x) x$label)))[1]) %>%
   rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance (m)',y='Pulse effect')
+  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Pulse effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
@@ -486,7 +489,7 @@ plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
 #Check for multicollinearity - same as above
 
 #Check k values and residual distribution
-par(mfrow=c(2,2)); gam.check(mod3); par(mfrow=c(1,1))
+par(mfrow=c(2,2)); gam.check(mod3); abline(0,1,col='red'); par(mfrow=c(1,1)); 
 plot(mod3,scheme=2,shade=T,pages=1,all.terms=T,rug=F,seWithMean=T)
 
 #Smoothing term estimates
@@ -523,8 +526,9 @@ ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=stFigX,height=stFigY,sc
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
 #Days to display on plots (early,mid,late)
-dispDays <- data.frame(doy=c(173,203,232)) %>% #June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-  mutate(date=c('Early','Mid','Late')) 
+# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
+dispDays <- data.frame(doy=c(173,232)) %>% 
+  mutate(date=c('Early','Late')) 
 
 #Trap location - less in canola, more in wetland/pivot
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
@@ -536,18 +540,18 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Grassland/wetland (space + time)
-p2 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
+p2 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Grassland effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Grassland effect')
 
 #Tree/Shrub (space + time)
-p3 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
+p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
   smoothPred(mod3,whichSmooth=which(grepl('TreeShrub',sapply(mod3$smooth,function(x) x$label)))) %>%
   rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance (m)',y='Woodland effect')
+  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Woodland effect')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
@@ -555,7 +559,6 @@ fixeffPlot <- ggarrange(p1,p2,p3,
                         legend='bottom',common.legend=T) 
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,raneffPlot,fixeffPlot) #Cleanup
-
 
 #Make plots for mod4 (non-crop only)
 
@@ -586,10 +589,10 @@ p3 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod4,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Noncrop
-p4 <- expand.grid(endDayMat=c(173,203,232),distMat=seq(30,1500,30),NonCrop=1) %>% 
+p4 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),NonCrop=1) %>% 
   smoothPred(mod4,whichSmooth=3:5) %>% rename(x=distMat,y=endDayMat) %>% 
   mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot()+labs(x='Distance (m)',y='Noncrop effect')
+  effectPlot()+labs(x='Distance from trap location (m)',y='Noncrop effect')
 
 ggarrange(p1,p2,p3,p4,labels=letters[1:4],nrow=2,ncol=2,legend='right',common.legend=F) 
 

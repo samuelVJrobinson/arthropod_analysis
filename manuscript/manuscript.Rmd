@@ -11,7 +11,7 @@ author:
     affiliation: University of Calgary
     footnote: 1
   - name: Diane Edwards
-    email: diane.edwards.ca@gmail.com
+    email: diane@abienvironmental.ca
     affiliation: Ambrose University
   - name: Jess Vickruck
     email: jessica.vickruck@canada.ca
@@ -24,11 +24,11 @@ author:
     affiliation: University of Calgary
 address:
   - code: University of Calgary
-    address: 2500 University Drive NW, Calgary, AB, Canada
+    address: 2500 University Drive NW, Calgary, AB
   - code: Ambrose University
     address: 150 Ambrose Circle SW, Calgary, AB
   - code: Oregon State University
-    address: 1500 SW Jefferson Way, Corvallis, OR, USA
+    address: 1500 SW Jefferson Way, Corvallis, OR
 footnote:
   - code: 1
     text: "Corresponding Author"
@@ -196,13 +196,15 @@ Ncatches <- lapply(list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod),function(x){
 \doublespacing
 
 # Introduction
+<!-- DE: BIOCONTROL THEME NEEDS SET-UP IN INTRODUCTION -->
+
 Arthropods are one of the most influential groups of animals in agricultural systems.
 Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in negative downstream economic effects and food insecurity.
 On the other hand, spillover of beneficial arthropods from adjacent non-crop patches can deliver increased crop yields by providing ecosystem services such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
 Seasonal "pulses" of food resources from crop fields act as a bottom-up driver of their associated arthropod communities, meaning that agricultural land can act as a source of nutrients and individuals for adjacent non-crop land [@diekotter2010; @galpern2017].
 These important fluxes of mobile arthropods, both to crops and away from them, are key for managing both crop yield and biodiversity in agroecosystems.
 Finding "win-win" practices is of particular importance to land managers and conservationists; that is, practices that result in better conservation outcomes while maintaining or improving crop yields.
-Finally, agricultural land occupies 15 million km$^2$ (~36%) of land globally [@ramankutty2018], suggesting that there remains great potential to achieve conservation outcomes by adjusting agricultural practices.
+<!-- Finally, agricultural land occupies 15 million km$^2$ (~36%) of land globally [@ramankutty2018], suggesting that there remains great potential to achieve conservation outcomes by adjusting agricultural practices. -->
 
 Uncultivated semi-natural land (SNL) can act as important habitat for beneficial arthropods [@duelli2003], which may spill over into adjacent cropland.
 Therefore, landscape management is a strategy to increase beneficial arthropod abundance in crops [@albrecht2010; @landis2000; @martin2020; but see @tscharntke2016; @karp2018].
@@ -210,7 +212,7 @@ For example, wild bee abundance in agricultural landscapes is largely driven by 
 Predatory arthropods such as beetles or spiders can be limited by water, food, and egg-laying sites [@lovei1996; @purtauf2005; @gardiner2010], but the effect of SNL on their abundance and diversity is less consistent [@macfadyen2013; @shackelford2013] as some taxa may use SNL as a travel corridor or overwintering site, but are not completely dependent on it for reproduction.
 Some taxa are not dependent on SNL at all, and thrive in cultivated landscapes, while others exclusively inhabit SNL and do not venture beyond the edge of cultivated fields.
 For example, carabid beetles are thought to reproduce in field margins, while the adults feed in fields [@desender1988].
-This depends on the life history of the organisms in question, such as the seasonal timing of emergence, feeding, and reproduction, as well as their traits such as dispersal capability.
+Habitat preference also depends on the life history of the organisms in question, such as the seasonal timing of emergence, feeding, and reproduction, as well as their traits such as dispersal capability.
 Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers [@oberg2008].
 <!-- Small patches of SNL can have a large effect if overall landscape lacks SNL (landscape contrast [@boetzl2020; @vanSchalkwyk2020]) -->
 In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism gathers resources.
@@ -223,7 +225,7 @@ For instance, bumblebee abundance can be controlled by both nearby and far-away 
 Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
 This makes it difficult to make generalizations of which habitat types harbour beneficial arthropods, making it even more difficult to provide accurate information to farmers about land management practices.
 
-In this study, we used pitfall traps to determine how landscape composition affects the seasonal activity-density of arthropods across a large Canadian prairie agroecosystem.
+In this study, we used pitfall traps to determine how landscape composition affects the seasonal abundance of arthropods across a large Canadian prairie agroecosystem.
 We considered the following hypotheses:
 1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as a source of arthropods during the early part of the season, and a sink during the later part of the season. 
 2. Crops act as sources of food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a sink for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
@@ -239,26 +241,26 @@ Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempT
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
 In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
 Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
-We used 582 mL Solo® cups buried up to the rim and partially filled with ethylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
+We used 582 mL Solo® cups buried up to the rim and partially filled with propylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
 Specimens were identified to species using appropriate taxonomic literature [@dondale1990; @edgar1990; @vogel2004; @yigit2007].
 
 We used counts of organisms in our pitfall traps as proxies of ecosystem service provision.
 However, increased counts of organisms in pitfall traps can represent higher activity levels (same number of organisms but more mobile) or higher abundances in the vicinity of the trap.
 This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts in the traps represent the "activity-density" of a given organism.
-Despite this disadvantage, activity-density is generally positively related to ecosystem services, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
+Despite this drawback, activity-density is generally positively related to ecosystem services, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
-```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified cover f. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field edges.', out.width='100%'}  
+```{r siteMap, echo=FALSE, fig.cap='Location of pitfall traps during 2017, and classified land cover. Inset map shows study location within Alberta. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields or in adjacent wetland or grassy field edges.', out.width='100%'}  
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
-We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare species [@winfree2015], but their habitat preferences are still poorly understood.
+We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are often more important for ecosystem service provision than rare species [@winfree2015].
 _Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist known to prey upon crop pests [@carcamo1994; @larsen2003; @busch_Msc].
 It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field edges as larval habitat [@desender1988].
-_Pardosa_ are wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
+_Pardosa_ are a genus of wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
 Both _Pardosa distincta_ and _Pardosa moesta_ are found in a wide variety of habitats, but are common in ungrazed pastures [@dondale1990; @carcamo2014].
 _P. distincta_ is also commonly found in disturbed environments [@collins1996; @wade2010], while _P. moesta_ appear to prefer less frequent disturbances [@graham2003; @kowal2011; but see @dondale1990].
 Other _Pardosa_ are known to use road margins and wooded areas as habitat [@buddle2000; @drapela2011].
-Finally, _Phallangium opilio_ is an introduced harvestman (Opiliones: Phalangiidae) that is found in drier disturbed areas [@bragg2009].
+Finally, _Phalangium opilio_ is an introduced harvestman (Opiliones: Phalangiidae) that is found in drier disturbed areas [@bragg2009].
 Juveniles hatch from eggs during the spring, becoming adults during the summer, and eggs are laid during the fall [adults do not overwinter; @bragg2009].
 They are commonly found in human-altered landscapes [@muster2014; @vandepoel2015Msc] and are nocturnal generalist hunters and scavengers [@halaj2000; @allard2005; @allard2005b], mainly eating small soft-bodied invertebrates [@acosta2007].
 
@@ -276,7 +278,7 @@ Scalar-on-function regression is a special type of linear regression model ($y=X
 <!-- As an example of scalar-on-function regression, biomass in a plot (scalar) could be modeled as a smoothed function of monthly average temperatures at that plot (function), meaning that the effect of monthly temperatures would also be a function of time. -->
 In our case, the proportion of landscape cover ($X$) within each annulus surrounding the trap is a function of distance away from the trap, meaning that the coefficients are a smoothed function of distance ($\beta_i = f(distance_i)$), and represent the additive effect of a given type of landscape cover at distances away from the trap (i.e. $X\beta$).
 This allows for the possibility that the size of the landscape "grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010].
-It also allows for the possibility that certain land cover types may be locally beneficial, but detremental at wider scales, indicating that the cover type may not constitute a completely usable habitat.
+It also allows for the possibility that certain land cover types may be locally beneficial, but detremental at large scales, indicating that the cover type may not constitute a completely usable habitat.
 
 Scalar-on-function regression of activity-density was fit using generalized additive models [_mgcv_ version `r packageVersion('mgcv')`; @wood2017]. 
 Count data of arthropods were modeled using a negative binomial distribution with a log-link function and a single dispersion parameter ($\theta$).
@@ -286,10 +288,10 @@ Day of year was included as a 1-dimensional smooth, and easting and northing (km
 
 For each landscape cover class, we used three scalar-on-function terms.
 First, we used the proportion cover in the annuli surrounding each trap location (spatial effect of cover class).
-Second, we used the average landcover in all annuli across days of the year (temporal effect of cover class). 
+Second, we used the average proportion cover across days of the year (temporal effect of cover class). 
 Finally, we used a tensor-product interaction of landscape cover and day of year (spatio-temporal interaction of cover class).
 We used 10 basis dimensions for the spatial and temporal landscape smoothers, and 16 basis dimensions for the spatio-temporal interaction.
-This was deemed adequate, as the effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
+The effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
 To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
 The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 Finally, we calculated the proportion of explained variance (R$^2$) for each set of terms [@nakagawa2013; @nakagawa2017].
@@ -309,11 +311,11 @@ This resulted in a reduced set of landscape terms, none of which were strongly c
 
 Functional linear regression is a special case of linear regression, where both the independent variable is predicted by a functional dependent variable, meaning that the slope is a function (vector) rather a fixed (scalar) value [@ramsay2004; @yen2014].
 Therefore, the interpretation of a functional regression plot is very different from that of a simple linear regression plot.
-Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity density_ (_y_) and a single predictor, _Proportion cover_ (_x_), which is measured in a circle of a fixed radius (_Distance_) surrounding each trap.
+Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity-density_ (_y_) and a single predictor, _Proportion cover_ (_x_), which is measured in a circle of a fixed radius (_Distance_) surrounding each trap.
 If we suppose that the relationship between _x_ and _y_ is similar at all radii at which _x_ is measured, then Figure \@ref(fig:frExample)b shows the resulting functional linear regression plot, where the slope ($\beta$) is the same at all distances.
-In reality it is more likely that nearby cover will be more influential on activity density than far-away cover, which would result in a relationship similar to Figure \@ref(fig:frExample)c.
+In reality it is more likely that nearby cover will be more influential on activity-density than far-away cover, which would result in a relationship similar to Figure \@ref(fig:frExample)c.
 As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover (measured within a fixed radius) as a predictor of measurements taken across time, allowing the effect of proportion cover to vary over the course of the season (Figure \@ref(fig:frExample)d).
-Finally, proportion cover over distance and time may be combined into a smoothed surface of effects, representing the spatio-temporal influence of landscape cover on activity density.
+Finally, proportion cover over distance and time may be combined into a smoothed surface of effects, representing the spatio-temporal influence of landscape cover on activity-density.
 
 ```{r frExample, echo=FALSE, fig.cap='Examples of (functional) linear regression plots. \\textbf{a)} shows a simple linear regression plot, with a single slope value for a single regressor. \\textbf{b)} shows the equivalent plot in functional regression form, where the the slope is a smoothed function that maps onto a function-valued regressor. \\textbf{c)} and \\textbf{d)} show functional linear regression plots where the slope varies with the location of the regressor.', out.width='100%'}  
   include_graphics('../figures/frExample.png',dpi=NA)
@@ -329,8 +331,8 @@ We consider 1) to be the more likely scenario, as it is unlikely that any one co
 <!-- As these data were collected from a single year, this model does not consider the next-generation fitness consequences of spillover. -->
 For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a net sink but never acts as a source of spill over.
 Alternatively, a cover class could act as a sink by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as a source at other times (e.g. during emergence).
-For brevity in the following Results section, we refer to local- and landscape-level effects, where local indicates the effects of landscape composition at scales of <500m, whereas landscape indicates scales >500 m.
-Similarly, we refer to early-, mid-, and late-season effects, where landscape composition affected abundance from June - July, July - August, or August - September, respectively.
+In the Results section, we refer to local- and landscape-level effects, where local indicates the effects of landscape composition at scales of <500 m, whereas landscape indicates scales >500 m.
+Similarly, we refer to early- and late-season effects, where landscape composition affected activity-density on June 20th or August 20th, respectively.
 
 # Results
 
@@ -362,7 +364,7 @@ Finally, _P. melanarius_ activity-density had a strong temporal and spatial comp
 Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
 <!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses the following "text references" instead. -->
-(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and canola at distances away from each trap. d) is a functional regression plot over time, showing the effect of pulses at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (blue = June, purple = July, red = August).
+(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and canola at distances away from each trap. d) is a functional regression plot over time, showing the effect of pulses at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
 
 ```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
   include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)
@@ -370,29 +372,29 @@ Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100
 
 ## *Wolf spiders:* Pardosa distincta *and* Pardosa moesta
 
-Activity density of _P. distincta_ and _P. moesta_ was influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeLinear), \@ref(tab:ParMoeSmooth)), but landscape composition had relatively weak effects on both species ($R^2$: `r filter(r2Nakagawa2,grepl('Par',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% group_by(model) %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`).
+Activity-density of _P. distincta_ and _P. moesta_ was influenced by trap location and landscape composition (Tables \@ref(tab:ParDisLinear), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeLinear), \@ref(tab:ParMoeSmooth)), but landscape composition had relatively weak effects on both species ($R^2$: `r filter(r2Nakagawa2,grepl('Par',model),!grepl('s\\(',terms),terms!='trapLoc',terms!='sigmaD') %>% group_by(model) %>% summarize(s=sum(r2comp)) %>% pull(s) %>% paste(.,collapse=', ')`).
 Unlike _P. melanarius_, both _Pardosa_ species had far lower activity-density in canola than any other cover type (Figures \@ref(fig:ParDisLandscape)a, \@ref(fig:ParMoeLandscape)a).
 Activity-density of both _Pardosa_ species had a strong temporal and spatial component, although the temporal component was dominant for _P. distincta_, whereas the spatial component was dominant for _P. moesta_ (Figures \@ref(fig:ParDisSpatiotemporal) and \@ref(fig:ParMoeSpatiotemporal); both p`r with(pmoeSmTerms,p[Smoother=='s(E,N)'])`).
 
-_P. distincta_ activity density was negatively affected by landscape-level pasture (Figure \@ref(fig:ParDisLandscape)b), while woodlands had a negative effect late in the season (Figure \@ref(fig:ParDisLandscape)c).
+_P. distincta_ activity-density was negatively affected by landscape-level pasture (Figure \@ref(fig:ParDisLandscape)b), while woodlands had a negative effect late in the season (Figure \@ref(fig:ParDisLandscape)c).
 This suggests that large amounts of pasture are unsuitable habitat for _P. distincta_, and that they migrate into woodlands later in the season.
 However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be locally abundant in certain cover types, it is highly general in its overall habitat preferences.
 <!-- The weak effect of canola crops (p>0.07) suggests that this species does not aggregate into these crops, meaning that its ecosystem service potential to farmers is limited. -->
 
-_P. moesta_ activity density responded to grassland, canola, and road margins.
+_P. moesta_ activity-density responded to grassland, canola, and road margins.
 Grasslands had a local negative effect, but a positive landscape-level effect, indicating that while these cover types act as a local sink, the general amount of grassland in the area had a positive effect (Figure \@ref(fig:ParMoeLandscape)b).
 Local canola cover had a positive early effect on activity-density, but a negative local effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
 Local road margins also had a similar effect, acting as an early source and a late sink (Figure \@ref(fig:ParMoeLandscape)d).
-Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
-Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
+Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity-density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
+Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity-density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
 
-(ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. a) shows the effect of local trap location, b) is a functional regression plot of the proportion pasture at distances away from each trap, and c) is a functional regression plot over time, showing the effect of woodland at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (blue = June, purple = July, red = August).
+(ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. a) shows the effect of local trap location, b) is a functional regression plot of the proportion pasture at distances away from each trap, and c) is a functional regression plot over time, showing the effect of woodland at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). 
 
 ```{r ParDisLandscape, echo=FALSE, fig.cap='(ref:ParDisCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_distincta_fixeff.png',dpi=NA)
 ```
 
-(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. a) shows the effect of local trap location, and b-e) are functional regression plots of the proportion grassland, canola, road margins, and pulses at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (blue = June, purple = July, red = August).
+(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. a) shows the effect of local trap location, and b-e) are functional regression plots of the proportion grassland, canola, road margins, and pulses at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
 
 ```{r ParMoeLandscape, echo=FALSE, fig.cap='(ref:ParMoeCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_moesta_fixeff.png',dpi=NA)
@@ -400,12 +402,12 @@ Similar to _P.distincta_, trap location and an East-West spatial random effect (
 
 ## *Harvestman:* Phalangium opilio 
 
-_P. opilio_ activity-density was somewhat influenced by trap location, with field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a), but this effect was swamped by the effect of landscape and the spatiotemporal random effects (Table \@ref(tab:rSquared)), meaning that _P. opilio_ activity density is only mildly influenced by local cover type.
+_P. opilio_ activity-density was somewhat influenced by trap location, with field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a), but this effect was swamped by the effect of landscape and the spatiotemporal random effects (Table \@ref(tab:rSquared)), meaning that _P. opilio_ activity-density is only mildly influenced by local cover type.
 Nearby grassland and woodland both had negative effects on _Phalangium opilio_ activity-density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c), suggesting that _P. opilio_ may preferentially migrate to these cover classes.
 The temporal random effect was overwhelmingly the most important predictor of _P. opilio_ activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='OpilioMod',terms=='s(day)')$r2comp),3)`), showing that activity-density increased during the spring, and showed very little decline during the rest of the season (Figure \@ref(fig:OpilioSpatiotemporal)a).
 Similar to _P. moesta_, _P. opilio_ also showed a distinct East-West spatial random effect (Figure \@ref(fig:OpilioSpatiotemporal)b), indicating that their activity-density is also influenced by larger-scale abiotic factors.
 
-(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early-, mid-, and late-season effects (blue = June, purple = July, red = August). __SHOULD WE TAKE OUT THE MID (PURPLE) TIME SEQUENCE, IN THE INTEREST OF READABLILITY? THIS WOULD WORK FINE FOR ALL OTHER FIGURES, EXCEPT FOR c OF THIS ONE.__
+(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
 
 ```{r OpilioLandscape, echo=FALSE, fig.cap='(ref:OpilioCap)', out.width='100%'}  
   include_graphics('../figures/Opiliones_fixeff.png',dpi=NA)
@@ -451,7 +453,7 @@ r2Nakagawa2 %>% select(model,terms,r2comp) %>% mutate(terms=as.character(terms),
 # 
 # summaryTab %>%
 #   mutate_all(linebreak) %>%  # required for linebreaks to work
-#   kable(.,format='latex',caption='Summary of model results. \\emph{Local/Landscape} denotes cover classes <500m or >500m away from the trap location, respectively. +/-- indicates positive or negative effects of the cover class, and \\emph{Early/Mid/Late} denotes whether the effects were present earlier or later during the season. Cover classes with weak effects on activity density are not shown.',
+#   kable(.,format='latex',caption='Summary of model results. \\emph{Local/Landscape} denotes cover classes <500m or >500m away from the trap location, respectively. +/-- indicates positive or negative effects of the cover class, and \\emph{Early/Mid/Late} denotes whether the effects were present earlier or later during the season. Cover classes with weak effects on activity-density are not shown.',
 #         col.names=linebreak(x=c('Cover class','\\emph{Pterostichus}\n\\emph{melanarius}','\\emph{Pardosa}\n\\emph{distincta}',
 #                               '\\emph{Pardosa}\n\\emph{moesta}','\\emph{Phalangium}\n\\emph{opilio}')),
 #         align='rllll',escape=FALSE) %>% 
@@ -478,11 +480,11 @@ mytable %>% mutate_all(linebreak) %>%
 # Discussion
 
 <!-- The activity-density of the four arthropods was influenced by landscape composition, but the response of _Pterostichus melanarius_ and _Phalangium opilio_ was much stronger. -->
-We found support for our predictions of SNL having late-season effects on beneficial arthropods; specifically, grassland had a negative effect on _P. melanarius_ activity-density, woodlands on _P. distincta_ activity density, and road margins on _P. moesta_ activity density, all during late summer (August - September).
+Our prediction of SNL having late-season effects on beneficial arthropods was supported; specifically, grassland had a negative effect on _P. melanarius_ activity-density, woodlands on _P. distincta_ activity-density, and road margins on _P. moesta_ activity-density, all during late summer (August - September).
 This suggests that these arthropods migrate to these habitats at the end of the summer to prepare for oviposition or overwintering.
 However, _P. opilio_ showed no evidence of this, instead showing a negative effect of grassland _early_ in the season, suggesting that a) they aggregate in grasslands or b) grasslands do not constitute suitable habitat for _P. opilio_, resulting in low spillover.
 There was little evidence of SNL acting as early-season sources, aside from road margins having a positive early effect on _P. moesta_ activity-density.
-However, some cover classes had a positive effect at the landscape level (grassland and road margins on _P. moesta_), suggesting earlier or wider-scale dispersal away from these cover classes.
+However, some cover classes had a positive effect at the landscape level (grassland and road margins on _P. moesta_), suggesting earlier or larger-scale dispersal away from these cover classes.
 Canola had a positive effect on _P. melanarius_ and _P. moesta_ in the early season, suggesting that these organisms aggregate to canola crops and disperse at the end of the season [mass effects _sensu_ @shmida1985].
 Canola also had negative landscape-level effects on _P. melanarius_ while pasture had negative effects on _P. distincta_, meaning that these cover types likely represent only partial habitat for these arthropods.
 Finally, the influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale _and_ local land cover can be important to beneficial arthropod abundance.
@@ -523,7 +525,7 @@ These indicate that while grass and wetlands could act as a reservoir, spillover
 _P. opilio_ is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern: forests had a weak negative effect on _P. opilio_, at least early in the year.
 Unlike the other arthropods, most of the variation in activity-density for _P. opilio_ was explained by day of year (R$^2$ = `r round(filter(r2Nakagawa2,model=='OpilioMod',grepl('day',terms))$r2comp,2)`), indicating strong seasonal emergence cues.
-However, there was also a strong East-West spatial random effect in both _P. opilio_ and _P. moesta_, meaning that wider-scale geographic patterns (possibly related to rainfall or temperature) also influence their activity-density.
+However, there was also a strong East-West spatial random effect in both _P. opilio_ and _P. moesta_, meaning that larger-scale geographic patterns (possibly related to rainfall or temperature) also influence their activity-density.
 <!-- Feels like this paragraph ends too soon. Why was there so little variation due to landscape? Link to biology of the critter. -->
 
 Many other studies have considered the overall effect of SNL on ecosystem service provision, but we have highlighted the different spatial and temporal aspects of ecosystem service provision.
@@ -537,7 +539,7 @@ Finally, future work should explicitly link landscape structure, arthropod abund
 
 Our work has three main applications.
 First, it adds to the basis of scientific evidence showing that SNL can act as reservoir habitats in intensely-managed agroecosystems.
-Based on our findings, farmers and land managers should consider preserving existing grassland and wetland habitat to act as a background source of pest-control in crop fields.
+Based on our findings, farmers and land managers should consider preserving existing grassland and wetland habitat to act as a background source of arthropods for pest-control in crops.
 While local habitat appears valuable, even landscape-level habitat can be valuable, as it can increase the number of beneficial arthropods at larger spatial scales (e.g. Figures \@ref(fig:PteMelLandscape), \@ref(fig:ParMoeLandscape)).
 Secondly, our work suggests that _P. melanarius_ and _P. moesta_ should be investigated for their role as predators in canola crops.
 They appear to aggregate in canola crops early in the season, meaning that they have the potential to provide valuable pest-control services to growers.
