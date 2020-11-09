@@ -208,18 +208,18 @@ In this context, finding "win-win" practices -- that is, practices that result i
 
 Uncultivated semi-natural land (SNL) can act as important habitat for beneficial arthropods [@duelli2003], which may spill over into adjacent cropland.
 Therefore, landscape management is a strategy to increase beneficial arthropod abundance in crops [@albrecht2010; @landis2000; @martin2020; but see @tscharntke2016; @karp2018].
-For example, wild bee abundance in agricultural landscapes is largely driven by flower and nest availability [@roulston2011], and the effect of SNL on bee abundance and diversity is generally positive.
+For example, wild bee abundance in agricultural landscapes is driven by food and nest availability [@roulston2011], and the effect of SNL on bee abundance and diversity is generally positive.
 Pest-suppressing predators, such as beetles or spiders, can be limited by water, food, and egg-laying sites [@lovei1996; @purtauf2005; @gardiner2010], but the effect of SNL on their abundance and diversity is less consistent [@macfadyen2013; @shackelford2013] as some taxa may use SNL as a travel corridor or overwintering site, but are not completely dependent on it for reproduction.
 Some taxa are not dependent on SNL at all, and thrive in cultivated landscapes, while others exclusively inhabit SNL and do not venture beyond the edge of cultivated fields.
 For example, carabid beetles are thought to reproduce in field margins, while the adults feed in fields [@desender1988].
 Habitat preference also depends on the life history of the organisms in question, such as the seasonal timing of emergence, feeding, and reproduction, as well as their traits such as dispersal capability.
 Non-adjacent cropland can also influence arthropod abundance if the organisms are long-distance dispersers [@oberg2008].
 <!-- Small patches of SNL can have a large effect if overall landscape lacks SNL (landscape contrast [@boetzl2020; @vanSchalkwyk2020]) -->
-In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism gathers resources.
+In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism forages.
 
 Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
-First, some non-crop habitat may act as origins of arthropods during some times of the year, but as destinations during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods in crop development.
-Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
+First, non-crop habitat may act as an origin of arthropods during some times of the year, but as a destination during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods of crop growth.
+Arthropods can move from crops back into SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
 Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
 For instance, bumblebee abundance can be influenced by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
 Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
@@ -227,7 +227,7 @@ This makes it difficult to make generalizations of which habitat types harbour b
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal abundance of predatory arthropods in a Canadian prairie agroecosystem.
 We considered the following hypotheses:
-1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as an origin of arthropods during the early part of the season, and a destination during the later part of the season. 
+1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as an _origin_ of arthropods during the early part of the season, and a _destination_ during the later part of the season. 
 2. Crops provide food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and an origin at the end of the season as they migrate out of the crop.
 3. Crops may act as a temporary feeding site for predators. Therefore, crops may act as a local destination for arthropods, but will also be negatively associated at larger (landscape-level) scales.
 Using a large pitfall trapping dataset, we related seasonal changes in arthropod abundance to landscape composition at multiple spatial scales.
@@ -246,7 +246,7 @@ Specimens were identified to species using appropriate taxonomic literature [@do
 
 We used counts of organisms in our pitfall traps as proxies of ecosystem services (specifically, pest control).
 However, increased counts of organisms in pitfall traps can represent higher activity levels (same number of organisms but more mobile) or higher abundances in the vicinity of the trap.
-This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts in the traps represent the "activity-density" of a given organism.
+This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts from traps represent the "activity-density" of a given organism, not absolute density.
 Despite this drawback, activity-density is generally positively related to pest consumption, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
 ```{r siteMap, echo=FALSE, fig.cap='Classified land cover and location of pitfall traps during 2017. Inset map shows study location within Alberta provincial boundaries. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields, wetlands, or grassy field edges.', out.width='100%'}  
