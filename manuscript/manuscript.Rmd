@@ -1,10 +1,5 @@
 ---
-title: "Beneficial arthropod habitat useage changes within-season: implications for pest control services in croplands"
-#Potential titles: 
-# Non-crop features influence the abundance and timing of beneficial arthropod abundance
-# 1) Cropland ecosystem services in space and time: Beneficial arthropod habitat use shifts within-season.
-# 2) Beneficial arthropod habitat use shifts within-season: implications for pest control services in croplands
-# 
+title: "Non-crop sources of beneficial arthropods vary within-season across a prairie agroecosystem"
 author:
   - name: Samuel Robinson
     email: samuel.robinson@ucalgary.ca
@@ -33,7 +28,7 @@ footnote:
   - code: 1
     text: "Corresponding Author"
 date: "Spring 2020"
-abstract: "Ground-dwelling arthropods can be important generalist predators in agro-ecosystems, and can use non-crop features as overwintering habitats. However, it is unclear which types of landscape features constitute useful non-crop habitat, and at what spatial scale organisms gather resources. Additionally, the same landscape feature may act as an origin or destination for arthropods at different times of the year, but this is rarely considered. We modeled the activity-density of four highly-abundant species of Canadian prairie arthropods, and used functional regression to simultaneously consider both their habitat preferences and the timing of origins and destinations. _Pterostichus melanarius_ (Coleoptera: Carabidae) and _Pardosa moesta_ (Arachnida: Lycosidae) appear to be attracted to canola (_Brassica napus_ L.) during the early summer, then dispersed to grasslands, wetlands, and grassy road margins during the end of the summer. This suggests that grasslands and wetlands act as reservoir habitats for predatory arthropods, and that farmers should consider preserving existing habitat in order to maintain pest-control services across the season."
+abstract: "Ground-dwelling arthropods can be important generalist predators in agroecosystems, and can use non-crop features as overwintering habitats. However, it is unclear which types of landscape features constitute useful non-crop habitat, and at what spatial scale organisms gather resources. Additionally, the same landscape feature may act as a source or destination for arthropods at different times of the year, but this is rarely considered. We modeled the abundance of four highly-abundant species of Canadian prairie arthropods caught in pitfall traps, and used functional regression to simultaneously consider both their habitat preferences and the timing of sources and destinations. _Pterostichus melanarius_ (Coleoptera: Carabidae) and _Pardosa moesta_ (Arachnida: Lycosidae) appear to be attracted to canola (_Brassica napus_ L.) during the early summer, then dispersed to grasslands, wetlands, and grassy road margins during the end of the summer. This suggests that grasslands and wetlands act as seasonal reservoir habitats for predatory arthropods, and that farmers should consider preserving existing habitat in order to maintain pest-control services across the season."
 
 bibliography: refs.bib
 csl: ecology-letters.csl
@@ -192,12 +187,12 @@ Ncatches <- lapply(list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod),function(x){
 
 ```
 
+Key words: beetles; spiders; harvestmen; movement; natural enemies; functional regression
+
 \newpage
 \doublespacing
 
 # Introduction
-<!-- DE: BIOCONTROL THEME NEEDS SET-UP IN INTRODUCTION -->
-
 Arthropods are one of the most influential groups of animals in agricultural systems.
 Pest arthropods can cause large reductions in crop yield [@oerke2005], which can result in negative downstream economic effects and food insecurity.
 However, beneficial arthropods living in non-crop patches can increase crop yields by providing ecosystem services, such as extra pollination or pest suppression [@losey2006; @klein2007; @garibaldi2013].
@@ -218,8 +213,13 @@ Non-adjacent cropland can also influence arthropod abundance if the organisms ar
 In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism forages.
 
 Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
+<<<<<<< HEAD
 First, non-crop habitat may act as an origin of arthropods during some times of the year, but as a destination during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods of crop growth.
 Arthropods can move from crops back into SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
+=======
+First, some non-crop habitat may act as sources of arthropods during some times of the year, but as destinations during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods in crop development.
+Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
+>>>>>>> 93157579376da00785989a3ed7e3a4d78e4464b7
 Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
 For instance, bumblebee abundance can be influenced by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
 Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
@@ -227,8 +227,13 @@ This makes it difficult to make generalizations of which habitat types harbour b
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal abundance of predatory arthropods in a Canadian prairie agroecosystem.
 We considered the following hypotheses:
+<<<<<<< HEAD
 1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as an _origin_ of arthropods during the early part of the season, and a _destination_ during the later part of the season. 
 2. Crops provide food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and an origin at the end of the season as they migrate out of the crop.
+=======
+1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as a _source_ of arthropods during the early part of the season, and a _destination_ during the later part of the season. 
+2. Crops provide food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
+>>>>>>> 93157579376da00785989a3ed7e3a4d78e4464b7
 3. Crops may act as a temporary feeding site for predators. Therefore, crops may act as a local destination for arthropods, but will also be negatively associated at larger (landscape-level) scales.
 Using a large pitfall trapping dataset, we related seasonal changes in arthropod abundance to landscape composition at multiple spatial scales.
 
@@ -249,7 +254,9 @@ However, increased counts of organisms in pitfall traps can represent higher act
 This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts from traps represent the "activity-density" of a given organism, not absolute density.
 Despite this drawback, activity-density is generally positively related to pest consumption, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
-```{r siteMap, echo=FALSE, fig.cap='Classified land cover and location of pitfall traps during 2017. Inset map shows study location within Alberta provincial boundaries. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields, wetlands, or grassy field edges.', out.width='100%'}  
+(ref:siteMapCap) Classified land cover and location of pitfall traps during 2017. Inset map shows study location within Alberta provincial boundaries. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields, wetlands, or grassy field edges.
+
+```{r siteMap, echo=FALSE, fig.cap='(ref:siteMapCap)', out.width='100%'}  
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
@@ -323,14 +330,14 @@ Finally, the effect of proportion cover over distance and time may be modeled as
 
 ***
 
-Functional regression plots of landscape composition reveal which cover classes are acting as origins or destinations of a given arthropod, and at what spatial scale.
-Positive effects of nearby landscape cover classes indicate that arthropods are spilling over *from* it, therefore acting as an origin.
+Functional regression plots of landscape composition reveal which cover classes are acting as sources or destinations of a given arthropod, and at what spatial scale.
+Positive effects of nearby landscape cover classes indicate that arthropods are spilling over *from* it, therefore acting as a source.
 However, negative responses to nearby landscape cover classes can indicate one of two things:
 1) It may indicate that arthropods are spilling over *into* it (therefore acting as a destination) or 2) it may indicate that no arthropods are available to spill over *from* it.
 We consider 1) to be the more likely scenario, as it is unlikely that any one cover class is *completely* unoccupied.
 <!-- As these data were collected from a single year, this model does not consider the next-generation fitness consequences of spillover. -->
-For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a destination but never as an origin.
-Alternatively, a cover class could act as a destination by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as an origin at other times (e.g. during emergence).
+For example, a cover class with low-quality habitat could act as an ecological trap [@galpern2017] if it acts as a destination but never as a source.
+Alternatively, a cover class could act as a destination by providing high-quality habitat at certain times of the year (e.g. egg laying/feeding), but act as a source at other times (e.g. during emergence).
 
 
 In the Results section, we refer to local- and landscape-level effects, where local indicates the effects of landscape composition at scales of <500 m, whereas landscape indicates scales >500 m.
@@ -352,7 +359,7 @@ _P. melanarius_ activity-density was strongly influenced by trap location and la
 Canola crops had a marginally higher activity-density of _P. melanarius_ than other trap locations (Figure \@ref(fig:PteMelLandscape)a).
 Grassland cover was the most important land cover type in explaining activity-density ($R^2$: 0.104, Table \@ref(tab:rSquared)), and local grassland had a negative effect late in the summer (Figure \@ref(fig:PteMelLandscape)b), suggesting that _P. melanarius_ may move into grasslands later in the year.
 Local canola had a positive effect in the early season, but landscape-level canola had a negative effect, indicating that areas with widespread canola coverage had lower _P. melanarius_ activity-density (Figure \@ref(fig:PteMelLandscape)c).
-Pulses acted as a late-season origin, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest (Figure \@ref(fig:PteMelLandscape)d).
+Pulses acted as a late-season source, indicating that _P. melanarius_ may migrate out of the crop after (or during) harvest (Figure \@ref(fig:PteMelLandscape)d).
 Finally, _P. melanarius_ activity-density had a strong temporal and spatial component (both p `r with(pmelSmTerms,p[Smoother=='s(E,N)'])`), indicating that phenology and local geographic factors were important drivers of ground beetle activity-density (Figure \@ref(fig:PteMelSpatiotemporal)).
 Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
@@ -377,7 +384,7 @@ However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSp
 _P. moesta_ activity-density responded to grassland, canola, and road margins.
 Grasslands had a local negative effect, but a positive landscape-level effect, indicating that while these cover types act as a local destination, the general amount of grassland in the area had a positive effect (Figure \@ref(fig:ParMoeLandscape)b).
 Local canola cover had a positive early effect on activity-density, but a negative local effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
-Local road margins also had a similar effect, acting as an early origin and a late destination (Figure \@ref(fig:ParMoeLandscape)d).
+Local road margins also had a similar effect, acting as an early source and a late destination (Figure \@ref(fig:ParMoeLandscape)d).
 Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity-density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
 Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity-density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
 
@@ -448,15 +455,15 @@ Our prediction of SNL having late-season effects on beneficial arthropods was su
 Specifically, grassland had a negative effect on _P. melanarius_ activity-density, woodlands on _P. distincta_ activity-density, and road margins on _P. moesta_ activity-density, all during late summer (August - September).
 This suggests that these arthropods migrate to these habitats at the end of the summer to prepare for oviposition or overwintering.
 However, _P. opilio_ showed no evidence of this, instead showing a negative effect of grassland _early_ in the season, suggesting that a) they aggregate in grasslands or b) grasslands do not constitute suitable habitat for _P. opilio_, resulting in low spillover.
-There was little evidence of SNL acting as early-season origins, aside from road margins having a positive early effect on _P. moesta_ activity-density.
+There was little evidence of SNL acting as early-season sources, aside from road margins having a positive early effect on _P. moesta_ activity-density.
 However, some cover classes had a positive effect at the landscape level (grassland and road margins on _P. moesta_), suggesting earlier or larger-scale dispersal away from these cover classes.
 Canola had a positive effect on _P. melanarius_ and _P. moesta_ in the early season, suggesting that these organisms aggregate to canola crops and disperse at the end of the season [mass effects _sensu_ @shmida1985].
 Canola also had negative landscape-level effects on _P. melanarius_ while pasture had negative effects on _P. distincta_, meaning that these cover types likely represent only partial habitat for these arthropods.
 Finally, the influence of landscape composition tended to be limited to a radius of about 500m, indicating that large-scale _and_ local land cover can be important to beneficial arthropod abundance.
-There was also a strong temporal component to most of the landscape effects, meaning that it is important to consider how destinations and origins may change over the season.
+There was also a strong temporal component to most of the landscape effects, meaning that it is important to consider how destinations and sources may change over the season.
 
-<!-- 1. ... nearby SNL should act as an origin of arthropods during the early part of the season, and a destination during the later part of the season.  -->
-<!-- 2. ... should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and an origin at the end of the season as they migrate out of the crop. -->
+<!-- 1. ... nearby SNL should act as a source of arthropods during the early part of the season, and a destination during the later part of the season.  -->
+<!-- 2. ... should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop. -->
 <!-- 3. ... crops may act as a local destination for arthropods, but will also be negatively associated at larger (landscape-level) scales. -->
 
 The predatory ground beetle _Pterostichus melanarius_ responded to landscape composition, primarily to canola, pulses, and grass and wetland cover.
@@ -511,6 +518,11 @@ Secondly, our work suggests that _P. melanarius_ and _P. moesta_ should be inves
 They appear to aggregate in canola crops early in the season, meaning that they have the potential to provide valuable pest-control services to growers.
 Finally, we demonstrate that timing and spatial scale of spillover should be considered in future landscape studies of ecosystem services.
 We show important differences in the timing of landscape effects on activity-density (early-season vs. late-season spillover) that are typically ignored, but should be considered when assessing how SNL can deliver ecosystem services.
+
+# Acknowledgements
+
+Many thanks to the farmers who gave us access to their land for this study. This also would not have been possible without the help of Michael Gavin, Jennifer Retzlaff, and Mugunzal Abarmayan, and John Swann. Funding for this research was provided by Ducks Unlimited Canada's Institute for Wetland and waterfowl Research, the Alberta Canola Producers Commission, Manitoba Canola Growers Association, SaskCanola, the Alberta Biodiversity Monitoring Institute, the Alberta Conservation Association.
+
 
 \newpage 
 
