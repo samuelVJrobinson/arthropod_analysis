@@ -213,13 +213,8 @@ Non-adjacent cropland can also influence arthropod abundance if the organisms ar
 In this way, the spillover of beneficial arthropods into crops depends not only on the amount of adjacent SNL, but the specific habitat type, the time of the year, and the spatial scale at which an organism forages.
 
 Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
-<<<<<<< HEAD
-First, non-crop habitat may act as an origin of arthropods during some times of the year, but as a destination during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods of crop growth.
-Arthropods can move from crops back into SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
-=======
 First, some non-crop habitat may act as sources of arthropods during some times of the year, but as destinations during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods in crop development.
 Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
->>>>>>> 93157579376da00785989a3ed7e3a4d78e4464b7
 Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
 For instance, bumblebee abundance can be influenced by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
 Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
@@ -227,13 +222,8 @@ This makes it difficult to make generalizations of which habitat types harbour b
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal abundance of predatory arthropods in a Canadian prairie agroecosystem.
 We considered the following hypotheses:
-<<<<<<< HEAD
-1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as an _origin_ of arthropods during the early part of the season, and a _destination_ during the later part of the season. 
-2. Crops provide food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and an origin at the end of the season as they migrate out of the crop.
-=======
 1. Untilled semi-natural land provides egg-laying and feeding areas for predatory arthropods, meaning that it should act as a _source_ of arthropods during the early part of the season, and a _destination_ during the later part of the season. 
 2. Crops provide food (pest insects) for predatory arthropods during the growing season. This should result in agricultural land becoming a destination for predators in the early part of the season as they migrate into the crop, and a source at the end of the season as they migrate out of the crop.
->>>>>>> 93157579376da00785989a3ed7e3a4d78e4464b7
 3. Crops may act as a temporary feeding site for predators. Therefore, crops may act as a local destination for arthropods, but will also be negatively associated at larger (landscape-level) scales.
 Using a large pitfall trapping dataset, we related seasonal changes in arthropod abundance to landscape composition at multiple spatial scales.
 
