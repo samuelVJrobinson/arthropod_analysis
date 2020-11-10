@@ -1,0 +1,95 @@
+\newpage
+
+# Supplementary Material {-}
+
+\beginsupplement
+
+```{r concurvity, echo=FALSE, fig.cap='Concurvity estimates for reduced cover classes used in models.', out.width='100%'}  
+  include_graphics('../figures/coverCorPlots/concurvityEstimate_reduced.png',dpi=NA)
+```
+
+```{r landscapeComp, echo=FALSE, fig.cap='Percent cover of landscape cover classes in annuli surrounding each trap location. Sites are represented by individual lines. Mean cover for each class is listed in each sub-heading.', fig.width=5, fig.height=5}  
+coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p=100*round(p/sum(unique(p)),4)) %>% 
+  mutate(cover=paste0(as.character(cover),' (',p,'%)'),prop=prop*100) %>% 
+  mutate(cover=factor(cover,levels=unique(cover))) %>% 
+  ggplot(aes(dist,prop,group=site))+geom_line(alpha=0.2)+
+  facet_wrap(~cover,ncol=4)+theme_classic()+theme(axis.text = element_text(size = 8),strip.text=element_text(size=8))+
+  labs(y='Percent cover',x='Distance from trap location (m)')
+```
+
+(ref:PteMelSTCap) Temporal and spatial components of _Pterostichus melanarius_ activity-density (after accounting for landscape composition and trap location). a) shows the effect of day of year, and b) shows the spatially smoothed effect of site location.
+
+```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='(ref:PteMelSTCap)', out.width='100%'}
+  include_graphics('../figures/Pterostichus_melanarius_raneff.png',dpi=NA)
+```
+
+(ref:ParDisSTCap) Temporal and spatial components of _Pardosa distincta_ activity-density (after accounting for landscape composition and trap location). a) shows the effect of day of year, and b) shows the spatially smoothed effect of site location.
+
+```{r ParDisSpatiotemporal, echo=FALSE, fig.cap='(ref:ParDisSTCap)', out.width='100%'}
+  include_graphics('../figures/Pardosa_distincta_raneff.png',dpi=NA)
+```
+
+(ref:ParMoeSTCap) Temporal and spatial components of _Pardosa moesta_ activity-density (after accounting for landscape composition and trap location). a) shows the effect of day of year, and b) shows the spatially smoothed effect of site location.
+
+```{r ParMoeSpatiotemporal, echo=FALSE, fig.cap='(ref:ParMoeSTCap)', out.width='100%'}
+  include_graphics('../figures/Pardosa_moesta_raneff.png',dpi=NA)
+```
+
+(ref:OpilioSTCap) Temporal and spatial components of _Phalangium opilio_ activity-density (after accounting for landscape composition and trap location). a) shows the effect of day of year, and b) shows the spatially smoothed effect of site location.
+
+```{r OpilioSpatiotemporal, echo=FALSE, fig.cap='(ref:OpilioSTCap)', out.width='100%'}
+  include_graphics('../figures/Opiliones_raneff.png',dpi=NA)
+```
+
+```{r PteMelLinear, echo=FALSE, warning=FALSE}
+pmelLinTerms %>% select(-p) %>% 
+  kable(.,caption='Trap location (cover type that trap was located in) intercept estimates for \\emph{Pterostichus melanarius}',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+      digits=c(1,2,2,2,2),align='rrrrl',escape=FALSE)
+```
+
+
+```{r PteMelSmooth, echo=FALSE, warning=FALSE}
+pmelSmTerms %>% select(-Ref.df,-p) %>% 
+  kable(.,caption='Smooth terms for \\emph{Pterostichus melanarius}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
+      col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
+      digits=c(1,2,2,2),align='rrll',escape=FALSE)
+```
+
+```{r ParDisLinear, echo=FALSE, warning=FALSE}
+pdisLinTerms %>% select(-p) %>% 
+  kable(.,caption='Trap location (cover type that trap was located in) intercept estimates for \\emph{Pardosa distincta}',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl',escape=FALSE)
+```
+
+```{r ParDisSmooth, echo=FALSE, warning=FALSE}
+pdisSmTerms %>% select(-Ref.df,-p) %>% 
+  kable(.,caption='Smooth terms for \\emph{Pardosa distincta}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
+        col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
+        digits=c(1,2,2,2),align='rrll',escape=FALSE)
+```
+
+```{r ParMoeLinear, echo=FALSE, warning=FALSE}
+pmoeLinTerms %>% select(-p) %>% 
+  kable(.,caption='Trap location (cover type that trap was located in) intercept estimates for \\emph{Pardosa moesta}.',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl',escape=FALSE)
+```
+
+```{r ParMoeSmooth, echo=FALSE, warning=FALSE}
+pmoeSmTerms %>% select(-Ref.df,-p) %>% 
+  kable(.,caption='Smooth terms for \\emph{Pardosa moesta}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
+        col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
+        digits=c(1,2,2,2),align='rrll',escape=FALSE)
+```
+
+```{r OpilioLinear, echo=FALSE, warning=FALSE}
+opilLinTerms %>% select(-p) %>% 
+  kable(.,caption='Trap location (cover type that trap was located in) intercept estimates for \\emph{Phalangium opilio}',col.names=c('Trap location','$\\beta$','S.E.','Z','p'),
+        digits=c(1,2,2,2,2),align='rrrrl',escape=FALSE)
+```
+
+```{r OpilioSmooth, echo=FALSE, warning=FALSE}
+opilSmTerms %>% select(-Ref.df,-p) %>% 
+  kable(.,caption='Smooth terms for \\emph{Phalangium opilio}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
+        col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
+        digits=c(1,2,2,2),align='rrll',escape=FALSE)
+```
