@@ -46,7 +46,7 @@ output:
     base_format: rticles::elsevier_article
     toc: false
     fig_caption: true
-csl: journal-of-applied-ecology.csl    
+csl: ecology-letters.csl    
 header-includes:
   \makeatletter \def\ps@pprintTitle{  \let\@oddhead\@empty  \let\@evenhead\@empty  \def\@oddfoot{\centerline{\thepage}} \let\@evenfoot\@oddfoot} \makeatother
   \usepackage{float} \floatplacement{figure}{H} 
