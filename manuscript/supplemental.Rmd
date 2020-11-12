@@ -1,6 +1,6 @@
 \newpage
 
-# Supplementary Material {-}
+# Appendix A: Supplementary Material {-}
 
 \beginsupplement
 
@@ -92,4 +92,20 @@ opilSmTerms %>% select(-Ref.df,-p) %>%
   kable(.,caption='Smooth terms for \\emph{Phalangium opilio}. \\emph{s} indicates a thin-plate spline, \\emph{ti} indicates a tensor-product interaction. All terms except for day and (E,N) are functional regression fits.',
         col.names=c('Smoothing term','E.d.f.','$\\chi^2$','p'),
         digits=c(1,2,2,2),align='rrll',escape=FALSE)
+```
+
+\newpage
+
+# Appendix B: Interpreting Functional Regression Plots {-}
+
+Functional linear regression is a special case of linear regression, where both the independent variable is predicted by a functional dependent variable, meaning that the slope is a function (vector) rather a fixed (scalar) value [@ramsay2004; @yen2014].
+Therefore, the interpretation of a functional regression plot is very different from that of a simple linear regression plot.
+Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity-density_ (_y_) and a single predictor, _proportion cover_ (_x_), which is measured in a circle of a fixed radius surrounding each trap.
+If we suppose that the relationship between _x_ and _y_ is similar at all radii at which _x_ is measured, then Figure \@ref(fig:frExample)b shows the resulting functional linear regression plot, where the slope ($\beta$) is the same at all distances (we avoid the problem of overlapping concentric circles by using concentric _annuli_).
+In reality, it is more likely that nearby cover will be more influential on activity-density than far-away cover, which could result in a relationship similar to Figure \@ref(fig:frExample)c.
+As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover (measured within an annulus of a fixed radius) as a predictor of measurements taken across time, allowing the effect of proportion cover to vary over the course of the season (Figure \@ref(fig:frExample)d).
+Finally, the effect of proportion cover over distance and time may be modeled as a smoothed surface, representing the joint spatio-temporal influence of landscape cover on activity-density.
+
+```{r frExample, echo=FALSE, fig.cap='Examples of (functional) linear regression plots. \\textbf{a)} shows a simple linear regression plot, with a single slope value for a single regressor. \\textbf{b)} shows the equivalent plot in functional regression form, where the the slope is a smoothed function that maps onto a function-valued regressor. \\textbf{c)} and \\textbf{d)} show functional linear regression plots where the slope varies with the location of the regressor.', out.width='100%'}  
+  include_graphics('../figures/frExample.png',dpi=NA)
 ```

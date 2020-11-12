@@ -244,7 +244,7 @@ Specimens were identified to species using appropriate taxonomic literature [@li
 
 We used counts of organisms in our pitfall traps as proxies of ecosystem services (specifically, pest control).
 However, increased counts of organisms in pitfall traps can represent higher activity levels (same number of organisms but more mobile) or higher abundances in the vicinity of the trap.
-This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000; @zhao2013], meaning that counts from traps represent the "activity-density" of a given organism, not absolute density.
+This makes it impossible to disentangle arthropod activity from density using single traps [@lang2000], meaning that counts from traps represent the "activity-density" of a given organism, not absolute density.
 Despite this drawback, activity-density is generally positively related to pest consumption, at least in carabids [@trichard2014; @boetzl2018; @gonzalez2020], making it acceptable for our study.
 
 (ref:siteMapCap) Classified land cover and location of pitfall traps during 2017. Inset map shows study location within Alberta provincial boundaries. Roadside traps were installed in road margins, while in-field traps were installed directly in canola fields, wetlands, or grassy field edges.
@@ -262,7 +262,7 @@ _P. distincta_ is also commonly found in disturbed environments [@collins1996; @
 Other _Pardosa_ are known to use road margins and wooded areas as habitat [@buddle2000; @drapela2011].
 Finally, _Phalangium opilio_ is an introduced harvestman (Opiliones: Phalangiidae) that is found in drier disturbed areas [@bragg2009].
 Juveniles hatch from eggs during the spring, becoming adults during the summer, and eggs are laid during the fall [adults do not overwinter; @bragg2009].
-They are commonly found in human-altered landscapes [@muster2014; @vandepoel2015Msc] and are nocturnal generalist hunters and scavengers [@halaj2000; @allard2005; @allard2005b], mainly eating small soft-bodied invertebrates [@acosta2007].
+They are commonly found in human-altered landscapes [@muster2014; @vandepoel2015Msc] and are nocturnal generalist hunters and scavengers [@halaj2000; @allard2005b], mainly eating small soft-bodied invertebrates [@allard2005; @acosta2007].
 
 To characterize landscape composition surrounding the traps, we used publicly available classified landscape data [30 m resolution; @AAFC_data].
 AAFC cropland landscape classifications from 2017 were very accurate for cultivated fields (~90%), but were less accurate for non-crop areas (~70%).
@@ -306,24 +306,7 @@ Forests and shrubland were combined into a single ``woodland" category, and gras
 Cereal was removed from the model, as it was negatively correlated with canola cover at distances less than 200m and was positively correlated at distances over 500m, reflecting the most common crop rotations (canola $\rightarrow$ wheat $\rightarrow$ barley) and the commonly-used 800 m block structure of farmland in our study region (quarter-sections).
 This resulted in a reduced set of landscape terms, none of which were strongly concurved with each other (cropland: canola, pulses; SNL: grassland, pasture, woodland, roadside; see Figure \@ref(fig:concurvity)).
 
-***
-**Box 1: Interpreting Functional Regression Plots**
-
-Functional linear regression is a special case of linear regression, where both the independent variable is predicted by a functional dependent variable, meaning that the slope is a function (vector) rather a fixed (scalar) value [@ramsay2004; @yen2014].
-Therefore, the interpretation of a functional regression plot is very different from that of a simple linear regression plot.
-Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity-density_ (_y_) and a single predictor, _proportion cover_ (_x_), which is measured in a circle of a fixed radius surrounding each trap.
-If we suppose that the relationship between _x_ and _y_ is similar at all radii at which _x_ is measured, then Figure \@ref(fig:frExample)b shows the resulting functional linear regression plot, where the slope ($\beta$) is the same at all distances (we avoid the problem of overlapping concentric circles by using concentric _annuli_).
-In reality, it is more likely that nearby cover will be more influential on activity-density than far-away cover, which could result in a relationship similar to Figure \@ref(fig:frExample)c.
-As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover (measured within an annulus of a fixed radius) as a predictor of measurements taken across time, allowing the effect of proportion cover to vary over the course of the season (Figure \@ref(fig:frExample)d).
-Finally, the effect of proportion cover over distance and time may be modeled as a smoothed surface, representing the joint spatio-temporal influence of landscape cover on activity-density.
-
-```{r frExample, echo=FALSE, fig.cap='Examples of (functional) linear regression plots. \\textbf{a)} shows a simple linear regression plot, with a single slope value for a single regressor. \\textbf{b)} shows the equivalent plot in functional regression form, where the the slope is a smoothed function that maps onto a function-valued regressor. \\textbf{c)} and \\textbf{d)} show functional linear regression plots where the slope varies with the location of the regressor.', out.width='100%'}  
-  include_graphics('../figures/frExample.png',dpi=NA)
-```
-
-***
-
-Functional regression plots of landscape composition reveal which cover classes are acting as sources or destinations of a given arthropod, and at what spatial scale.
+Functional regression plots of landscape composition reveal which cover classes are acting as sources or destinations of a given arthropod, and at what spatial scale (Figure \@ref(fig:frExample)).
 Positive effects of nearby landscape cover classes indicate that arthropods are spilling over *from* it, therefore acting as a source.
 However, negative responses to nearby landscape cover classes can indicate one of two things:
 1) It may indicate that arthropods are spilling over *into* it (therefore acting as a destination) or 2) it may indicate that no arthropods are available to spill over *from* it.
@@ -399,7 +382,6 @@ _P. opilio_ activity-density was somewhat influenced by trap location, with fiel
 Nearby grassland and woodland both had negative effects on _Phalangium opilio_ activity-density, but only early in the season (Figures \@ref(fig:OpilioLandscape)b,c), suggesting that _P. opilio_ may preferentially migrate to these cover classes.
 The temporal random effect was overwhelmingly the most important predictor of _P. opilio_ activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='OpilioMod',terms=='s(day)')$r2comp),3)`), showing that activity-density increased during the spring, and showed very little decline during the rest of the season (Figure \@ref(fig:OpilioSpatiotemporal)a).
 Similar to _P. moesta_, _P. opilio_ also showed a distinct East-West spatial random effect (Figure \@ref(fig:OpilioSpatiotemporal)b), indicating that their activity-density is also influenced by larger-scale abiotic factors.
-<!-- JV: THIS EAST-WEST PATTERN SHOULD BE MENTIONED IN THE DISCUSSION -->
 
 (ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of local trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
 
@@ -491,7 +473,7 @@ These indicate that while grass and wetlands could act as a reservoir, spillover
 _P. opilio_ is also found in large numbers at the edges of forests, and may migrate from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern: forests had a weak negative effect on _P. opilio_, at least early in the year.
 Unlike the other arthropods, most of the variation in activity-density for _P. opilio_ was explained by day of year (R$^2$ = `r round(filter(r2Nakagawa2,model=='OpilioMod',grepl('day',terms))$r2comp,2)`), indicating strong seasonal emergence cues.
-However, there was also a strong East-West spatial random effect in both _P. opilio_ and _P. moesta_, meaning that larger-scale geographic patterns (possibly related to rainfall or temperature) also influence their activity-density.
+However, there was also a strong East-West spatial random effect in both _P. opilio_ and _P. moesta_, meaning that larger-scale geographic patterns (rainfall or temperature) are more important influences on their activity-density.
 <!-- Feels like this paragraph ends too soon. Why was there so little variation due to landscape? Link to biology of the critter. -->
 
 Many other studies have considered the overall effect of SNL on ecosystem service provision, but we have highlighted the different spatial and temporal aspects of these services.
