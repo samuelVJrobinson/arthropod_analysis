@@ -41,6 +41,7 @@ arth %>% filter(grepl('PF',BTID),arthOrder=='Araneae') %>%
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 #Lots of Pardosa distincta and moesta. Could try all lycosids or Pardosa at once, but this might be a stretch
 
+
 # Basic maps of sites/trap distribution -----------------------------------
 
 #Calgary-centred projection from Paul - seems to be problems when using this

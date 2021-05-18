@@ -221,7 +221,7 @@ First, some non-crop habitat may act as sources of arthropods during some times 
 Arthropods can migrate from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
 Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
 For instance, bumblebee abundance can be influenced by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
-Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America.
+<!-- Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America. -->
 This makes it difficult to make generalizations of which habitat types harbour beneficial arthropods, making it even more difficult to provide accurate information to farmers about land management practices.
 
 In this study, we used pitfall traps to determine how landscape composition affects the seasonal abundance of predatory arthropods in a Canadian prairie agroecosystem.
@@ -238,6 +238,8 @@ We used a set of `r sum(NtrapsPer$n)` pitfall traps installed in road margins (m
 The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
 Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempTrap$startjulian)),format='%j'),format='%B %d')`, and collections ended on `r format(as.Date(as.character(max(PteMelMod$tempTrap$endjulian)),format='%j'),format='%B %d')`, with collection occurring continuously and traps being emptied every `r round(mean(PteMelMod$tempTrap$trapdays),1)` days on average (SD: `r round(sd(PteMelMod$tempTrap$trapdays),1)`). 
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
+These data were collected as a continuation of an earlier study that examined pollination services in crops [@vickruck2019], and here we use pitfall trap data to examine the predatory arthropod community with a focus on canola crops (\emph{Brassica napus} L.).
+Canola is one of the most common crops grown in southern Alberta, 
 In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
 Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
 We used 582 mL Solo® cups buried up to the rim and partially filled with propylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
