@@ -236,10 +236,13 @@ Using a large pitfall trapping dataset, we related seasonal changes in arthropod
 ## Data collection
 We used a set of `r sum(NtrapsPer$n)` pitfall traps installed in road margins (minimum of 5 m away from the road edge, `r with(NtrapsPer, sum(n[trapLoc=='ditch']))` traps) and in-field locations (`r with(NtrapsPer, sum(n[trapLoc!='ditch']))`) across southern Alberta, Canada in 2017 (Figure \@ref(fig:siteMap)).
 The sites spanned a west-to-east gradient of four natural subregions, including foothills parkland, foothills fescue, mixedgrass, and dry mixedgrass [@ABRegions2006].
+These data were collected as a continuation of an earlier study that examined pollination services in crops [@vickruck2019], and here we use pitfall trap data to examine the predatory arthropod community with a focus on canola crops (\emph{Brassica napus} L.).
+Canola is one of the most commonly-grown crops in southern Alberta, and represented 15\% of the total land cover within the spatial extent of our sampling region during 2017 (Figure \@ref(fig:siteMap)).
+We did not collect information on soil fertilization, pesticide application, mowing, or tillage (approximately 82% of planting in Vulcan County was done with zero-till in 2016; [@statscan_tillage2016]). 
+Diverse crop rotations may increase predatory arthropod abundance [@busch_Msc; @bertrand2016], but this was beyond the scope of the study.
+
 Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempTrap$startjulian)),format='%j'),format='%B %d')`, and collections ended on `r format(as.Date(as.character(max(PteMelMod$tempTrap$endjulian)),format='%j'),format='%B %d')`, with collection occurring continuously and traps being emptied every `r round(mean(PteMelMod$tempTrap$trapdays),1)` days on average (SD: `r round(sd(PteMelMod$tempTrap$trapdays),1)`). 
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
-These data were collected as a continuation of an earlier study that examined pollination services in crops [@vickruck2019], and here we use pitfall trap data to examine the predatory arthropod community with a focus on canola crops (\emph{Brassica napus} L.).
-Canola is one of the most common crops grown in southern Alberta, 
 In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
 Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
 We used 582 mL Solo® cups buried up to the rim and partially filled with propylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.

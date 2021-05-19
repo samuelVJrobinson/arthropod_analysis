@@ -1,0 +1,82 @@
+Reviewers' comments:
+Editor: Thank you for submitting this research to AGEE. The ms has now been evaluated by two reviewers. Both reviewers highlight that additional information is required in order to fully evaluate the sampling design and the statistical analyses that were conducted here.
+Looking forward to receiving a revised version of the ms that clarifies the different points raised and  a point by point response to reviewers
+Yours sincerely
+Dr Sandrine Petit
+
+
+
+Reviewer #1: In this article, you present an analysis of arthropod count data in different types of habitat, exploring spatio-temporal variation of the landscape effect of diverse land uses on local abundances, with the goal to infer population dispersal patterns. In addition with the nice spatio-temporal dataset, one of the originality of this work is the use of functional regression to analyze landscape effects at different scales and to account for the repetition of measures in time.
+The ms is particularly clear (except for some specific points, see below), well written and structured. The figures are very clear and informative. I appreciated the nice didactic presentation of the statistical method (including a specific box and fig), a method which is quite new in the field of landscape ecology. Please find my comments below.
+
+L49-50. Ok but did you address this issue in the present study?
+
+L72. "Canola" At this stage, there is no justification of the choice of canola as a focus crop model. The rational for this choice should appear here or before in the text
+
+L72. In the local effect, you only accounted for the type of cover, without consideration for management practices that could affect arthropod population. Could you give information on the types of practices (treatments, soil operations, crop succession for crop fields, mowing frequencies for other fields, etc…)?
+
+L73. "grassy field edges" Is in-field an appropriate name for the category? Is a grassy field margin not more similar to a road margin than to an agricultural field?
+
+L73. "remnant prairie grasslands" What is it exactly?
+
+L74-75. I did not fully understand the design (fields/transects/other sites). I was expecting that the number of traps in canola fields would be three times the total number of traps in wetland, grassy field edges and remnant prairie, but it is not the case. In the map Fig 1. there are only about 35 in-field traps. It is not clear given the legend if a road trap is always placed next to a in-field trap as the two symbols overlaps in the map.
+
+L112. "30m annuli (rings)" Most of studies are using circle buffers. I agree that buffers may not be fully relevant with many drawbacks when exploring the scale of effects such as de facto correlation between the same variables calculated for different buffer size. However, to allow for comparison with other studies I suggest that (i) you justify your choice for using rings rather than full buffers - I guess it is more rigorous for the analysis with function regression, given the definition of beta(i), but it is not straightforward; (ii) you give information on the possible change in the results if you were using buffers (did you compare for some analysis?). There is only an implicit justification between brackets in Box 1 (L177), I suggest you make it more explicit.
+
+L120. "Local and regional" Please use a consistent terminology through the whole ms (see my comment for Line 197).
+
+L128. "grain" In my mind, this is the scale of effect that is varying when you change from a ring to another, rather than the relevant grain that refers to the degree of fineness in the description of landscape features
+
+L143 "the average proportion cover across days of the year (temporal eﬀect of cover class)" This is the only unclear point for me in the description of the analysis. I understand this sentence as accounting for the variation of landscape composition during the year (which would require multiple dates for mapping) and I do not think that you did that. As you clearly set L180-182, the temporal effect of landscape land uses is accounted through the sampling dates ("measurements taken across time")
+
+L160. "strongly positively correlated at all distances" Correlated or concurved? Did you choose on the basis of a correlation threshold too? If it is the case, which threshold? If not, I think it is more appropriate to write "as they were strongly concurved"
+L161. "correlated" idem
+
+L169. "both" ?
+
+L197-198. This is clear and relevant to separate the processes between scales but the terminology is quite unusual. Many references exist in the literature with landscape accounted for with distances <500m. Local usually refer to the habitat were the trap is (and it is also the case in your article, which may be misleading for the reader), what you indeed included in you model (canola, field edge, grassland, road margin, and wetlands). I suggest you use another terminology, for e.g. "near" and "far" as in Whytock, R.C., Fuentes-Montemayor, E., Watts, K., Macgregor, N.A., Call, E., Mann, J.A., Park, K.J., 2020. Regional land-use and local management create scale-dependent 'landscapes of fear' for a common woodland bird. Landsc. Ecol. doi:10.1007/s10980-019-00965-x. This could be moved to (or linked with) the "local versus regional" dichotomy line 120
+
+L221. "out of the crop" out of this type of crop
+
+L223. "local" why local? In my mind s(E, N) explores the whole spatial coverage. It is difficult to extract relevant scale of clustering from Fig S3b.
+
+L232-233. This is not consistent with Table S4, P. distincta, significant temporal component but ns for spatial; Table S6, P. moesta, significant spatial component but ns for temporal. Again, difficult to have an idea of the strength of spatial patterns from Fig S4b and S5b
+
+L236. "late in the season" I do not understand. There was no significant effect of s(Day):Pasture. As far as I understand Fig4 and TableS4, the results are negative effects of pasture and woodlands, both increasing for large landscape scales.
+
+L236-237. "This suggests that large amounts of pasture are unsuitable habitat for P. distincta, and that they migrate into woodlands later in the season" I do not understand your interpretation. I see the woodland effect similar to the pasture effect (bad quality habitat for both)
+
+L247-248. "Similar to P.distincta" See my comment for Line 232
+
+L257. "but only early in the season" I did no see a significant interaction of Woodland and the time period in Table S8 (also consistent with Fig 6c where regressions for early and late periods have overlapping confident regions over the whole graph)
+
+In the whole ms: I think dispersal (resp. dispersion) is more appropriate than migrate (resp. migration).
+
+In Figs3a, 4a, 5a, 6a, is it possible to add letters for groups as a result of a pariwise comparison (rather than only significant level of estimates in Tables S1, S3, S5 and S7)?
+
+In tables, S2, S4, S6 and S8, "Roads" rather than "Urban" would be more consistent with the text
+
+
+
+
+Reviewer #2: This manuscript investigates how surrounding landscape composition relate to arthropods activity-density in canola fields, road margins and adjacent non-crop habitats. I found the study most interesting and applaud the use of a functional approach to model the impact of landscape composition at incremental scales and over time within a growing season. Such modelling techniques can provide valuable insight into our understanding of the impact of landscape on species distribution and potentially on the provision of ecosystem services in agricultural systems. This innovative approach has great potential and allows the authors to better account for the spatial and temporal drivers of arthropods' activity-density in agro-ecosystems.
+Despite my overall enthusiasm, it was sometime challenging to understand how exactly the sampling and the analyses were computed. The method section is not always clear, lacking details, and on many occasions, I found myself guessing how the study and the modelling were conducted.
+Although critical for the understanding of the study, I believe that the authors can address these issues by editing and augmenting some parts of their text, and potentially providing additional results to support their interpretation. This study has the potential to contribute to our understanding of the spatiotemporal dynamics and habitat use of arthropods in agroecosystems.
+
+1. Data sampling - From the manuscript, it is unclear how the pitfall traps were distributed. From the text and Figure 2, pitfall traps were installed in road margins and in-field locations. Although the authors provide the number of pitfalls installed, the number of sites or fields sampled is not mentioned. From the text (L66, section 2.1), each field (canola) had four traps, set at 0, 25, 75 and 200m from the field margin, with 45 traps set at 0m being outside the cultivated field (16 in wetlands, 11 in grassy field edges and 18 in remnant prairies). With 68 pitfall traps assigned to in-field canola, it appears that not all distances were sampled in each of the 45 fields. It is also unclear if the surrounding landscape was characterized around each trap or each site (4 traps), although L175 suggests each trap.
+Overall, this section requires some clarification and would benefit from an explanation for the unbalanced distribution of trap across local covers.  Also, because several traps are nested within the same field, the lack of independence between nearby traps (25-50m) should be included in the model. Does the spatial effect (easting-northing) capture the spatial effect at multiple scales, including the one between nearby pitfall traps?
+
+2. Modelling and analysis - In the method, I was confused with the analyses and how the authors specified their statistical models. What confused me was the use of the terms "scalar-on-function" and "functional linear regression", the latter used in conjunction with the phrase "where both the independent variable is predicted by a functional dependent variable" (L169). At first reading, I understood that the authors used a function-on-function regression model, where both the dependant and the independent variables are modelled functions. After further reading, I assume that this was not the case and that all models were of the scalar-on-function class, with the response being the activity- density and the smoothers applied on the right-hand side (predictors). This needs to be clarified in the text, and I would suggest providing the formula used to fit the models.
+In the analysis, location and temporal effect are defined as fixed and smooth effects (L136), but in the results, these are presented as random effects (L238).
+
+3. A temporal effect of "cover class" was included in the model (L143). However, it is unclear how this term was informed. Was it derived from known crops' phenology and/or sowing dates?
+
+4. Activity-density - Because pitfall traps measure activity-density, change in the number of arthropods captured can vary during the season, not only because of movement, but due to specific life-cycle events and change in foraging activity. This signal (S3-6) is likely to be confounded with the one expected from the movement and thereby will influence the interpretation of the positive of negative slopes (L191). These potential confounding effects should be discussed, and inference about movement and spill-over (L267) should be cautious as these rely on correlations.
+
+5. Because the sampling scheme and the models are complex, it is challenging to disentangle the landscape and local effects on activity-density, partly because the effect of the landscape was modelled over several local habitat types. I am not clear how to interpret grassland's landscape effect on a species in canola when a species was found mainly in grassland or along road margin sites (e.g., Fig 4-a). If the model suggests that individuals are moving from one habitat to another during the season, we should also detect a temporal effect in the specific habitats. The evidence would be more convincing if supported by such local trends (e.g., change in activity density over time).
+
+6. L278-280. If the influence was limited to a radius of about 500 m, why is this an indication of "large-scale" effect when in the method, large-scale (landscape scales L198) refers to > 500 m radius?
+
+7. L199. The early and late-season effects are defined by two dates. Are these specific dates, threshold dates (before and after, until) or median date of the period?
+
+8. L89 Although it has been shown and often repeated that the contribution of common species more important to pollination services, several studies shows that this is not true for every aspect of service provision as diversity (including less common/rare species) is associated with increased stability and resilience of service provision. I would rephrase this part of the text.

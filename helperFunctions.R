@@ -48,27 +48,9 @@ matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
 #fitFam = family of distribution to use
 #basisFun = name of basis function to be used ('ts' = thin plate spline with extra shrinkage)
 #doublePenalize = should gam use double-penalization? (don't use if using 'ts' or 'cr' as basis functions)
-runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
-                    fitMethod='REML',fitFam='nb',basisFun='ts',doublePenalize=F){
+runMods <- function(tempTrap,nnDistMat,oRingMat2,formulas=NULL,
+                    fitMethod='REML',fitFam='nb',basisFun='ts',doublePenalize=FALSE){
   if(is.null(formulas)) stop('No gam formulas provided')
-  
-  #Only use pitfall traps from 2017
-  tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
-    # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
-    select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>%
-    mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
-    left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
-    left_join(tempArth,by='BTID') %>% mutate(n=ifelse(is.na(n),0,n)) %>% filter(!is.na(grass)) %>% 
-    arrange(BLID,dist,pass) %>% mutate(BLID=factor(BLID)) %>% 
-    mutate_at(vars(ephemeral:noncrop),function(x) ifelse(x>1500,1500,x)) %>% 
-    rename('count'='n') %>% 
-    #Converts 0 dist trapLoc to distFrom (pitfall traps at 0 m are "inside of" feature)
-    mutate(trapLoc=factor(ifelse(dist==0 & distFrom!='control',distFrom,trapLoc))) %>% 
-    #Get UTM coordinates for traps
-    mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
-    st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
-    st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
-    mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
   
   #Arrange matrices from oRingMat2 to correspond with rows of tempTrap
   oRingMat2 <- lapply(oRingMat2,function(x){
@@ -138,7 +120,8 @@ runMods <- function(tempArth,trap,nnDistMat,oRingMat2,formulas=NULL,
   # #Problem: requires 5 new terms to be written for each cover category, and is likely inestimable. Leaving this out for now.
   
   #List of objects to return
-  retList <- list(datList=datList,tempTrap=tempTrap,mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
+  retList <- list(datList=datList,#tempTrap=tempTrap,
+                  mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
   return(retList)
 }
 
@@ -288,3 +271,45 @@ boldRMD <- function(x) paste0('**',x,'**')
 #Makes text bold in LaTeX
 boldLaTeX <- function(x) paste0('\\textbf{',x,'}') 
 
+# Convenience function to make FR plots from model structure
+#mod = model
+#term = which landscape term? (eg "Pulses")
+#type = both, space, time
+#days = range of days to use
+#dists = range of distances to use
+#ylab = custom y label
+#showLegend = show legend for "both" plots?
+makeFRplot <- function(mod,term=NULL,type=NULL,days=NULL,dists=seq(30,1500,30),ylab=NULL,dateLabs=NULL,showLegend=F){
+  if(is.null(days)|is.null(dateLabs)){
+    if(type=='time'){
+      days <- 149:241
+    } else {
+      days <- c(173,232)
+      dateLabs <- c('Early','Late')
+    }
+  }
+  smLabs <- sapply(mod$smooth,function(x) x$label) #Smoother labels
+  whichSmooths <- which(grepl(term,smLabs)) #Select terms
+  if(is.null(ylab)) ylab <- paste0(term,' effect')
+  if(type=='time') {
+    whichSmooths <- whichSmooths[2]
+    d <- data.frame(endDayMat=days,Temp=1,y=NA) 
+    names(d)[2] <- term  
+    p <- d %>% smoothPred(mod,whichSmooth=whichSmooths) %>% rename(x=endDayMat) %>%
+      mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>%
+      effectPlot(leg=showLegend)+labs(x='Time of year',y=ylab)
+  } else if(type=='space') {
+    whichSmooths <- whichSmooths[1]
+    d <- data.frame(distMat=dists,Temp=1,y=NA) 
+    names(d)[2] <- term
+    p <- d %>% smoothPred(mod,whichSmooth=whichSmooths) %>% rename(x=distMat) %>% 
+      effectPlot(leg=showLegend)+labs(x='Distance from trap location (m)',y=ylab)
+  } else {
+    d <- expand.grid(endDayMat=days,distMat=dists,Temp=1) 
+    names(d)[3] <- term
+    p <- d %>% smoothPred(mod,whichSmooth=whichSmooths) %>% rename(x=distMat,y=endDayMat) %>%
+      mutate(y=factor(y,labels=dateLabs)) %>%
+      effectPlot(leg=showLegend,cols=smoothCols)+labs(x='Distance from trap location (m)',y=ylab)
+  }
+  return(p)
+}

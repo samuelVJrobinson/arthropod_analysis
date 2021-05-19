@@ -15,6 +15,33 @@ load('./data/geoDataAAFC.Rdata') #Load oring data extracted from AAFC data
 
 source('helperFunctions.R') #Load helper functions
 
+#Select critters of interest
+tempArth <- arth %>% mutate(genSpp=paste(genus,species,sep=' ')) %>%
+  filter(genSpp=='Pterostichus melanarius'|genSpp=='Pardosa distincta'|
+           genSpp=='Pardosa moesta'|genSpp=='Phalangium opilio') %>%
+  filter(year==2017) %>% group_by(BTID,genSpp) %>% summarize(n=n()) %>%
+  pivot_wider(names_from=genSpp,values_from=n)
+
+#Only use pitfall traps from 2017
+tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
+  # filter(!grepl('PF',BTID)) %>% #Some ditch sites don't have cover properly digitized at further distances, but it's OK for now
+  select(BLID,BTID,pass,contains('julian'),deployedhours,trapLoc,distFrom,dist,lonTrap,latTrap,lonSite:ID) %>%
+  mutate(trapdays=deployedhours/24) %>% select(-deployedhours) %>% 
+  left_join(rownames_to_column(data.frame(nnDistMat),'ID'),by='ID') %>% 
+  left_join(tempArth,by='BTID') %>% filter(!is.na(grass)) %>% 
+  mutate(across(c(`Pterostichus melanarius`,`Pardosa distincta`,`Pardosa moesta`,`Phalangium opilio`), ~ifelse(is.na(.x),0,.x))) %>% 
+  arrange(BLID,dist,pass) %>% mutate(BLID=factor(BLID)) %>% 
+  mutate_at(vars(ephemeral:noncrop),function(x) ifelse(x>1500,1500,x)) %>% 
+  # rename('count'='n') %>% 
+  #Converts 0 dist trapLoc to distFrom (pitfall traps at 0 m are "inside of" feature)
+  mutate(trapLoc=ifelse(dist==0 & distFrom!='control',distFrom,trapLoc)) %>% 
+  mutate(trapLoc=factor(ifelse(trapLoc=='pivot','ditch',trapLoc))) %>% #TEST: Changes all pivot features to ditch, as per reviewer 1's comment
+  #Get UTM coordinates for traps
+  mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
+  st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
+  st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
+  mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
+
 #Arrange oRing data
 oRingMat2 <- lapply(oRingMat2,function(x) x[,-1]) #Remove distance=0 measurements (already in trapLoc category)
 
@@ -70,10 +97,10 @@ smoothCols <- c('blue','red') #Colours for smoothing lines
 
 # Pterostichus melanarius ----------------------------------
 
-#Select only P. melanarius
-tempArth <- arth %>% filter(genus=='Pterostichus',species=='melanarius',year==2017) %>% group_by(BTID) %>% summarize(n=n())
 
-# PteMelMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts',doublePenalize=FALSE); beep(1)
+# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# beep(1)
 # save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
@@ -186,41 +213,60 @@ dispDays <- data.frame(doy=c(173,232)) %>%
 #Get order of terms to plot
 cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
 
-#Trap location 
-p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
-  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+#Trap location
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>%
   mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
-  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
   labs(x='Trap location',y='Activity')
 
 #Grass/wetland effect (space + time)
-p2 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>% 
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=F,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Grassland effect')
+p2 <- makeFRplot(mod3,type='both',term='GrassWetland',ylab='Grassland effect')
 
 #Canola effect (space + time)
-p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Canola=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>% 
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(leg=T,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
+p3 <- makeFRplot(mod3,type='both',term='Canola')
 
 #Pulse effect (time)
-p4 <- data.frame(endDayMat=149:241,Pulses=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=16) %>% rename(x=endDayMat) %>% 
-  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
-  effectPlot(leg=F)+labs(x='Time of year',y='Pulse effect')
+p4 <- makeFRplot(mod3,type='time',term='Pulses')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,
                         labels=letters[1:5],nrow=2,ncol=2,
-                        legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
+                        legend='bottom',common.legend=T,font.label=list(size=landscapeLabel))
 ggsave('./figures/Pterostichus_melanarius_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,raneffPlot,fixeffPlot) #Cleanup
+
+# # Alternate model with ditch/pivot corners combined
+# #Trap location
+# p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+#   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+#   mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','Field\nmargin',trapLoc)) %>%
+#   mutate(trapLoc=gsub('native','grassland',trapLoc)) %>%
+#   mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
+#   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+#   labs(x='Trap location',y='Activity')
+# 
+# #Grass/wetland effect (time)
+# p2 <- makeFRplot(mod3,type='time',term='GrassWetland')
+# 
+# #Pasture (space)
+# p3 <- makeFRplot(mod3,type='space',term='Pasture')
+# 
+# #Tree/shrub (space + time)
+# p4 <- makeFRplot(mod3,type='both',term='TreeShrub')
+# 
+# #Pulse effect (space)
+# p5 <- makeFRplot(mod3,type='space',term='Pulses')
+# 
+# #Urban effect (space + time)
+# p6 <- makeFRplot(mod3,type='both',term='Urban')
+# 
+# #Plot landscape effects
+# ggarrange(p1,p2,p3,p4,p5,p6,
+#                         labels=letters[1:6],nrow=2,ncol=3,
+#                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel))
 
 #Looks like the ring model of landscape does better. Important landscape features seem to be:
 # Grassland/Wetland, Canola, Pulses
@@ -243,16 +289,10 @@ detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
-#Select only Pardosa distincta
-tempArth <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
-# tempArthF <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017,sex=='F') %>% group_by(BTID) %>% summarize(n=n())
-# tempArthM <- arth %>% filter(genus=='Pardosa',species=='distincta',year==2017,sex=='M') %>% group_by(BTID) %>% summarize(n=n())
-
 # Takes way longer to run. 5-10 mins +
-# ParDisMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Full model
-# ParDisModF <- runMods(tempArthF,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Female model
-# ParDisModM <- runMods(tempArthM,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1) #Male model
-
+ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),nnDistMat,oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
 load('./data/ParDisMod.Rdata')
 
@@ -336,33 +376,53 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
 #   effectPlot(leg=T,cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
 
 #Pasture (space)
-p3 <- expand.grid(distMat=seq(30,1500,30),Pasture=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Pasture',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
-  rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Pasture effect')
+p3 <- makeFRplot(mod3,type='space',term='Pasture')
 
 #Tree/shrub (time)
-p4 <- data.frame(endDayMat=149:241,TreeShrub=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('TreeShrub',sapply(mod3$smooth,function(x) x$label)))[2]) %>% 
-  rename(x=endDayMat) %>% 
-  mutate(x=as.Date(paste0(x,'-2017'),format='%j-%Y')) %>% 
-  effectPlot(leg=F)+labs(x='Time of year',y='Woodland effect')
+p4 <- makeFRplot(mod3,type='time',term='TreeShrub')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p3,p4,
                         labels=letters[1:3],nrow=2,ncol=2,
                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
 ggsave('./figures/Pardosa_distincta_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
+
+# # Alternate model with ditch/pivot corners combined
+# #Trap location
+# p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+#   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+#   mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','Field\nmargin',trapLoc)) %>%
+#   mutate(trapLoc=gsub('native','grassland',trapLoc)) %>%
+#   mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
+#   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+#   labs(x='Trap location',y='Activity')
+# 
+# #Grass/wetland effect (time)
+# p2 <- makeFRplot(mod3,type='both',term='GrassWetland')
+# 
+# #Canola (space)
+# p3 <- makeFRplot(mod3,type='space',term='Canola')
+# 
+# #Pulse effect (space + time)
+# p4 <- makeFRplot(mod3,type='both',term='Pulses')
+# 
+# #Urban effect (space)
+# p5 <- makeFRplot(mod3,type='space',term='Urban')
+# 
+# #Plot landscape effects
+# ggarrange(p1,p2,p3,p4,p5,
+#                         labels=letters[1:6],nrow=2,ncol=3,
+#                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel))
+
+
 rm(p1,p2,p3,p4,raneffPlot,fixeffPlot) #Cleanup
 detach(ParDisMod)
 
 # Pardosa moesta (wolf spider) --------------------------------------------
 
-#Select only Pardosa moesta
-tempArth <- arth %>% filter(genus=='Pardosa',species=='moesta',year==2017) %>% group_by(BTID) %>% summarize(n=n())
-
 # Takes way longer to run. 5-10 mins +
-# ParMoeMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # save(ParMoeMod,file='./data/ParMoeMod.Rdata')
 load('./data/ParMoeMod.Rdata')
 
@@ -429,30 +489,16 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Grass/Wetland (space)
-p2 <- expand.grid(distMat=seq(30,1500,30),GrassWetland=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))[1]) %>% 
-  rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Grassland effect')
+p2 <- makeFRplot(mod3,type='space',term='GrassWetland')
 
 #Canola (space + time)
-p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Canola=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Canola',sapply(mod3$smooth,function(x) x$label)))) %>%
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Canola effect')
+p3 <- makeFRplot(mod3,type='both',term='Canola')
 
 #Urban effect (space + time)
-p4 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),Urban=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Urban',sapply(mod3$smooth,function(x) x$label)))) %>%
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Road margin effect')
+p4 <- makeFRplot(mod3,type='both',term='Urban')
 
 #Pulses (space)
-p5 <- expand.grid(distMat=seq(30,1500,30),Pulses=1,y=NA) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('Pulses',sapply(mod3$smooth,function(x) x$label)))[1]) %>%
-  rename(x=distMat) %>% 
-  effectPlot(leg=F)+labs(x='Distance from trap location (m)',y='Pulse effect')
+p5 <- makeFRplot(mod3,type='space',term='Pulses')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
@@ -460,15 +506,41 @@ fixeffPlot <- ggarrange(p1,p2,p3,p4,p5,
                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel)) 
 ggsave('./figures/Pardosa_moesta_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
+
+# # Alternate model with ditch/pivot corners combined
+# #Trap location
+# p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+#   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+#   mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','Field\nmargin',trapLoc)) %>%
+#   mutate(trapLoc=gsub('native','grassland',trapLoc)) %>%
+#   mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
+#   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+#   labs(x='Trap location',y='Activity')
+# 
+# #Canola (space + time)
+# p2 <- makeFRplot(mod3,type='both',term='Canola')
+# 
+# #Tree/shrub (space + time)
+# p3 <- makeFRplot(mod3,type='space',term='TreeShrub')
+# 
+# #Pulses (space)
+# p4 <- makeFRplot(mod3,type='space',term='Pulses')
+# 
+# #Urban (space + time)
+# p5 <- makeFRplot(mod3,type='both',term='Urban')
+# 
+# #Plot landscape effects
+# ggarrange(p1,p2,p3,p4,p5,
+#                         labels=letters[1:6],nrow=2,ncol=3,
+#                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel))
 detach(ParMoeMod)
 
 # Harvestmen -------------------------------------------------------------
 
-#Select only harvestmen
-tempArth <- arth %>% filter(arthOrder=='Opiliones',year==2017) %>% group_by(BTID) %>% summarize(n=n())
-
 #Takes way longer to run. 5-10 mins +
-# OpilioMod <- runMods(tempArth,trap,nnDistMat,oRingMat2Prop,formulas=modFormulas,basisFun='ts'); beep(1)
+
+# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # save(OpilioMod,file='./data/OpilioMod.Rdata')
 load('./data/OpilioMod.Rdata')
 
@@ -540,18 +612,10 @@ p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='
   labs(x='Trap location',y='Activity')
 
 #Grassland/wetland (space + time)
-p2 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),GrassWetland=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('GrassWetland',sapply(mod3$smooth,function(x) x$label)))) %>%
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Grassland effect')
+p2 <- makeFRplot(mod3,type='both',term='GrassWetland',showLegend = TRUE)
 
 #Tree/Shrub (space + time)
-p3 <- expand.grid(endDayMat=c(173,232),distMat=seq(30,1500,30),TreeShrub=1) %>% 
-  smoothPred(mod3,whichSmooth=which(grepl('TreeShrub',sapply(mod3$smooth,function(x) x$label)))) %>%
-  rename(x=distMat,y=endDayMat) %>% 
-  mutate(y=factor(y,labels=dispDays$date)) %>% 
-  effectPlot(cols=smoothCols)+labs(x='Distance from trap location (m)',y='Woodland effect')
+p3 <- makeFRplot(mod3,type='both',term='TreeShrub',showLegend = TRUE)
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
@@ -559,6 +623,29 @@ fixeffPlot <- ggarrange(p1,p2,p3,
                         legend='bottom',common.legend=T) 
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,raneffPlot,fixeffPlot) #Cleanup
+
+
+# # Alternate model with ditch/pivot corners combined
+# #Trap location
+# p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+#   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+#   mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','Field\nmargin',trapLoc)) %>%
+#   mutate(trapLoc=gsub('native','grassland',trapLoc)) %>%
+#   mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
+#   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+#   labs(x='Trap location',y='Activity')
+# 
+# #Pasture (space + time)
+# p2 <- makeFRplot(mod3,type='both',term='Pasture')
+# 
+# #Tree/shrub (space + time)
+# p3 <- makeFRplot(mod3,type='both',term='TreeShrub')
+# 
+# #Plot landscape effects
+# ggarrange(p1,p2,p3,
+#                         labels=letters[1:6],nrow=2,ncol=2,
+#                         legend='bottom',common.legend=T,font.label=list(size=landscapeLabel))
+
 
 #Make plots for mod4 (non-crop only)
 
