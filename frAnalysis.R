@@ -98,10 +98,10 @@ smoothCols <- c('blue','red') #Colours for smoothing lines
 # Pterostichus melanarius ----------------------------------
 
 
-# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
-# save(PteMelMod,file='./data/PteMelMod.Rdata')
+# save(PteMelMod,file='./data/PteMelMod2.Rdata')
 load('./data/PteMelMod.Rdata')
 
 #Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
@@ -109,9 +109,24 @@ load('./data/PteMelMod.Rdata')
 
 #Check models
 attach(PteMelMod)
+# detach(PteMelMod)
 
 # detach(PteMelMod)
 AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
+
+#Original models
+#            df      AIC
+# mod1 48.00979 4779.429
+# mod2 51.27912 4732.102
+# mod3 67.62359 4722.432
+# mod4 57.57936 4740.469
+
+#Updated models - field margin/road margins combined
+#            df      AIC
+# mod1 48.00979 4779.429
+# mod2 50.29594 4732.312
+# mod3 69.61288 4722.696
+# mod4 55.73488 4736.132
 
 #Model 3 - landscape effects matter quite a bit
 summary(mod3); AIC(mod3)
@@ -148,7 +163,7 @@ termNames <- gsub('TreeShrub','Woodland',termNames)
 N <- 1:nrow(checkMC) #Plot all smooth terms
 # N <- 4:nrow(checkMC) #Plot with only landscape smoothers
 lN <- length(N)
-png('./figures/coverCorPlots/concurvityEstimate_reduced.png',1200,1000,pointsize=20)
+png('./figures/coverCorPlots/concurvityEstimate_reduced2.png',1200,1000,pointsize=20)
 matrixplot(checkMC[N,N],mar=c(1, 10, 10, 1),termNames[N])
 abline(h=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3)) #Lines to separate terms
 abline(v=seq(0-1/lN/2,1+1/lN/2,length.out=1+lN/3))
@@ -300,6 +315,20 @@ load('./data/ParDisMod.Rdata')
 attach(ParDisMod)
 AIC(mod1,mod2,mod3,mod4) 
 
+#Original models
+#             df      AIC
+# mod1  8.281321 4075.018
+# mod2 29.267712 3897.135
+# mod3 20.366559 3887.316
+# mod4 31.878192 3896.132
+
+#Updated models - field margin/road margins combined
+#             df      AIC
+# mod1  8.281321 4075.018
+# mod2 28.282745 3896.150
+# mod3 42.594997 3880.951
+# mod4 30.863718 3899.080
+
 #Model 3 
 summary(mod3); AIC(mod3)
 plot(mod3,pages=1,scheme=2,rug=F,shade=T,all.terms=T)
@@ -421,15 +450,29 @@ detach(ParDisMod)
 # Pardosa moesta (wolf spider) --------------------------------------------
 
 # Takes way longer to run. 5-10 mins +
-# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # save(ParMoeMod,file='./data/ParMoeMod.Rdata')
 load('./data/ParMoeMod.Rdata')
 
 #Check models
 attach(ParMoeMod)
 
-AIC(mod1,mod2,mod3,mod4) 
+AIC(mod1,mod2,mod3,mod4)
+
+#Original models
+#             df      AIC
+# mod1  5.427305 2129.857
+# mod2 13.241496 2013.304
+# mod3 24.446528 2000.302
+# mod4 14.193293 2012.957
+
+#Updated models - field margin/road margins combined
+#             df      AIC
+# mod1  5.427305 2129.857
+# mod2 12.289208 2014.002
+# mod3 21.271566 2011.780
+# mod4 12.893013 2014.300
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -538,9 +581,8 @@ detach(ParMoeMod)
 # Harvestmen -------------------------------------------------------------
 
 #Takes way longer to run. 5-10 mins +
-
-# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
 # save(OpilioMod,file='./data/OpilioMod.Rdata')
 load('./data/OpilioMod.Rdata')
 
@@ -549,6 +591,22 @@ attach(OpilioMod)
 # detach(OpilioMod)
 
 AIC(mod1,mod2,mod3,mod4) #Much less info from landscape level
+
+#Original models
+#            df      AIC
+# mod1 29.17757 6581.182
+# mod2 33.24854 6562.159
+# mod3 28.77088 6558.007
+# mod4 21.48624 6549.950
+
+#Updated models - field margin/road margins combined
+#            df      AIC
+# mod1 29.15878 6581.504
+# mod2 32.72448 6562.097
+# mod3 43.49739 6568.028
+# mod4 37.88387 6565.738
+
+
 
 #Model 3 - none of the fixed terms are super important
 #Model 4 - noncrop land
