@@ -219,7 +219,7 @@ In this way, the spillover of beneficial arthropods into crops depends not only 
 Despite what is known about the spatial and temporal aspects of beneficial arthropod spillover, these are rarely considered together.
 First, some non-crop habitat may act as sources of arthropods during some times of the year, but as destinations during other times, meaning that the timing of spillover from non-crop habitat may not align with important periods in crop development.
 Arthropods can disperse from managed crops back into adjacent SNL at the end of the season [@desender1988; @tscharntke2005b], but this is seldom considered.
-Second, the spatial "grain" of the landscape that is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
+Second, the scale at which the landscape is relevant to an organism depends on their traits and life history [@ahrenfeldt2015].
 For instance, bumblebee abundance can be influenced by both nearby and far-away SNL abundance [@westphal2006], but this is poorly studied for other groups of beneficial organisms [but see @sander2006].
 <!-- Finally, the feeding and life-history characteristics of many predatory ground beetles and spiders are often poorly-documented, especially in North America. -->
 This makes it difficult to make generalizations of which habitat types harbour beneficial arthropods, making it even more difficult to provide accurate information to farmers about land management practices.
@@ -259,7 +259,7 @@ Despite this drawback, activity-density is generally positively related to pest 
   include_graphics('../figures/maps/PF2017Map.png',dpi=NA)
 ```
   
-We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are more important for ecosystem service provision than rare species [@winfree2015].
+We used four highly-abundant species of predatory arthropods found in the pitfall traps, as common species are more important for ecosystem service provision than rare species [@winfree2015; @kleijn2015; but see @winfree2018].
 _Pterostichus melanarius_ is an introduced predatory ground beetle (Coleoptera: Carabidae) that is a wide-ranging generalist known to prey upon crop pests [@carcamo1994; @larsen2003; @busch_Msc].
 It is commonly found in untilled grasslands [@purtauf2005] and may use grassy field edges as larval habitat [@desender1988].
 _Pardosa_ are a genus of wolf spiders (Araneae: Lycosidae) that use an active wandering predation strategy [@young1990], and are common across the Canadian prairies.
@@ -283,7 +283,7 @@ Functional regression [@ramsay2004; @yen2014] was used to incorporate landscape 
 Scalar-on-function regression is a special type of linear regression model ($y=X\beta + e$), where the columns of the model matrix $X$ contain some continuous predictor of the scalar $y$, and the values of the coefficients ($\beta$) are modeled as a smooth function $f(x)$ of the predictors.
 <!-- As an example of scalar-on-function regression, biomass in a plot (scalar) could be modeled as a smoothed function of monthly average temperatures at that plot (function), meaning that the effect of monthly temperatures would also be a function of time. -->
 In our case, the proportion of landscape cover ($X$) within each annulus surrounding the trap is a function of distance away from the trap, meaning that the coefficients are a smoothed function of distance ($\beta_i = f(distance_i)$), and represent the additive effect of a given type of landscape cover at distances away from the trap (i.e. $X\beta$).
-This allows for the possibility that the size of the landscape "grain" relevant to a given organism may change over the course of its life stages [@addicott1987; @lima1996; @gardiner2010].
+This allows for the possibility that the scale of landscape relevant to a given organism may change over the course of its life [@addicott1987; @lima1996; @gardiner2010].
 It also allows for the possibility that small amounts of certain land cover types may be beneficial, but are detrimental at large scales, indicating that the cover type may not constitute a completely usable habitat.
 
 Scalar-on-function regression of activity-density was fit using generalized additive models [_mgcv_ version `r packageVersion('mgcv')`; @wood2017]. 
@@ -293,13 +293,13 @@ Trapping location was included as a fixed effect with 5 levels (canola, field ed
 Day of year was included as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centre point) were included as 2-dimensional smooths, in order to account for underlying spatial and temporal autocorrelation in the data.
 
 For each landscape cover class, we used three scalar-on-function terms.
-First, we used the proportion cover in the annuli surrounding each trap location (spatial effect of cover class).
-Second, we used the average proportion cover across days of the year (temporal effect of cover class). 
-Finally, we used a tensor-product interaction of landscape cover and day of year (spatio-temporal interaction of cover class).
+First, we used the proportion cover in the annuli surrounding each trap location (spatial effect of cover class - _i.e._ does the effect of cover differ with distance?).
+Second, we used the average proportion cover in all annuli across days of the year (temporal effect of cover class - _i.e._ does the effect of cover differ with time?). 
+Finally, we used a tensor-product interaction of landscape cover and day of year (spatio-temporal interaction of cover class - _i.e._ does the effect of cover differ with distance and time?).
 We used 10 basis dimensions for the spatial and temporal landscape smoothers, and 16 basis dimensions for the spatio-temporal interaction.
 The effective degrees of freedom for all smoothing terms were far below the number of basis dimensions, indicating that no additional basis dimensions were needed (see Tables \@ref(tab:PteMelSmooth), \@ref(tab:ParDisSmooth), \@ref(tab:ParMoeSmooth), \@ref(tab:OpilioSmooth)).
-To remove unimportant terms from the model, we used thin-plate regression splines with shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
-The deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
+To remove unimportant terms from the model, we used thin-plate regression splines with extra shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
+Deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 Finally, we calculated the proportion of explained variance (R$^2$) for each set of terms [@nakagawa2013; @nakagawa2017].
 
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
@@ -322,7 +322,7 @@ Therefore, the interpretation of a functional regression plot is very different 
 Figure \@ref(fig:frExample)a shows a simple linear regression plot of a hypothetical relationship between trap _activity-density_ (_y_) and a single predictor, _proportion cover_ (_x_), which is measured in a circle of a fixed radius surrounding each trap.
 If we suppose that the relationship between _x_ and _y_ is similar at all radii at which _x_ is measured, then Figure \@ref(fig:frExample)b shows the resulting functional linear regression plot, where the slope ($\beta$) is the same at all distances (we avoid the problem of overlapping concentric circles by using concentric _annuli_).
 In reality, it is more likely that nearby cover will be more influential on activity-density than far-away cover, which could result in a relationship similar to Figure \@ref(fig:frExample)c.
-As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover (measured within an annulus of a fixed radius) as a predictor of measurements taken across time, allowing the effect of proportion cover to vary over the course of the season (Figure \@ref(fig:frExample)d).
+As functional regression takes any continuous predictor of _y_, it is also possible to use proportion cover as a predictor of measurements taken across time, allowing the effect of a (fixed) proportion cover on activity density to vary over the course of the season (Figure \@ref(fig:frExample)d).
 Finally, the effect of proportion cover over distance and time may be modeled as a smoothed surface, representing the joint spatio-temporal influence of landscape cover on activity-density.
 
 ```{r frExample, echo=FALSE, fig.cap='Examples of (functional) linear regression plots. \\textbf{a)} shows a simple linear regression plot, with a single slope value for a single regressor. \\textbf{b)} shows the equivalent plot in functional regression form, where the the slope is a smoothed function that maps onto a function-valued regressor. \\textbf{c)} and \\textbf{d)} show functional linear regression plots where the slope varies with the location of the regressor.', out.width='100%'}  
@@ -364,7 +364,7 @@ Finally, _P. melanarius_ activity-density had a strong temporal and spatial comp
 Landscape composition and trap location explained `r r2Nakagawa$PteMelMod[1]*100`% of the variance in activity-density, while the spatial and temporal smoothers accounted for `r with(r2Nakagawa,(PteMelMod[2]-PteMelMod[1])*100)`% (Table \@ref(tab:rSquared)).
 
 <!-- Percent signs are escaped in LaTeX, but this causes havoc if used in fig.cap of chunk options (OK if used in internal captions, I think). Yihui uses the following "text references" instead. -->
-(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. a) shows the effect of trap location, and b-c) are functional regression plots of the proportion grassland and canola at distances away from each trap. d) is a functional regression plot over time, showing the effect of pulses at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
+(ref:PteMelCap) Landscape influence on _Pterostichus melanarius_ activity-density. a) shows the effect of trap location, and b-c) are functional regression plots of the proportion grassland and canola at distances away from each trap. d) is a functional regression plot over time, showing the effect of pulses at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June 20, red = August 20).
 
 ```{r PteMelLandscape, echo=FALSE, fig.cap='(ref:PteMelCap)', out.width='100%'}  
   include_graphics('../figures/Pterostichus_melanarius_fixeff.png',dpi=NA)
@@ -394,7 +394,7 @@ Similar to _P.distincta_, trap location and an East-West spatial random effect (
   include_graphics('../figures/Pardosa_distincta_fixeff.png',dpi=NA)
 ```
 
-(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. a) shows the effect of trap location, and b-e) are functional regression plots of the proportion grassland, canola, road margins, and pulses at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
+(ref:ParMoeCap) Landscape influence on _Pardosa moesta_ activity-density. a) shows the effect of trap location, and b-e) are functional regression plots of the proportion grassland, canola, road margins, and pulses at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June 20, red = August 20).
 
 ```{r ParMoeLandscape, echo=FALSE, fig.cap='(ref:ParMoeCap)', out.width='100%'}  
   include_graphics('../figures/Pardosa_moesta_fixeff.png',dpi=NA)
@@ -407,7 +407,7 @@ Nearby grassland and woodland both had negative effects on _Phalangium opilio_ a
 The temporal random effect was overwhelmingly the most important predictor of _P. opilio_ activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='OpilioMod',terms=='s(day)')$r2comp),3)`), showing that activity-density increased during the spring, and showed very little decline during the rest of the season (Figure \@ref(fig:OpilioSpatiotemporal)a).
 Similar to _P. moesta_, _P. opilio_ also showed a distinct East-West spatial random effect (Figure \@ref(fig:OpilioSpatiotemporal)b), indicating that their activity-density is also influenced by larger-scale abiotic factors.
 
-(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June, red = August).
+(ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June 20, red = August 20).
 
 ```{r OpilioLandscape, echo=FALSE, fig.cap='(ref:OpilioCap)', out.width='100%'}  
   include_graphics('../figures/Opiliones_fixeff.png',dpi=NA)

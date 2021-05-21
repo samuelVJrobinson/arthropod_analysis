@@ -280,7 +280,8 @@ boldLaTeX <- function(x) paste0('\\textbf{',x,'}')
 #ylab = custom y label
 #showLegend = show legend for "both" plots?
 makeFRplot <- function(mod,term=NULL,type=NULL,days=NULL,dists=seq(30,1500,30),ylab=NULL,dateLabs=NULL,showLegend=F){
-  if(is.null(days)|is.null(dateLabs)){
+  if(xor(is.null(days),is.null(dateLabs))) stop('Must specify days and dateLabs, or neither')
+  if(is.null(days)&is.null(dateLabs)){
     if(type=='time'){
       days <- 149:241
     } else {
@@ -313,3 +314,25 @@ makeFRplot <- function(mod,term=NULL,type=NULL,days=NULL,dists=seq(30,1500,30),y
   }
   return(p)
 }
+
+#Get compact letter display from GAM linear terms
+#Idea from: 
+# https://stats.stackexchange.com/questions/376237/correcting-for-multiple-pairwise-comparisons-with-gam-objects-mgcv-in-r
+cldGam <- function(mod){ 
+  require(multcomp)
+  coefNames <- names(coef(mod)[1:5])
+  comparisons <- rep('',sum(seq(length(coefNames)-1)))
+  n <- 1
+  for(i in 1:(length(coefNames)-1)){
+    for(j in (i+1):length(coefNames)){
+      comparisons[n] <- paste0(coefNames[i],' - ',coefNames[j],' = 0') 
+      n <- n+1
+    }
+  }
+  modcomp <- glht(mod,linfct=comparisons)
+  # summary(mod3comp)
+  modcomp$focus <- 'trapLoc' #Trick to get CLD from GAM
+  letDisp <- cld(modcomp)$mcletters$Letters
+  data.frame(trapLoc=names(letDisp),labs=unname(letDisp))
+}
+

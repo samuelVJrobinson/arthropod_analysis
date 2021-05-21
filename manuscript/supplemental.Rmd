@@ -17,6 +17,30 @@ coverList %>% group_by(cover) %>% mutate(p=sum(prop)) %>% ungroup() %>% mutate(p
   labs(y='Percent cover',x='Distance from trap location (m)')
 ```
 
+
+Model formula:
+
+gam( count ~ offset(log(trapdays)) + trapLoc + s(day) + s(E,N)+ 
+    s(distanceMatrix,by=GrassWetland) + s(dayMatrix,by=GrassWetland) + ti(distanceMatrix,dayMatrix,by=GrassWetland) + 
+    s(distanceMatrix,by=Canola) + s(dayMatrix,by=Canola) + ti(distanceMatrix,dayMatrix,by=Canola) + 
+    s(distanceMatrix,by=Pasture)+ s(dayMatrix,by=Pasture) + ti(distanceMatrix,dayMatrix,by=Pasture) + 
+    s(distanceMatrix,by=TreeShrub) + s(dayMatrix,by=TreeShrub)+ ti(distanceMatrix,dayMatrix,by=TreeShrub) + 
+    s(distanceMatrix,by=Pulses) + s(dayMatrix,by=Pulses)+ ti(distanceMatrix,dayMatrix,by=Pulses) + 
+    s(distanceMatrix,by=Urban) + s(dayMatrix,by=Urban)+ ti(distanceMatrix,dayMatrix,by=Urban),
+    family= 'nb'
+)
+
+where:
+count = N x 1 vector of activity density from traps (count)
+trapdays = N x 1 vector of number of days that the trap was installed for (numeric)
+trapLoc = N x 1 vector of trap location type (factor)
+day = N x 1 vector of day of year that the trap was installed on (numeric)
+E,N = N x 1 vector(s) of Easting and Northing (numeric)
+distanceMatrix = N x M matrix of distances, where the Nth row contains a vector of distances to the annuli (numeric)
+dayMatrix = N x M matrix of days, where the Nth row contains a vector of days that spans the range of days of the year (numeric)
+GrassWetland,Canola,... = N x M matrix of cover measurements, where the Nth row contains a vector of proportion cover measurements within each annulus (numeric)
+
+
 (ref:PteMelSTCap) Temporal and spatial components of _Pterostichus melanarius_ activity-density (after accounting for landscape composition and trap location). a) shows the effect of day of year, and b) shows the spatially smoothed effect of site location.
 
 ```{r PteMelSpatiotemporal, echo=FALSE, fig.cap='(ref:PteMelSTCap)', out.width='100%'}

@@ -96,14 +96,20 @@ stLegPosY <- 0.3 #Legend position Y
 theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
 smoothCols <- c('blue','red') #Colours for smoothing lines
-
 ylimRaneffPlots <- c(-5,2.7) #Y-limits for random effects smoothers (everything on the same scale)
+#Days to display on plots (early,mid,late)
+# c(171,201,232) = June 20, July 20, Aug 20
+
+#Changed to c(153,232) to show effects at the extreme ends of the season
+
+dispDays <- data.frame(doy=c(153,232)) %>% 
+  mutate(date=c('Early','Late')) 
+
 
 # Pterostichus melanarius ----------------------------------
 
-
-# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
 # save(PteMelMod,file='./data/PteMelMod2.Rdata')
 load('./data/PteMelMod.Rdata')
@@ -218,28 +224,25 @@ ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=stFigX,he
 
 #Plot significant landscape effects: GrassWetland, Canola, Pulses
 
-#Days to display on plots (early,mid,late)
-# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-dispDays <- data.frame(doy=c(173,232)) %>% 
-  mutate(date=c('Early','Late')) 
-
 #Get order of terms to plot
 cbind(1:length(mod3$smooth),sapply(mod3$smooth,function(x) x$label))
 
 #Trap location
 p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
   rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+  left_join(cldGam(mod3),by='trapLoc') %>% 
   mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>%
   mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
   mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  geom_text(aes(label=labs),position=position_nudge(x=0.2,y=0.4))+  
   labs(x='Trap location',y='Activity')
 
 #Grass/wetland effect (space + time)
-p2 <- makeFRplot(mod3,type='both',term='GrassWetland',ylab='Grassland effect')
+p2 <- makeFRplot(mod3,type='both',term='GrassWetland',ylab='Grassland effect',days=dispDays$doy,dateLabs=dispDays$date)
 
 #Canola effect (space + time)
-p3 <- makeFRplot(mod3,type='both',term='Canola')
+p3 <- makeFRplot(mod3,type='both',term='Canola',days=dispDays$doy,dateLabs=dispDays$date)
 
 #Pulse effect (time)
 p4 <- makeFRplot(mod3,type='time',term='Pulses')
@@ -375,18 +378,15 @@ ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=stFigX,height=s
 #Get order of terms to plot
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
-#Days to display on plots (early,mid,late)
-# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-dispDays <- data.frame(doy=c(173,232)) %>% 
-  mutate(date=c('Early','Late')) 
-
 #Trap location - far less in canola
-p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
-  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+  left_join(cldGam(mod3),by='trapLoc') %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>%
   mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
-  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  geom_text(aes(label=labs),position=position_nudge(x=0.2,y=0.4))+  
   labs(x='Trap location',y='Activity')
 
 # #Canola (space + time: weak)
@@ -503,28 +503,25 @@ ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=stFigX,height=stFi
 #Get order of terms to plot
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
-#Days to display on plots (early,mid,late)
-# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-dispDays <- data.frame(doy=c(173,232)) %>% 
-  mutate(date=c('Early','Late')) 
-
 #Trap location - far less in canola
-p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
-  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+  left_join(cldGam(mod3),by='trapLoc') %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>%
   mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
-  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  geom_text(aes(label=labs),position=position_nudge(x=0.2,y=0.4))+  
   labs(x='Trap location',y='Activity')
 
 #Grass/Wetland (space)
 p2 <- makeFRplot(mod3,type='space',term='GrassWetland')
 
 #Canola (space + time)
-p3 <- makeFRplot(mod3,type='both',term='Canola')
+p3 <- makeFRplot(mod3,type='both',term='Canola',days=dispDays$doy,dateLabs=dispDays$date)
 
 #Urban effect (space + time)
-p4 <- makeFRplot(mod3,type='both',term='Urban')
+p4 <- makeFRplot(mod3,type='both',term='Urban',days=dispDays$doy,dateLabs=dispDays$date)
 
 #Pulses (space)
 p5 <- makeFRplot(mod3,type='space',term='Pulses')
@@ -642,25 +639,23 @@ ggsave('./figures/Opiliones_raneff.png',raneffPlot,width=stFigX,height=stFigY,sc
 #Get order of terms to plot
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
 
-#Days to display on plots (early,mid,late)
-# c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
-dispDays <- data.frame(doy=c(173,232)) %>% 
-  mutate(date=c('Early','Late')) 
-
 #Trap location - less in canola, more in wetland/pivot
-p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>% 
-  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>% 
-  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>% 
+p1 <- data.frame(trapLoc=tempTrap$trapLoc,pred=predict(mod3,type='terms',terms='trapLoc',se.fit=T)) %>%
+  rename('pred'='pred.trapLoc','se'='pred.trapLoc.1') %>% distinct() %>%
+  left_join(cldGam(mod3),by='trapLoc') %>% 
+  mutate(upr=pred+se*1.96,lwr=pred-se*1.96,trapLoc=gsub('ditch','road\nmargin',trapLoc)) %>%
   mutate(trapLoc=gsub('native','grassland',trapLoc),trapLoc=gsub('pivot','field\nedge',trapLoc)) %>%
-  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>% 
+  mutate(trapLoc=factor(trapLoc,labels=sort(firstUpper(trapLoc)))) %>%
   ggplot(aes(x=trapLoc,y=pred))+geom_pointrange(aes(ymax=upr,ymin=lwr))+
+  geom_text(aes(label=labs),position=position_nudge(x=0.2,y=0.4))+  
   labs(x='Trap location',y='Activity')
 
 #Grassland/wetland (space + time)
-p2 <- makeFRplot(mod3,type='both',term='GrassWetland',showLegend = TRUE)
+p2 <- makeFRplot(mod3,type='both',term='GrassWetland',showLegend = TRUE,days=dispDays$doy,dateLabs=dispDays$date)
 
 #Tree/Shrub (space + time)
-p3 <- makeFRplot(mod3,type='both',term='TreeShrub',showLegend = TRUE)
+# p3 <- makeFRplot(mod3,type='both',term='TreeShrub',showLegend = TRUE,days=dispDays$doy,dateLabs=dispDays$date)
+p3 <- makeFRplot(mod3,type='space',term='TreeShrub')
 
 #Plot landscape effects
 fixeffPlot <- ggarrange(p1,p2,p3,
@@ -668,7 +663,6 @@ fixeffPlot <- ggarrange(p1,p2,p3,
                         legend='bottom',common.legend=T) 
 ggsave('./figures/Opiliones_fixeff.png',fixeffPlot,width=landscapeFigX,height=landscapeFigY,scale=1)
 rm(p1,p2,p3,raneffPlot,fixeffPlot) #Cleanup
-
 
 # # Alternate model with ditch/pivot corners combined
 # #Trap location
