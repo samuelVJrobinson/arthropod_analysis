@@ -35,7 +35,7 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   # rename('count'='n') %>% 
   #Converts 0 dist trapLoc to distFrom (pitfall traps at 0 m are "inside of" feature)
   mutate(trapLoc=ifelse(dist==0 & distFrom!='control',distFrom,trapLoc)) %>% 
-  mutate(trapLoc=factor(ifelse(trapLoc=='pivot','ditch',trapLoc))) %>% #TEST: Changes all pivot features to ditch, as per reviewer 1's comment
+  # mutate(trapLoc=factor(ifelse(trapLoc=='pivot','ditch',trapLoc))) %>% #TEST: Changes all pivot features to ditch, as per reviewer 1's comment
   #Get UTM coordinates for traps
   mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
   st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
@@ -60,6 +60,8 @@ oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
 #Grassland + Wetland
 oRingMat2Prop$GrassWetland <- oRingMat2Prop$Wetland + oRingMat2Prop$Grassland
 # oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
+
+
 
 #Create model formulas
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
@@ -95,11 +97,13 @@ theme_set(theme_classic()) #Classic theme
 maptheme <- theme(panel.border=element_rect(size=1,fill=NA),axis.line=element_blank()) #Better theme for maps
 smoothCols <- c('blue','red') #Colours for smoothing lines
 
+ylimRaneffPlots <- c(-5,2.7) #Y-limits for random effects smoothers (everything on the same scale)
+
 # Pterostichus melanarius ----------------------------------
 
 
-PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
 # save(PteMelMod,file='./data/PteMelMod2.Rdata')
 load('./data/PteMelMod.Rdata')
@@ -120,13 +124,6 @@ AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTempo
 # mod2 51.27912 4732.102
 # mod3 67.62359 4722.432
 # mod4 57.57936 4740.469
-
-#Updated models - field margin/road margins combined
-#            df      AIC
-# mod1 48.00979 4779.429
-# mod2 50.29594 4732.312
-# mod3 69.61288 4722.696
-# mod4 55.73488 4736.132
 
 #Model 3 - landscape effects matter quite a bit
 summary(mod3); AIC(mod3)
@@ -202,15 +199,16 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
   smoothPred(mod3,whichSmooth=1) %>% 
   ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
-  labs(x='Day of Year',y='Activity')
+  labs(x='Day of Year',y='Activity')+
+  ylim(ylimRaneffPlots)
 
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E)-5,to=max(E)+5,length.out=100),N=seq(from=min(N)-5,to=max(N)+5,length.out=100))) %>%
   smoothPred(mod3,whichSmooth=2) %>% 
-  filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
+  filter(!exclude.too.far(E,N,datList$E,datList$N,0.08)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
-  scale_fill_gradient(low='blue',high='red')+
+  scale_fill_gradient(low='blue',high='red',limits=ylimRaneffPlots)+
   labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
   theme(legend.position = c(stLegPosX, stLegPosY),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
   maptheme
@@ -218,7 +216,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E)-5,to=max(E)+5,length.out=100),N
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2],font.label=list(size=landscapeLabel)) #Plot spatial/temporal effects
 ggsave('./figures/Pterostichus_melanarius_raneff.png',raneffPlot,width=stFigX,height=stFigY,scale=1.2)
 
-#Plot significant landscape effects
+#Plot significant landscape effects: GrassWetland, Canola, Pulses
 
 #Days to display on plots (early,mid,late)
 # c(173,203,232) = June 20, July 20, Aug 20 (Actually June/July 22, but close enough...)
@@ -305,8 +303,8 @@ detach(PteMelMod)
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
 # Takes way longer to run. 5-10 mins +
-ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),nnDistMat,oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
 load('./data/ParDisMod.Rdata')
@@ -321,13 +319,6 @@ AIC(mod1,mod2,mod3,mod4)
 # mod2 29.267712 3897.135
 # mod3 20.366559 3887.316
 # mod4 31.878192 3896.132
-
-#Updated models - field margin/road margins combined
-#             df      AIC
-# mod1  8.281321 4075.018
-# mod2 28.282745 3896.150
-# mod3 42.594997 3880.951
-# mod4 30.863718 3899.080
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -362,7 +353,8 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
   smoothPred(mod3,whichSmooth=1) %>% 
   ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
-  labs(x='Day of Year',y='Activity')
+  labs(x='Day of Year',y='Activity')+
+  ylim(ylimRaneffPlots)
 
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
@@ -370,7 +362,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
-  scale_fill_gradient(low='blue',high='red')+
+  scale_fill_gradient(low='blue',high='red',limits=ylimRaneffPlots)+
   labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
   theme(legend.position = c(stLegPosX, stLegPosY),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
   maptheme
@@ -378,7 +370,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
 ggsave('./figures/Pardosa_distincta_raneff.png',raneffPlot,width=stFigX,height=stFigY,scale=1.2)
 
-#Plot important landscape effects
+#Plot important landscape effects: Canola (weak interaction), Pasture, TreeShrub
 
 #Get order of terms to plot
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
@@ -450,8 +442,8 @@ detach(ParDisMod)
 # Pardosa moesta (wolf spider) --------------------------------------------
 
 # Takes way longer to run. 5-10 mins +
-ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # save(ParMoeMod,file='./data/ParMoeMod.Rdata')
 load('./data/ParMoeMod.Rdata')
 
@@ -466,13 +458,6 @@ AIC(mod1,mod2,mod3,mod4)
 # mod2 13.241496 2013.304
 # mod3 24.446528 2000.302
 # mod4 14.193293 2012.957
-
-#Updated models - field margin/road margins combined
-#             df      AIC
-# mod1  5.427305 2129.857
-# mod2 12.289208 2014.002
-# mod3 21.271566 2011.780
-# mod4 12.893013 2014.300
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -496,7 +481,8 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
   smoothPred(mod3,whichSmooth=1) %>% 
   ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
-  labs(x='Day of Year',y='Activity')
+  labs(x='Day of Year',y='Activity')+
+  ylim(ylimRaneffPlots)
 
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
@@ -504,7 +490,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
-  scale_fill_gradient(low='blue',high='red')+
+  scale_fill_gradient(low='blue',high='red',limits=ylimRaneffPlots)+
   labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
   theme(legend.position = c(stLegPosX, stLegPosY),legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
   maptheme
@@ -512,7 +498,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
 raneffPlot <- ggarrange(p1,p2,labels=letters[1:2]) #Plot spatial/temporal effects
 ggsave('./figures/Pardosa_moesta_raneff.png',raneffPlot,width=stFigX,height=stFigY,scale=1.2)
 
-#Plot important landscape effects
+#Plot important landscape effects: GrassWetland, Canola, TreeShrub (weak), Pulses, Urban
 
 #Get order of terms to plot
 data.frame(round(anova(mod3)$s.table,3)) %>% rownames_to_column('smoother')
@@ -581,8 +567,8 @@ detach(ParMoeMod)
 # Harvestmen -------------------------------------------------------------
 
 #Takes way longer to run. 5-10 mins +
-OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
+# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
 # save(OpilioMod,file='./data/OpilioMod.Rdata')
 load('./data/OpilioMod.Rdata')
 
@@ -634,7 +620,8 @@ p1 <- data.frame(day=min(datList$day):max(datList$day)) %>%
   smoothPred(mod3,whichSmooth=1) %>% 
   ggplot(aes(x=day,y=pred))+geom_ribbon(aes(ymax=upr,ymin=lwr),alpha=0.3)+
   geom_line()+
-  labs(x='Day of Year',y='Activity')
+  labs(x='Day of Year',y='Activity')+
+  ylim(ylimRaneffPlots)
 
 #Spatial smoother
 p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq(from=min(N),to=max(N),length.out=100))) %>% 
@@ -642,7 +629,7 @@ p2 <- with(datList,expand.grid(E=seq(from=min(E),to=max(E),length.out=100),N=seq
   filter(!exclude.too.far(E,N,datList$E,datList$N,0.1)) %>% 
   ggplot(aes(x=E,y=N))+geom_raster(aes(fill=pred))+
   geom_point(data=tempTrap,aes(x=easting,y=northing))+
-  scale_fill_gradient(low='blue',high='red')+
+  scale_fill_gradient(low='blue',high='red',limits=ylimRaneffPlots)+
   labs(x='Easting (km)',y='Northing (km)',fill='Activity')+
   theme(legend.position = c(stLegPosX, stLegPosY), legend.background = element_rect(size=0.5,linetype="solid",colour="black"))+
   maptheme
