@@ -61,12 +61,10 @@ oRingMat2Prop$TreeShrub <- oRingMat2Prop$Shrubland + oRingMat2Prop$Forest
 oRingMat2Prop$GrassWetland <- oRingMat2Prop$Wetland + oRingMat2Prop$Grassland
 # oRingMat2Prop$Wetland <- NULL; oRingMat2Prop$Grassland <- NULL
 
-
-
 #Create model formulas
 modFormulas <- 'count~offset(log(trapdays))+s(day,k=10,bs=basisFun)+s(E,N,k=50,bs=basisFun)' #Temporal + spatial
 # modFormulas <- paste0(modFormulas,'+ti(N,E,day,k=5,bs=basisFun)') # Add spatiotemporal interaction
-modFormulas[c(2,3,4)] <- paste0(modFormulas[1],'+trapLoc-1')
+modFormulas[c(2,3,4,5,6)] <- paste0(modFormulas[1],'+trapLoc-1')
 mod3Vars <- c('GrassWetland','Canola','Pasture','TreeShrub','Pulses','Urban') #Variables for mod3
 # mod3Vars <- c('GrassWetland','Cereal','Canola','Pasture','TreeShrub','Pulses','Flax','Urban') #As above, but includes cereal, flax
 # mod3Vars <- c('Grassland','Cereal','Canola','Pasture','Pulses','Wetland','Urban','Shrubland','Flax','Forest') #Expanded variables for mod3 - adding Water causes problems
@@ -80,8 +78,10 @@ for(i in 1:length(mod3Vars)){ #Add in specified terms (s and ti)
   modFormulas[3] <- paste0(modFormulas[3],"+ ti(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
   # #Full interaction (te)
   # modFormulas[3] <- paste0(modFormulas[3],"+ te(distMat,endDayMat,by=",mod3Vars[i],",bs=basisFun)")
+  modFormulas[5] <- paste0(modFormulas[5],"+ s(",mod3Vars[i],",bs=basisFun,k=5)")
 }
 modFormulas[4] <- paste0(modFormulas[2],'+s(distMat,by=NonCrop,bs=basisFun)+s(endDayMat,by=NonCrop,bs=basisFun)+ti(distMat,endDayMat,by=NonCrop,bs=basisFun)')
+modFormulas[6] <- paste0(modFormulas[2],'+s(NonCrop,bs=basisFun)')
 
 #Parameters for multiplot figures
 #Landscape-level parameters
@@ -105,13 +105,12 @@ ylimRaneffPlots <- c(-5,2.7) #Y-limits for random effects smoothers (everything 
 dispDays <- data.frame(doy=c(153,232)) %>% 
   mutate(date=c('Early','Late')) 
 
-
 # Pterostichus melanarius ----------------------------------
 
-PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),nnDistMat,oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),oRingMat2Prop,
+#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
-# save(PteMelMod,file='./data/PteMelMod2.Rdata')
+# save(PteMelMod,file='./data/PteMelMod.Rdata')
 load('./data/PteMelMod.Rdata')
 
 #Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
@@ -121,15 +120,15 @@ load('./data/PteMelMod.Rdata')
 attach(PteMelMod)
 # detach(PteMelMod)
 
-# detach(PteMelMod)
-AIC(mod1,mod2,mod3,mod4) #Best model has separate land cover types + SpatioTemporal effect
+AIC(mod1,mod2,mod3,mod4,mod5,mod6) #Best model has separate land cover types + SpatioTemporal effect
 
-#Original models
 #            df      AIC
 # mod1 48.00979 4779.429
 # mod2 51.27912 4732.102
-# mod3 67.62359 4722.432
-# mod4 57.57936 4740.469
+# mod3 70.95912 4717.258
+# mod4 59.17897 4734.267
+# mod5 58.55392 4733.131
+# mod6 51.29167 4732.127
 
 #Model 3 - landscape effects matter quite a bit
 summary(mod3); AIC(mod3)
@@ -306,22 +305,26 @@ detach(PteMelMod)
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
 # Takes way longer to run. 5-10 mins +
-# ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),nnDistMat,oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # beep(1)
 # save(ParDisMod,file='./data/ParDisMod.Rdata')
 load('./data/ParDisMod.Rdata')
 
 #Check models
 attach(ParDisMod)
-AIC(mod1,mod2,mod3,mod4) 
+# detach(ParDisMod)
+AIC(mod1,mod2,mod3,mod4,mod5,mod6)
+
 
 #Original models
 #             df      AIC
 # mod1  8.281321 4075.018
 # mod2 29.267712 3897.135
-# mod3 20.366559 3887.316
-# mod4 31.878192 3896.132
+# mod3 43.572516 3882.490
+# mod4 31.832816 3900.648
+# mod5 36.034118 3885.015
+# mod6 29.454549 3897.497
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -442,22 +445,25 @@ detach(ParDisMod)
 # Pardosa moesta (wolf spider) --------------------------------------------
 
 # Takes way longer to run. 5-10 mins +
-# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),nnDistMat,oRingMat2Prop,
+# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),oRingMat2Prop,
 #                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
 # save(ParMoeMod,file='./data/ParMoeMod.Rdata')
 load('./data/ParMoeMod.Rdata')
 
 #Check models
 attach(ParMoeMod)
+# detach(ParMoeMod)
 
-AIC(mod1,mod2,mod3,mod4)
+AIC(mod1,mod2,mod3,mod4,mod5,mod6)
 
 #Original models
 #             df      AIC
 # mod1  5.427305 2129.857
 # mod2 13.241496 2013.304
-# mod3 24.446528 2000.302
-# mod4 14.193293 2012.957
+# mod3 23.052757 2008.208
+# mod4 13.888788 2013.806
+# mod5 49.900658 1975.407
+# mod6 14.184520 2011.450
 
 #Model 3 
 summary(mod3); AIC(mod3)
@@ -564,7 +570,7 @@ detach(ParMoeMod)
 # Harvestmen -------------------------------------------------------------
 
 #Takes way longer to run. 5-10 mins +
-# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),nnDistMat,oRingMat2Prop,
+# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),oRingMat2Prop,
 #                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
 # save(OpilioMod,file='./data/OpilioMod.Rdata')
 load('./data/OpilioMod.Rdata')
@@ -573,23 +579,16 @@ load('./data/OpilioMod.Rdata')
 attach(OpilioMod)
 # detach(OpilioMod)
 
-AIC(mod1,mod2,mod3,mod4) #Much less info from landscape level
+AIC(mod1,mod2,mod3,mod4,mod5,mod6) #Much less info from landscape level
 
 #Original models
 #            df      AIC
 # mod1 29.17757 6581.182
 # mod2 33.24854 6562.159
-# mod3 28.77088 6558.007
-# mod4 21.48624 6549.950
-
-#Updated models - field margin/road margins combined
-#            df      AIC
-# mod1 29.15878 6581.504
-# mod2 32.72448 6562.097
-# mod3 43.49739 6568.028
-# mod4 37.88387 6565.738
-
-
+# mod3 45.80893 6566.665
+# mod4 40.78027 6566.397
+# mod5 38.01087 6565.277
+# mod6 42.11493 6536.756
 
 #Model 3 - none of the fixed terms are super important
 #Model 4 - noncrop land

@@ -44,26 +44,37 @@ matrixplot <- function(m,nam=NULL,mar=NULL,numSize=1,numCol='red'){
 }
 
 #Takes a df of arthropod counts at each site (unique to each spp), then runs 4 landscape-level models of abundance
+#tempTrap = df of data to be used
+#oRingMatA = matrix of o-ring proportion cover
 #fitMethod = 'ML' or 'REML'
 #fitFam = family of distribution to use
 #basisFun = name of basis function to be used ('ts' = thin plate spline with extra shrinkage)
 #doublePenalize = should gam use double-penalization? (don't use if using 'ts' or 'cr' as basis functions)
-runMods <- function(tempTrap,nnDistMat,oRingMat2,formulas=NULL,
+runMods <- function(tempTrap,oRingMatA,formulas=NULL,
                     fitMethod='REML',fitFam='nb',basisFun='ts',doublePenalize=FALSE){
+  # #Test
+  # tempTrap <- rename(tempTrap,count=`Pterostichus melanarius`)
+  # oRingMatA <- oRingMat2Prop
+  # formulas <- modFormulas
+  # fitMethod <- 'REML'
+  # fitFam <- 'nb'
+  # basisFun <- 'ts'
+  # doublePenalize <- FALSE
+  
   if(is.null(formulas)) stop('No gam formulas provided')
   
-  #Arrange matrices from oRingMat2 to correspond with rows of tempTrap
-  oRingMat2 <- lapply(oRingMat2,function(x){
+  #Arrange matrices from oRingMatA to correspond with rows of tempTrap
+  oRingMatA <- lapply(oRingMatA,function(x){
     x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
       right_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
       select(-ID) %>% as.matrix() })
   
   #Distance matrix to use in functional regression
-  distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMat2[[1]]))),each=nrow(oRingMat2[[1]])),
-                    ncol=ncol(oRingMat2[[1]]))
+  distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMatA[[1]]))),each=nrow(oRingMatA[[1]])),
+                    ncol=ncol(oRingMatA[[1]]))
   #Matrix of end ("julian") days
-  endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMat2[[1]])),
-                      ncol=ncol(oRingMat2[[1]]))
+  endDayMat <- matrix(rep(tempTrap$endjulian,times=ncol(oRingMatA[[1]])),
+                      ncol=ncol(oRingMatA[[1]]))
   
   #Make list containing appropriate data
   datList <- with(tempTrap,list(count=count,trapLoc=trapLoc,trapdays=trapdays,day=endjulian,
@@ -71,7 +82,7 @@ runMods <- function(tempTrap,nnDistMat,oRingMat2,formulas=NULL,
                                 distMat=as.matrix(distMat),endDayMat=as.matrix(endDayMat)))
   
   #Assemble data list
-  datList <- c(datList,oRingMat2)
+  datList <- c(datList,oRingMatA)
   
   #Fit models
   mod1 <- gam(formula=as.formula(formulas[1]), 
@@ -93,35 +104,52 @@ runMods <- function(tempTrap,nnDistMat,oRingMat2,formulas=NULL,
               data=datList,family=fitFam,method=fitMethod,select=doublePenalize)
   cat('Finished mod4.')
   
-  # #What if there are interactions between trapping location and surrounding landscape? (eg. nearby wetlands only affect abundance in canola)
-  # #This requires some lengthy coding in mgcv, but can be done. Here's an example for noncrop land
-  # 
-  # #Set up matrix of distance values (composition values in rows with that trap location, 0 otherwise) 
-  # mmat <- model.matrix(~trapLoc+0,data=tempTrap)
-  # mmat <- lapply(1:5,function(x) matrix(rep(mmat[,x],ncol(oRingNoncropProp)),ncol=ncol(oRingNoncropProp)))
-  # mmat <- lapply(mmat,function(x) x*oRingNoncropProp)
-  # names(mmat) <- levels(tempTrap$trapLoc)
-  # 
-  # mod5 <- gam(count~offset(log(trapdays))+
-  #               s(day,bs=basisFun,k=Kvals[[4]][1])+ #Thin plate spline with shrinkage
-  #               s(E,N,bs=basisFun,k=Kvals[[4]][2])+
-  #               ti(N,E,day,bs=basisFun,k=Kvals[[4]][3])+ #Spatiotemporal interaction   
-  #               trapLoc+ 
-  #               s(distMat,by=oRingNoncropProp,bs=basisFun)+ 
-  #               s(distMat,by=mmat$canola,bs=basisFun)+
-  #               s(distMat,by=mmat$ditch,bs=basisFun)+
-  #               s(distMat,by=mmat$native,bs=basisFun)+
-  #               s(distMat,by=mmat$pivot,bs=basisFun)+
-  #               s(distMat,by=mmat$wetland,bs=basisFun)+
-  #               ti(distMat,endDayMat,by=oRingNoncropProp,bs=basisFun) #Noncrop
-  #             ,data=datList,family='nb')
-  # summary(mod5)
-  # plot(mod5,rug=F,scheme=2,pages=1,all.terms=T)
-  # #Problem: requires 5 new terms to be written for each cover category, and is likely inestimable. Leaving this out for now.
+  #Fit fixed radius composition models to compare FR models
+  oRingMatB <- lapply(oRingMatA,oRing2Circles) #Convert rings to circles
+  
+  mod5list <- lapply(2:ncol(oRingMatB[[1]]),function(j){ #Doesn't seem to run with only local distances
+    datList2 <- with(tempTrap,data.frame(count=count,trapLoc=trapLoc,trapdays=trapdays,day=endjulian,E=easting,N=northing))
+    datList2 <- cbind(datList2,sapply(oRingMatB,function(m) m[,j])) #Join in radius data from each
+    mod <- gam(formula=as.formula(formulas[5]),
+               data=datList2,family=fitFam,method=fitMethod,select=doublePenalize)
+    return(mod)}
+    )
+  
+  #Get info from models
+  mod5info <- data.frame(
+    radiusDist=as.numeric(gsub('d','',colnames(oRingMatA[[1]]))), #Distance of radius
+    logLik=c(NA,sapply(mod5list,function(x) logLik(x))), #Log likelihood
+    AIC=c(NA,sapply(mod5list,function(x) AIC(x))) #AIC
+    )
+  mod5 <- mod5list[[which.min(mod5info$AIC)]] #Select model with lowest AIC
+  cat('Finished mod5list.')
+  
+  mod6list <- lapply(2:ncol(oRingMatB[[1]]),function(j){
+    datList2 <- with(tempTrap,data.frame(count=count,trapLoc=trapLoc,trapdays=trapdays,day=endjulian,E=easting,N=northing))
+    datList2 <- cbind(datList2,sapply(oRingMatB,function(m) m[,j])) #Join in radius data from each
+    mod <- gam(formula=as.formula(formulas[6]),
+               data=datList2,family=fitFam,method=fitMethod,select=doublePenalize)
+    return(mod)
+  })
+  
+  #Get info from models
+  mod6info <- data.frame(
+    radiusDist=as.numeric(gsub('d','',colnames(oRingMatA[[1]]))), #Distance of radius
+    logLik=c(NA,sapply(mod5list,function(x) logLik(x))), #Log likelihood
+    AIC=c(NA,sapply(mod5list,function(x) AIC(x))) #AIC
+  )
+  plot(AIC~radiusDist,data=mod6info,type='l')
+  mod6 <- mod6list[[which.min(mod6info$AIC)]] #Select model with lowest AIC
+  cat('Finished mod6list.')
+  
+  par(mfrow=c(2,1))
+  with(mod5info,plot(AIC~radiusDist))
+  with(mod6info,plot(AIC~radiusDist))
   
   #List of objects to return
-  retList <- list(datList=datList,#tempTrap=tempTrap,
-                  mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4)
+  retList <- list(datList=datList,tempTrap=tempTrap,
+                  mod1=mod1,mod2=mod2,mod3=mod3,mod4=mod4,mod5=mod5,mod6=mod6,
+                  mod5info=mod5info,mod6info=mod6info)
   return(retList)
 }
 
@@ -336,3 +364,17 @@ cldGam <- function(mod){
   data.frame(trapLoc=names(letDisp),labs=unname(letDisp))
 }
 
+#Function to convert o-ring matrix to circle matrix
+#o-ring = matrix with values for each ring in columns
+#output = matrix with weighted average of rings
+oRing2Circles <- function(mat){
+  nc <- ncol(mat) #Number of columns
+  
+  weightVec <- c(0:ncol(mat))^2 #Area within each circle. Distance (and pi) not needed unless distances are non-constant between rings
+  weightVec <- weightVec[2:(nc+1)]-weightVec[1:nc] #Area within each ring
+  
+  newMat <- cbind(mat[,1],sapply(2:nc,function(j) apply(mat[,1:j],1,weighted.mean,w=weightVec[1:j])))
+  dimnames(newMat) <- dimnames(mat)
+  return(newMat)
+}
+# oRing2Circles(matrix(1:12,ncol=3,dimnames = list(1:4,letters[1:3])))

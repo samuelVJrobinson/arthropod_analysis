@@ -1,0 +1,41 @@
+\newpage
+
+# Appendix B: R Code {-}
+
+```{r modelFormula, eval=FALSE}
+
+#Code to run functional regression using gam function from mgcv 1.8-35 
+
+gam(count ~ offset(log(trapdays)) + trapLoc + s(day) + s(E,N)+ 
+      #Canola
+      s(distanceMatrix,by=Canola) + #Functional regression of distance
+      s(dayMatrix,by=Canola) + #FR of time
+      ti(distanceMatrix,dayMatrix,by=Canola) + #FR of distance and time
+      #Pasture
+      s(distanceMatrix,by=Pasture)+ #Functional regression of distance
+      s(dayMatrix,by=Pasture) + #FR of time 
+      ti(distanceMatrix,dayMatrix,by=Pasture) + #FR of distance and time
+      #Other land cover classes here
+      #...
+      #...
+      #...
+      s(distanceMatrix,by=Roads) + 
+      s(dayMatrix,by=Roads)+ 
+      ti(distanceMatrix,dayMatrix,by=Roads),
+    family= 'nb'
+)
+# where:
+#
+# count = N x 1 vector of activity density from traps (count)
+# trapdays = N x 1 vector of number of days that the trap was installed for (numeric)
+# trapLoc = N x 1 vector of trap location type (factor)
+# day = N x 1 vector of day of year that the trap was installed on (numeric)
+# E,N = N x 1 vector(s) of Easting and Northing (numeric)
+# distanceMatrix = N x M matrix of distances, where the Nth row contains a vector
+#     of distances to the annuli (numeric)
+# dayMatrix = N x M matrix of days, where the Nth row contains a vector of days 
+#     that spans the range of days of the year (numeric)
+# Canola, Pasture, ... = N x M matrix of cover measurements, where the Nth row
+#     contains a vector of proportion cover measurements within each annulus (numeric)
+# 'nb' = Negative binomial family
+```

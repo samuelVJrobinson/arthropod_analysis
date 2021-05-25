@@ -118,7 +118,8 @@ pmelLinTerms <- pmelRes$p.table %>% as.data.frame() %>%
 pmelSmTerms <- pmelRes$s.table %>% as.data.frame() %>% 
   rownames_to_column('Smoother') %>% 
   mutate(Smoother=gsub('distMat','Distance',Smoother),Smoother=gsub('endDayMat','Day',Smoother),Smoother=gsub('day','Day',Smoother)) %>%
-  mutate(Smoother=gsub('GrassWetland','Grassland',Smoother),Smoother=gsub('TreeShrub','Woodland',Smoother)) %>% 
+  mutate(Smoother=gsub('GrassWetland','Grassland',Smoother),Smoother=gsub('TreeShrub','Woodland',Smoother)) %>%
+  mutate(Smoother=gsub('Urban','Roads',Smoother)) %>% 
   rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
   mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
   mutate(pTable=ifelse(sig,boldLaTeX(p),p)) %>% select(-sig) #Make text bold
@@ -136,6 +137,7 @@ pdisSmTerms <- pdisRes$s.table %>% as.data.frame() %>%
   rownames_to_column('Smoother') %>% 
   mutate(Smoother=gsub('distMat','Distance',Smoother),Smoother=gsub('endDayMat','Day',Smoother),Smoother=gsub('day','Day',Smoother)) %>% 
   mutate(Smoother=gsub('GrassWetland','Grassland',Smoother),Smoother=gsub('TreeShrub','Woodland',Smoother)) %>% 
+  mutate(Smoother=gsub('Urban','Roads',Smoother)) %>% 
   rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
   mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
   mutate(pTable=ifelse(sig,boldLaTeX(p),p)) %>% select(-sig) #Make text bold
@@ -153,6 +155,7 @@ pmoeSmTerms <- pmoeRes$s.table %>% as.data.frame() %>%
   rownames_to_column('Smoother') %>% 
   mutate(Smoother=gsub('distMat','Distance',Smoother),Smoother=gsub('endDayMat','Day',Smoother),Smoother=gsub('day','Day',Smoother)) %>% 
   mutate(Smoother=gsub('GrassWetland','Grassland',Smoother),Smoother=gsub('TreeShrub','Woodland',Smoother)) %>% 
+  mutate(Smoother=gsub('Urban','Roads',Smoother)) %>% 
   rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
   mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
   mutate(pTable=ifelse(sig,boldLaTeX(p),p)) %>% select(-sig) #Make text bold
@@ -170,6 +173,7 @@ opilSmTerms <- opilRes$s.table %>% as.data.frame() %>%
   rownames_to_column('Smoother') %>% 
   mutate(Smoother=gsub('distMat','Distance',Smoother),Smoother=gsub('endDayMat','Day',Smoother),Smoother=gsub('day','Day',Smoother)) %>% 
   mutate(Smoother=gsub('GrassWetland','Grassland',Smoother),Smoother=gsub('TreeShrub','Woodland',Smoother)) %>% 
+  mutate(Smoother=gsub('Urban','Roads',Smoother)) %>% 
   rename(p='p-value') %>% mutate(p=roundLess(p,3)) %>% mutate_at(vars(2:4),roundLess,dig=2) %>% 
   mutate(sig=is.na(as.numeric(p))|as.numeric(p)<0.05) %>% #If p<0.05
   mutate(pTable=ifelse(sig,boldLaTeX(p),p)) %>% select(-sig) #Make text bold
@@ -191,6 +195,15 @@ Ncatches <- lapply(list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod),function(x){
   with(data.frame(x$datList), data.frame(perDayMean=mean(count/trapdays),perDayMedian=median(count/trapdays),total=sum(count),perDaySD=sd(count/trapdays)))
 }) %>% do.call('rbind',.) %>% mutate(spp=c('PteMel','ParDis','ParMoe','Opilio'))
 
+#Compare annular and radial models 
+compareMods <- list(PteMelMod,ParDisMod,ParMoeMod,OpilioMod) %>% 
+  sapply(.,function(x){
+    with(x,c(mod2AIC=AIC(mod2),mod2df=attr(logLik(mod2),'df'),
+      mod3AIC=AIC(mod3),mod3df=attr(logLik(mod3),'df'),
+      mod5AIC=AIC(mod5),mod5df=attr(logLik(mod5),'df'),bestDist=mod5info$radiusDist[which.min(mod5info$AIC)]))
+  }) %>% t() %>% data.frame() %>% 
+  mutate(spp=c('Pterostichus melanarius','Pardosa distincta','Pardosa moesta','Phalangium opilio')) %>% 
+  column_to_rownames('spp')
 
 ```
 
@@ -241,10 +254,11 @@ Canola is one of the most commonly-grown crops in southern Alberta, and represen
 We did not collect information on soil fertilization, pesticide application, mowing, or tillage (approximately 82% of planting in Vulcan County was done with zero-till in 2016; [@statscan_tillage2016]). 
 Diverse crop rotations may increase predatory arthropod abundance [@busch_Msc; @bertrand2016], but this was beyond the scope of the study.
 
+Traps in canola were installed in 27 fields at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
+The remaining 90 sites had only a single trap.
+In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
 Traps were placed starting on `r format(as.Date(as.character(min(PteMelMod$tempTrap$startjulian)),format='%j'),format='%B %d')`, and collections ended on `r format(as.Date(as.character(max(PteMelMod$tempTrap$endjulian)),format='%j'),format='%B %d')`, with collection occurring continuously and traps being emptied every `r round(mean(PteMelMod$tempTrap$trapdays),1)` days on average (SD: `r round(sd(PteMelMod$tempTrap$trapdays),1)`). 
 This resulted in `r nrow(PteMelMod$tempTrap)` unique collection events, taking place across a total of `r round(sum(PteMelMod$tempTrap$trapdays),1)` trapping days.
-In-field traps were placed in canola crops (`r with(NtrapsPer, sum(n[trapLoc=='canola']))`), wetlands (`r with(NtrapsPer, sum(n[trapLoc=='wetland']))`), grassy field edges (`r with(NtrapsPer, sum(n[trapLoc=='pivot']))`), and remnant prairie grasslands (`r with(NtrapsPer, sum(n[trapLoc=='native']))`).
-Traps in canola were installed at 25, 75, and 200 m along a transect heading away from the nearest non-crop feature (wetland, grassy field edges, or remnant prairie), while the trap at 0 m was installed in the non-crop feature itself.
 We used 582 mL Solo® cups buried up to the rim and partially filled with propylene glycol, with 2 cm wire mesh mounted over the rim to prevent vertebrates from falling into the traps.
 Specimens were identified to species using appropriate taxonomic literature [@lindroth1966; @dondale1990; @edgar1990; @vogel2004; @yigit2007].
 
@@ -290,7 +304,7 @@ Scalar-on-function regression of activity-density was fit using generalized addi
 Count data of arthropods were modeled using a negative binomial distribution with a log-link function and a single dispersion parameter ($\theta$).
 To account for different lengths of trap exposure, log-days since trap placement were used as a fixed effect with their slope held at 1 ("offset" variable).
 Trapping location was included as a fixed effect with 5 levels (canola, field edge, grassland, road margin, and wetlands) to account for the effect of local cover independent of the surrounding landscape composition. 
-Day of year was included as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centre point) were included as 2-dimensional smooths, in order to account for underlying spatial and temporal autocorrelation in the data.
+Day of year was included as a 1-dimensional smooth, and easting and northing (km east and north of the trap extent centroid) were included as 2-dimensional smooths in order to account for underlying spatial and temporal autocorrelation in the data.
 
 For each landscape cover class, we used three scalar-on-function terms.
 First, we used the proportion cover in the annuli surrounding each trap location (spatial effect of cover class - _i.e._ does the effect of cover differ with distance?).
@@ -301,6 +315,10 @@ The effective degrees of freedom for all smoothing terms were far below the numb
 To remove unimportant terms from the model, we used thin-plate regression splines with extra shrinkage, a continuous analog to stepwise model selection where weaker terms are completely removed from the model rather than reduced to a line [@marra2011].
 Deviance residuals from each model were visually inspected for normality and equal variance [@hilbe2011; @wood2017].
 Finally, we calculated the proportion of explained variance (R$^2$) for each set of terms [@nakagawa2013; @nakagawa2017].
+
+To compare scalar-on-function (annular) regression to the more traditional (radial) regression approach, we also fit radial models of abundance using the same cover classes.
+We fit models using proportion cover in radii of increasing distances around each trap location (30 - 1500m, as above), and chose the model with the lowest AIC as the ``best" model. 
+As in the annular regression model, trapping location, log-days of trap placement, day of year, and easting and northing were also included in the radial models.
 
 <!-- + Double-penalization gave qualitatively similar results, but required twice the number of penalty terms, and some of the penalty terms were unstable  -->
 
@@ -378,7 +396,7 @@ Activity-density of both _Pardosa_ species had a strong temporal and spatial com
 
 _P. distincta_ activity-density was negatively affected by far pasture (Figure \@ref(fig:ParDisLandscape)b), suggesting that large amounts of pasture are unsuitable habitat for _P. distincta_.
 There was also a negative effect of woodlands late in the summer (Figure \@ref(fig:ParDisLandscape)c) that did not depend on spatial scale, indicating that _P. distincta_ may disperse into woodlands at this time.
-However, trap location and the temporal random effect (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be abundant in certain cover types, its overall habitat preferences are fairly general.
+However, trap location and the temporal smoother (Figure \@ref(fig:ParDisSpatiotemporal)a) explained roughly 10 times more variance than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms=='trapLoc'|grepl('day',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParDisMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that while _P. distincta_ may be abundant in certain cover types, its overall habitat preferences are fairly general.
 <!-- The weak effect of canola crops (p>0.07) suggests that this species does not aggregate into these crops, meaning that its pest suppressing potential for farmers is limited. -->
 
 _P. moesta_ activity-density responded to grassland, canola, and road margins.
@@ -386,7 +404,7 @@ Grasslands had a near negative effect, but a positive far effect, indicating tha
 Near canola cover had a positive early effect on activity-density, but a negative effect later in the season (Figure \@ref(fig:ParMoeLandscape)c).
 Near road margins also had a similar effect, acting as an early source and a late destination (Figure \@ref(fig:ParMoeLandscape)d).
 Pulses also had a positive effect at the landscape level (Figure \@ref(fig:ParMoeLandscape)e), but this explained very little variance in _P. moesta_ activity-density (Table \@ref(tab:rSquared), $R^2$: `r round(filter(r2Nakagawa2,model=="ParMoeMod",terms=="Pulses")$r2comp,3)`).
-Similar to _P.distincta_, trap location and an East-West spatial random effect (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity-density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
+Similar to _P.distincta_, trap location and an East-West spatial smoother (Figure \@ref(fig:ParMoeSpatiotemporal)b) explained roughly 5 times more variance in _P. moesta_ activity-density than landscape composition ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms=='trapLoc'|grepl('E,N',terms))$r2comp),3)` versus `r round(sum(filter(r2Nakagawa2,model=='ParMoeMod',terms!='trapLoc',terms!='sigmaD',!grepl('s\\(',terms))$r2comp),3)`), meaning that _P. moesta_ is also fairly general in its overall habitat preferences, and is influenced more heavily by larger-scale abiotic factors.
 
 (ref:ParDisCap) Landscape influence on _Pardosa distincta_ activity-density. a) shows the effect of trap location, b) is a functional regression plot of the proportion pasture at distances away from each trap, and c) is a functional regression plot over time, showing the effect of woodland at different times of the year. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). 
 
@@ -402,10 +420,10 @@ Similar to _P.distincta_, trap location and an East-West spatial random effect (
 
 ## *Harvestman:* Phalangium opilio 
 
-_P. opilio_ activity-density was somewhat influenced by trap location, with field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a), but this effect was swamped by the effect of landscape and the spatiotemporal random effects (Table \@ref(tab:rSquared)), meaning that _P. opilio_ activity-density is only mildly influenced by near cover type.
+_P. opilio_ activity-density was somewhat influenced by trap location, with field edges and wetlands having the highest activity-density (Figure \@ref(fig:OpilioLandscape)a), but this effect was dwarfed by the spatial and temporal smoothers (Table \@ref(tab:rSquared)), meaning that _P. opilio_ activity-density is only mildly influenced by landscape composition.
 Nearby grassland and woodland both had negative effects on _Phalangium opilio_ activity-density Figures \@ref(fig:OpilioLandscape)b,c), but the effect of grassland was negative only early in the season (only weakly for woodland: p=0.07), suggesting that _P. opilio_ may preferentially disperse to these cover classes.
-The temporal random effect was overwhelmingly the most important predictor of _P. opilio_ activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='OpilioMod',terms=='s(day)')$r2comp),3)`), showing that activity-density increased during the spring, and showed very little decline during the rest of the season (Figure \@ref(fig:OpilioSpatiotemporal)a).
-Similar to _P. moesta_, _P. opilio_ also showed a distinct East-West spatial random effect (Figure \@ref(fig:OpilioSpatiotemporal)b), indicating that their activity-density is also influenced by larger-scale abiotic factors.
+The temporal smoother was overwhelmingly the most important predictor of _P. opilio_ activity-density ($R^2$: `r round(sum(filter(r2Nakagawa2,model=='OpilioMod',terms=='s(day)')$r2comp),3)`), showing that activity-density increased during the spring, and showed very little decline during the rest of the season (Figure \@ref(fig:OpilioSpatiotemporal)a).
+Similar to _P. moesta_, _P. opilio_ also showed a distinct East-West spatial smoother (Figure \@ref(fig:OpilioSpatiotemporal)b), indicating that their activity-density is also influenced by larger-scale abiotic factors.
 
 (ref:OpilioCap) Landscape influence on _Phalangium opilio_ activity-density. a) shows the effect of trap location, and b-c) are functional regression plots of the proportion grassland and woodland at distances away from each trap. Lines and dots represent means, and bars and shaded regions represent 95 % confidence regions (1.96 x SE). Coloured regions represent early- and late-season effects (blue = June 20, red = August 20).
 
@@ -447,6 +465,26 @@ mytable %>% mutate_all(linebreak) %>%
 
 ```
 
+## Comparison of annular and radial models
+
+Functional regression provided a better abundance model for two out of the four species (_P. melanarius_ and _P. distincta_), while radial regression performed better for _P. moesta_, and the null model (no landscape terms) was the best model for _P. opilio_ (Table \@ref(tab:compareModels)).
+The best radial model of _P. melanarius_ used a landscape radius of 1230 m, lending strength to the interpretation of the functional model where far-away landscapes have an influence on _P. melanarius_ abundance.
+The best landscape radii identified for _P. distincta_ and _P. moesta_ were much smaller (270 and 180 m, respectively), so it may be that the functional regression incorrectly identified effects of far-away land cover classes on abundance. 
+However, none of the radial models accounted for the temporal effects of specific land cover classes, so it is difficult to compare the models directly.
+Interestingly, the radial model of _P. moesta_ provided a much better fit than the functional regression model ($\delta$AIC: `r round(with(compareMods, mod5AIC[3]-mod3AIC[3]),2)`), suggesting that a simpler model may be more appropriate for some species than others.
+Finally, the null model (no landscape terms) provided the best model of _P. opilio_ abundance, indicating that the organism has very general landscape preferences.
+
+
+```{r compareModels, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+
+compareMods %>% #select(-bestDist) %>% 
+  rownames_to_column(var='Species') %>% 
+  kable(.,format='latex',caption='Comparison of models. The null model includes trap location and a spatial and a temporal smoother, but contains no landscape terms. The annular model includes the terms in the null model plus scalar-on-function landscape terms. The radial model includes the terms the null model plus radial landscape smoothers. Radius indicates the radius of landscape composition used in the best-fitting radial model.',escape=FALSE,
+      col.names=c('Species','AIC','edf','AIC','edf','AIC','edf','Radius (m)'),digits=1) %>% 
+  add_header_above(c(' '=1,'Null Model'=2,'Annular Model'=2,'Radial Model'=3)) %>% 
+  column_spec(1,italic=TRUE)
+```
+
 # Discussion
 
 <!-- The activity-density of the four arthropods was influenced by landscape composition, but the response of _Pterostichus melanarius_ and _Phalangium opilio_ was much stronger. -->
@@ -458,7 +496,7 @@ There was little evidence of SNL acting as early-season sources, aside from road
 However, some cover classes had a positive effect at the landscape level (grassland and road margins on _P. moesta_), suggesting earlier or larger-scale dispersal away from these cover classes.
 Canola had a positive effect on _P. melanarius_ and _P. moesta_ in the early season, suggesting that these organisms aggregate to canola crops and disperse at the end of the season [mass effects _sensu_ @shmida1985].
 Canola also had negative landscape-level effects on _P. melanarius_ while pasture had negative effects on _P. distincta_, meaning that these cover types likely represent only partial habitat for these arthropods.
-Finally, the influence of landscape composition tended to be limited to a radius of about 500m, indicating that nearby _and_ far-away landscape are associated with beneficial arthropod abundance.
+Finally, the influence of landscape composition tended to be limited to a radius of about 500m, indicating that nearby landscapes are associated with beneficial arthropod abundance.
 There was also a strong temporal component to most of the landscape effects, meaning that it is important to consider how destinations and sources may change over the season.
 
 <!-- 1. ... nearby SNL should act as a source of arthropods during the early part of the season, and a destination during the later part of the season.  -->
@@ -497,7 +535,7 @@ These indicate that while grass and wetlands could act as a reservoir, spillover
 _P. opilio_ is also found in large numbers at the edges of forests, and may disperse from forests into farmlands [@vandepoel2015Msc].
 We found the opposite pattern: forests had a weak negative effect on _P. opilio_, at least early in the year.
 Unlike the other arthropods, most of the variation in activity-density for _P. opilio_ was explained by day of year (R$^2$ = `r round(filter(r2Nakagawa2,model=='OpilioMod',grepl('day',terms))$r2comp,2)`), indicating strong seasonal emergence cues.
-However, there was also a strong East-West spatial random effect in both _P. opilio_ and _P. moesta_, meaning that larger-scale geographic patterns (rainfall or temperature) are more important influences on their activity-density.
+However, there was also a strong East-West pattern in the spatial smoother for both _P. opilio_ and _P. moesta_, meaning that larger-scale geographic patterns (rainfall or temperature) are more important influences on their activity-density.
 <!-- Feels like this paragraph ends too soon. Why was there so little variation due to landscape? Link to biology of the critter. -->
 
 Many other studies have considered the overall effect of SNL on ecosystem service provision, but we have highlighted the different spatial and temporal aspects of these services.
@@ -532,5 +570,8 @@ Many thanks to the farmers who gave us access to their land for this study. This
 <div id="refs"></div>
 
 ```{r child = 'supplemental.Rmd'}
+```
+
+```{r child = 'supplemental2.Rmd'}
 ```
 
