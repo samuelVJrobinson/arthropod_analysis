@@ -35,12 +35,18 @@ tempTrap <- trap %>% filter(startYear==2017,grepl('PF',BTID)) %>%
   # rename('count'='n') %>% 
   #Converts 0 dist trapLoc to distFrom (pitfall traps at 0 m are "inside of" feature)
   mutate(trapLoc=ifelse(dist==0 & distFrom!='control',distFrom,trapLoc)) %>% 
-  # mutate(trapLoc=factor(ifelse(trapLoc=='pivot','ditch',trapLoc))) %>% #TEST: Changes all pivot features to ditch, as per reviewer 1's comment
+  mutate(trapLoc=factor(trapLoc)) %>% 
   #Get UTM coordinates for traps
   mutate(lonTrap2=lonTrap,latTrap2=latTrap) %>% #Duplicate columns
   st_as_sf(coords=c('lonTrap2','latTrap2'),crs=4326) %>% 
   st_transform(3403) %>% mutate(easting=st_coordinates(.)[,1],northing=st_coordinates(.)[,2]) %>% 
   mutate(easting=(easting-mean(easting))/1000,northing=(northing-mean(northing))/1000) #Center and scale coordinates to km
+
+# tempTrap %>% st_drop_geometry() %>% group_by(ID) %>% #Write tempTrap df to a csv (for mapping)
+#   summarize(BLID=first(BLID),nPasses=length(unique(pass)),totalDays=sum(trapdays),trapLoc=first(trapLoc),distFrom=first(distFrom),dist=first(dist),
+#             latitude=first(latTrap),longitude=first(lonTrap),sumPteMel=sum(`Pterostichus melanarius`),
+#             sumParDis=sum(`Pardosa distincta`),sumParMoe=sum(`Pardosa moesta`),sumOpilio=sum(`Phalangium opilio`)) %>% 
+#   write.csv('./data/trapLocs.csv',row.names = FALSE)
 
 #Arrange oRing data
 oRingMat2 <- lapply(oRingMat2,function(x) x[,-1]) #Remove distance=0 measurements (already in trapLoc category)
@@ -105,13 +111,58 @@ ylimRaneffPlots <- c(-5,2.7) #Y-limits for random effects smoothers (everything 
 dispDays <- data.frame(doy=c(153,232)) %>% 
   mutate(date=c('Early','Late')) 
 
-# Pterostichus melanarius ----------------------------------
+# Load/run models ----------------------------------------
 
-# PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
-# beep(1)
-# save(PteMelMod,file='./data/PteMelMod.Rdata')
-load('./data/PteMelMod.Rdata')
+# #Load all instead of running
+# load('./data/PteMelMod.Rdata')
+# load('./data/ParDisMod.Rdata')
+# load('./data/ParMoeMod.Rdata')
+# load('./data/OpilioMod.Rdata')
+
+#Run models from scratch
+PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+save(PteMelMod,file='./data/PteMelMod.Rdata')
+beep(1)
+
+# Takes way longer to run. 5-10 mins +
+ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+save(ParDisMod,file='./data/ParDisMod.Rdata')
+beep(1)
+
+# Takes way longer to run. 5-10 mins +
+ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
+save(ParMoeMod,file='./data/ParMoeMod.Rdata')
+beep(1)
+
+#Takes way longer to run. 5-10 mins +
+OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
+save(OpilioMod,file='./data/OpilioMod.Rdata')
+beep(1)
+
+#Run models with ML (AIC comparisons)
+fm <- 'ML'
+PteMelMod <- runMods(rename(tempTrap,count=`Pterostichus melanarius`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = fm)
+save(PteMelMod,file='./data/PteMelMod_ML.Rdata')
+
+ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = fm)
+save(ParDisMod,file='./data/ParDisMod_ML.Rdata')
+
+ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = fm)
+save(ParMoeMod,file='./data/ParMoeMod_ML.Rdata')
+
+OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),oRingMat2Prop,
+                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = fm)
+save(OpilioMod,file='./data/OpilioMod_ML.Rdata')
+
+
+# Pterostichus melanarius ----------------------------------
 
 #Tried running this with double-penalization instead of shrinkage. Results were similar, but some of the shrinkage 
 #Also tried running this with Cereal included, despite concurvity. Fits, but causes a bunch of weird instability in other results.
@@ -304,13 +355,6 @@ detach(PteMelMod)
 
 # Pardosa distincta (wolf spider) -----------------------------------------------------------------
 
-# Takes way longer to run. 5-10 mins +
-ParDisMod <- runMods(rename(tempTrap,count=`Pardosa distincta`),oRingMat2Prop,
-                     formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
-# beep(1)
-# save(ParDisMod,file='./data/ParDisMod.Rdata')
-load('./data/ParDisMod.Rdata')
-
 #Check models
 attach(ParDisMod)
 # detach(ParDisMod)
@@ -444,12 +488,6 @@ detach(ParDisMod)
 
 # Pardosa moesta (wolf spider) --------------------------------------------
 
-# Takes way longer to run. 5-10 mins +
-# ParMoeMod <- runMods(rename(tempTrap,count=`Pardosa moesta`),oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE)
-# save(ParMoeMod,file='./data/ParMoeMod.Rdata')
-load('./data/ParMoeMod.Rdata')
-
 #Check models
 attach(ParMoeMod)
 # detach(ParMoeMod)
@@ -568,12 +606,6 @@ rm(p1,p2,p3,p4,p5,raneffPlot,fixeffPlot) #Cleanup
 detach(ParMoeMod)
 
 # Harvestmen -------------------------------------------------------------
-
-#Takes way longer to run. 5-10 mins +
-# OpilioMod <- runMods(rename(tempTrap,count=`Phalangium opilio`),oRingMat2Prop,
-#                      formulas=modFormulas,basisFun='ts',doublePenalize=FALSE,fitMethod = 'REML')
-# save(OpilioMod,file='./data/OpilioMod.Rdata')
-load('./data/OpilioMod.Rdata')
 
 #Check models
 attach(OpilioMod)

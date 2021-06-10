@@ -66,8 +66,23 @@ runMods <- function(tempTrap,oRingMatA,formulas=NULL,
   #Arrange matrices from oRingMatA to correspond with rows of tempTrap
   oRingMatA <- lapply(oRingMatA,function(x){
     x %>% as.data.frame() %>% rownames_to_column('ID') %>% 
-      right_join(st_drop_geometry(select(tempTrap,ID)),by='ID') %>% 
-      select(-ID) %>% as.matrix() })
+      left_join(st_drop_geometry(select(tempTrap,ID)),.,by='ID') %>% 
+      # select(-ID) %>%
+      mutate(ID=paste0(ID,'.',1:nrow(.))) %>% column_to_rownames(var='ID') %>% 
+      as.matrix() })
+  
+  # oRingMatA$GrassWetland %>% head()
+  # oRingMatB$GrassWetland %>% head(10)
+  # st_drop_geometry(select(tempTrap,ID)) %>% head(10)
+  # oRingMatA$GrassWetland[which(rownames(oRingMatA$GrassWetland)=='10092-0-2017'),]
+  # 
+  # oRingMatA$GrassWetland[1,]-oRingMatB$GrassWetland[1,]
+  # 
+  # oRingMatA$GrassWetland %>% as.data.frame() %>% rownames_to_column('ID') %>% 
+  #   left_join(st_drop_geometry(select(tempTrap,ID)),.,by='ID') %>% 
+  #   # select(-ID) %>%
+  #   mutate(ID=paste0(ID,'.',1:nrow(.))) %>% column_to_rownames(var='ID') %>% 
+  #   as.matrix()
   
   #Distance matrix to use in functional regression
   distMat <- matrix(rep(as.numeric(gsub('d','',colnames(oRingMatA[[1]]))),each=nrow(oRingMatA[[1]])),
@@ -363,6 +378,11 @@ cldGam <- function(mod){
   letDisp <- cld(modcomp)$mcletters$Letters
   data.frame(trapLoc=names(letDisp),labs=unname(letDisp))
 }
+# 
+# debugonce(cldGam)
+# cldGam(mod3)
+
+
 
 #Function to convert o-ring matrix to circle matrix
 #o-ring = matrix with values for each ring in columns

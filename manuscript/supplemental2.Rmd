@@ -5,6 +5,7 @@
 ```{r modelFormula, eval=FALSE}
 
 #Code to run functional regression using gam function from mgcv 1.8-35 
+#See section 7.11 (p. 390) in Wood 2017 for more details
 
 gam(count ~ offset(log(trapdays)) + trapLoc + s(day) + s(E,N)+ 
       #Canola
@@ -15,10 +16,11 @@ gam(count ~ offset(log(trapdays)) + trapLoc + s(day) + s(E,N)+
       s(distanceMatrix,by=Pasture)+ #Functional regression of distance
       s(dayMatrix,by=Pasture) + #FR of time 
       ti(distanceMatrix,dayMatrix,by=Pasture) + #FR of distance and time
-      #Other land cover classes here
+      #Other land cover classes go here 
       #...
       #...
       #...
+      #Roads
       s(distanceMatrix,by=Roads) + 
       s(dayMatrix,by=Roads)+ 
       ti(distanceMatrix,dayMatrix,by=Roads),
